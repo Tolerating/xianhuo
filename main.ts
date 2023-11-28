@@ -1,5 +1,11 @@
 import App from './App'
-
+//监听tabbar中间的发布商品按钮的点击事件
+uni.onTabBarMidButtonTap(()=>{
+	console.log(123);
+	uni.navigateTo({
+		url:"/pages/home/releaseGoods"
+	})
+})
 // #ifndef VUE3
 // import Vue from 'vue'
 // import {crea}  from 'pinia'

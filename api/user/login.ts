@@ -1,8 +1,10 @@
-import request from '../../plugin/request.js'
+import request from '../../plugin/request'
+import { ResponseResult } from '../../types/Common';
+
 
 
 //登录
-const login = (data)=>request("/login",data,"POST");
+const login = (data)=>request("/user/login",data,"POST");
 
 // 注册API
 /* data结构

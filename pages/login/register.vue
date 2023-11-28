@@ -28,7 +28,7 @@
 </script>
 <template>
 	<view class="register_page">
-		<SearchNavbar class="register_topBar" :navBarHeight="40" :fixed="true" :statusBar="true">
+		<!-- <SearchNavbar class="register_topBar" :navBarHeight="40" :fixed="true" :statusBar="true">
 			<template>
 				<view class="topBar_back">
 					<navigator style="display: inline-block;" open-type="navigateBack" hover-class="navigator-hover">
@@ -36,7 +36,7 @@
 					</navigator>
 				</view>
 			</template>
-		</SearchNavbar>
+		</SearchNavbar> -->
 		<view class="register_page_container">
 			<view class="register_title">
 				<text>注册</text>
@@ -76,9 +76,12 @@
 
 <style lang="scss" scoped>
 .register_page{
-		background-color: #3295CB;
+		// background-color: #3295CB;
+		background-image: linear-gradient(#fd8464,#ff639f);
+		position: fixed;
+		top: -44px;
+		bottom: 0;
 		width: 100%;
-		height: 100vh;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -118,7 +121,8 @@
 				height: 40px;
 				padding-left: 5px;
 				margin-top: 5px;
-				background-color: #DED4D4;
+				font-size: 14px;
+				background-color: $input-bgColor;
 			}
 		}
 		.login_forget_pwd{
@@ -131,7 +135,9 @@
 			padding-top: 20px;
 		}
 		.login_button{
+			margin-top: 20px;
 			background-color: #1064AD;
+			background-image: linear-gradient(to right, #fe639e , #fd855d);
 			width: 175px;
 			color: white;
 			font-size: 18px;
@@ -146,12 +152,13 @@
 			flex:3;
 		}
 		.message_button{
-			background-color: #1064AD;
+			// background-color: #1064AD;
 			color: white;
-			font-size: 18px;
+			background-image: linear-gradient(to right, #fe639e , #fd855d);
+			font-size: 15px;
 			// width: 90px;
 			height: 40px;
-			border-radius: 0px;
+			border-radius: 5px;
 		}
 	}
 </style>

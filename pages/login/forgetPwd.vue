@@ -5,19 +5,18 @@
 		ref, watch
 	} from "vue";
 	
-	const phone = ref < string > ("")
+	const phone = ref <string> ("")
 	const code = ref < string > ("")
 	const pwd = ref<string>("")
 	const rePwd = ref<string>("")
 	const showInputPwd = ref<Boolean>(false)
 	watch(code,(newValue, oldValue)=>{
-		if (newValue == 1111) {
-			this.showInputPwd = true;
+		if (newValue == "1111") {
+			showInputPwd.value = true;
 		}
 	})
 	const isRegister = computed(()=>{
-		const result = this.phone != "" && this.code != "" && (this.pwd != "" && this.rePwd != "" && this.pwd ==
-			this.rePwd);
+		const result = phone.value != "" && code.value != "" && (pwd.value != "" && rePwd.value != "" && pwd.value == rePwd.value);
 		return !result;
 	})
 	const updatePwd = ()=>{
@@ -26,7 +25,7 @@
 </script>
 <template>
 	<view class="register_page">
-		<SearchNavbar class="register_topBar" :navBarHeight="40" :fixed="true" :statusBar="true">
+		<!-- <SearchNavbar class="register_topBar" :navBarHeight="40" :fixed="true" :statusBar="true">
 			<template>
 				<view class="topBar_back">
 					<navigator style="display: inline-block;" open-type="navigateBack" hover-class="navigator-hover">
@@ -34,7 +33,7 @@
 					</navigator>
 				</view>
 			</template>
-		</SearchNavbar>
+		</SearchNavbar> -->
 		<view class="register_page_container">
 			<view class="register_title">
 				<text>忘记密码</text>
@@ -74,9 +73,11 @@
 
 <style lang="scss" scoped>
 .register_page{
-		background-color: #3295CB;
+		background-image: $login-bgColor;
+		position: fixed;
+		top: -44px;
+		bottom: 0;
 		width: 100%;
-		height: 100vh;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -96,7 +97,7 @@
 		background-color: #FFFFFF;
 		border-radius: 10px;
 		width: 300px;
-		// height: 350px;
+		box-shadow: 5px 10px 10px 5px rgba(0, 0, 0, .2);
 		z-index: 2;
 		padding: 5px 25px;
 		display: flex;
@@ -116,7 +117,8 @@
 				height: 40px;
 				padding-left: 5px;
 				margin-top: 5px;
-				background-color: #DED4D4;
+				font-size: 14px;
+				background-color: $input-bgColor;
 			}
 		}
 		.login_forget_pwd{
@@ -129,8 +131,9 @@
 			padding-top: 20px;
 		}
 		.login_button{
-			background-color: #1064AD;
+			background-image: $login-btn-bgColor;
 			width: 175px;
+			margin-top: 25px;
 			color: white;
 			font-size: 18px;
 		}
@@ -140,16 +143,14 @@
 		justify-content: space-between;
 		align-items: flex-end;
 		input{
-			// width: 130px;
 			flex:3;
 		}
 		.message_button{
-			background-color: #1064AD;
+			background-image: $login-btn-bgColor;
 			color: white;
-			font-size: 18px;
-			// width: 90px;
+			font-size: 15px;
 			height: 40px;
-			border-radius: 0px;
+			border-radius: 5px;
 		}
 	}
 </style>
