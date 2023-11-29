@@ -44,12 +44,18 @@
 			}
 		}
 	],
+	
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "咸货",
 		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
+		"backgroundColor": "#F8F8F8",
+		"app-plus": {
+			"scrollIndicator": "none",
+			"bounce": "none"
+		}
 	},
+	
 	"uniIdRouter": {},
 	"tabBar": {
 		"backgroundColor": "#ffffff",

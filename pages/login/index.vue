@@ -23,7 +23,7 @@
 				<navigator style="display: inline-block;" url="/pages/login/register" hover-class="navigator-hover">
 				   <text>注册</text>
 				</navigator>
-				<navigator style="display: inline-block;" url="/pages/home/index" hover-class="navigator-hover">
+				<navigator style="display: inline-block;" url="/pages/home/index" open-type="switchTab" hover-class="navigator-hover">
 				   <text>主页</text>
 				</navigator>
 			</view>
