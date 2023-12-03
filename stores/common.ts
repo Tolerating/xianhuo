@@ -13,6 +13,7 @@ const useCommonStore = defineStore("common",()=>{
 		currentTab.value.id = val.id
 		currentTab.value.title = val.title
 	})
+	const currentScrollTop = ref<number>(0)
 	const tabList = reactive<DiscoveryType[]>([
 		{ id: 0, title: "最新发布" },
 		{ id: 1, title: "猜你喜欢" },
@@ -31,7 +32,8 @@ const useCommonStore = defineStore("common",()=>{
 		tabList,
 		updateTabList,
 		currentTab,
-		updateCurrentTab
+		updateCurrentTab,
+		currentScrollTop
 	}
 })
 

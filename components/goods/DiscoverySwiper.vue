@@ -18,13 +18,16 @@
 	import {DiscoveryType} from '@/types/common'
 	// import { storeToRefs } from 'pinia';
 	const store = useCommonStore()
-	const {tabList} = store
+	const {tabList,currentTab,currentScrollTop} = store
 	const emits = defineEmits<{
 		(e:"tabChange",arg1: DiscoveryType):void
 	}>()
 	const currentIndex = ref<number>(0);
 	const changeTab = (val : DiscoveryType) : void => {
 		currentIndex.value = val.id;
+		console.log(`设置storage--${"discovery" +currentTab.id}`,currentTab.title,store.currentScrollTop);
+		uni.setStorageSync("discovery" +currentTab.id,store.currentScrollTop)
+		console.log("获取最新页面位置的缓存",uni.getStorageSync("discovery"+currentTab.id));
 		emits("tabChange",val)
 	}
 </script>

@@ -11,7 +11,7 @@
 	import { DiscoveryType } from '@/types/common'
 	import { storeToRefs } from 'pinia';
 	const store = useCommonStore()
-	const { reachBottom,currentTab } = storeToRefs(store)
+	const { reachBottom,currentTab} = storeToRefs(store)
 	
 	const goodsWrapper = ref<HTMLElement>()
 	// 测试数据，模拟商品数据
@@ -25,14 +25,6 @@
 			goodsNum.value += 5 
 			
 		}
-	})
-
-	onActivated(() => {
-		console.log("被激活了", props.disCoveryType.title);
-		
-	})
-	onDeactivated(() => {
-		console.log("被卸载了", props.disCoveryType.title);
 	})
 	onMounted(() => {
 		// console.log("挂载好了", props.disCoveryType.title);

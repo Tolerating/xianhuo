@@ -10,7 +10,7 @@
 			</view>
 			<view class="search-wrapper">
 				<view class="search-input">
-					<uni-easyinput  v-model="searchValue" type="text" suffix-icon="search" placeholder=""  />
+					<uni-easyinput  v-model="searchValue" @focus="jumpSearch" type="text" suffix-icon="search" placeholder=""  />
 				</view>
 				<view class="search-category">
 					<uni-icons type="list" size="25">分类</uni-icons>
@@ -33,7 +33,7 @@
 
 <script lang="ts" setup>
 	import {ref} from 'vue'
-	import {onReachBottom} from '@dcloudio/uni-app'
+	import {onReachBottom,onPageScroll,onLoad} from '@dcloudio/uni-app'
 	import { DiscoveryType } from '@/types/common'
 	import DiscoverySwiper from '@/components/goods/DiscoverySwiper.vue'
 	import GoodsWaterFallFlow from '@/components/goods/GoodsWaterFallFlow.vue'
@@ -46,12 +46,38 @@
 	onReachBottom(()=>{
 		store.updateReachBottom(!reachBottom.value)
 	})
-	
-	const getTabSelectedGoods = (val:DiscoveryType)=>{
-		uni.pageScrollTo({
-			offsetTop:0,
-			duration:0
+	onPageScroll((e)=>{
+		// console.log("页面滚动：",e.scrollTop);
+		store.currentScrollTop = e.scrollTop
+		console.log("页面位置：",store.currentScrollTop);
+	})
+	onLoad(()=>{
+		tabList.forEach((item)=>{
+			uni.removeStorageSync("discovery"+item.id)
 		})
+	})
+	const jumpSearch = ()=>{
+		console.log("search");
+		uni.navigateTo({
+			url:"/pages/search/index"
+		})
+	}
+	const getTabSelectedGoods = (val:DiscoveryType)=>{
+		console.log("discovery0",uni.getStorageSync("discovery0"));
+		let timer = setTimeout(()=>{
+			uni.pageScrollTo({
+				scrollTop:uni.getStorageSync("discovery"+val.id) || 0,
+				duration:0,
+				fail() {
+					console.log("失败了");
+				},
+				success() {
+					console.log("成功了");
+				}
+			})
+			clearTimeout(timer)
+		},10)
+		
 		store.updateCurrentTab(val)
 	}
 </script>

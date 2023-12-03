@@ -42,6 +42,18 @@
 			"style": {
 				"navigationStyle": "custom"
 			}
+		},
+		{
+			"path": "pages/search/index",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/search/goodsShow",
+			"style": {
+				"navigationStyle": "custom"
+			}
 		}
 	],
 	
