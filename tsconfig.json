@@ -14,7 +14,8 @@
 		"resolveJsonModule": true,
 		"baseUrl": "./",
 		"paths": {
-			"@/*": ["/*"]
+			"@/*": ["/*", "/api/*","/componets/*","/assert/*","/stores/*","/types/*"],
+			"@/types":["/types/*"]
 		 },
 		"lib": [
 			"esnext",
