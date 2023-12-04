@@ -9,8 +9,8 @@
 				<text>浙江万里学院</text>
 			</view>
 			<view class="search-wrapper">
-				<view class="search-input">
-					<uni-easyinput  v-model="searchValue" @focus="jumpSearch" type="text" suffix-icon="search" placeholder=""  />
+				<view class="search-input" @tap="jumpSearch">
+					<uni-easyinput  v-model="searchValue" :disabled="true"  type="text" suffix-icon="search" placeholder="雨伞"/>
 				</view>
 				<view class="search-category">
 					<uni-icons type="list" size="25">分类</uni-icons>
@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts" setup>
-	import {ref} from 'vue'
+	import {reactive, ref} from 'vue'
 	import {onReachBottom,onPageScroll,onLoad} from '@dcloudio/uni-app'
 	import { DiscoveryType } from '@/types/common'
 	import DiscoverySwiper from '@/components/goods/DiscoverySwiper.vue'
@@ -43,13 +43,14 @@
 	const store = useCommonStore()
 	const {reachBottom} = storeToRefs(store)
 	const {tabList,currentTab} = store
+	
 	onReachBottom(()=>{
 		store.updateReachBottom(!reachBottom.value)
 	})
 	onPageScroll((e)=>{
 		// console.log("页面滚动：",e.scrollTop);
 		store.currentScrollTop = e.scrollTop
-		console.log("页面位置：",store.currentScrollTop);
+		// console.log("页面位置：",store.currentScrollTop);
 	})
 	onLoad(()=>{
 		tabList.forEach((item)=>{
@@ -59,7 +60,9 @@
 	const jumpSearch = ()=>{
 		console.log("search");
 		uni.navigateTo({
-			url:"/pages/search/index"
+			url:"/pages/search/index",
+			animationType:"slide-in-bottom",
+			animationDuration:0
 		})
 	}
 	const getTabSelectedGoods = (val:DiscoveryType)=>{
@@ -129,7 +132,6 @@ $icon-size:25px;
 			font-size: 13px;
 		}
 	}
-	
 }
 .top-fixed{
 	position: sticky;

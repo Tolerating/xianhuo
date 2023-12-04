@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts" setup>
-	import { ref, onMounted, onActivated, onDeactivated, watch } from 'vue';
+	import { ref, onMounted, watch } from 'vue';
 	import GoodCard from "@/components/goods/GoodCard.vue"
 	import useCommonStore from "@/stores/common"
 	import { DiscoveryType } from '@/types/common'

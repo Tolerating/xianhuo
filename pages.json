@@ -46,7 +46,27 @@
 		{
 			"path": "pages/search/index",
 			"style": {
-				"navigationStyle": "custom"
+				"app-plus": {
+					"titleNView": {
+						"type": "default",
+						"padding-right": "6px",
+						"searchInput": {
+							"backgroundColor": "#fff",
+							"borderRadius": "15px",
+							"placeholder": "请输入搜索内容",
+							"align": "left"
+						},
+						"buttons": [
+							{
+								"text": "搜索",
+								"color": "#000",
+								"fontSize": "14px",
+								"width":"48px"
+							}
+						],
+					}
+				}
+				
 			}
 		},
 		{
