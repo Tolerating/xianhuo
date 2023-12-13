@@ -1,4 +1,4 @@
-export type ResponseResult <T = any> = {
+type ResponseResult <T = any> = {
 	code:500 | 200 | 411,
 	data:{
 		data:T,
@@ -9,7 +9,7 @@ export type ResponseResult <T = any> = {
 type Header = {
 	Authorization:string
 }
-export type RequestParams = {
+type RequestParams = {
 	url: string,
 	data?: Object,
 	method?: "OPTIONS" | "GET" | "HEAD" | "POST" | "PUT" | "DELETE",
@@ -17,13 +17,22 @@ export type RequestParams = {
 }
 
 // 咸货首页的商品分类（横向滑动块），例如：猜你喜欢、最近发布.....
-export type DiscoveryType = {
+ type DiscoveryType = {
 	id:number,
 	title:string
 }
 
-export type HomeReachBottomType = {
+
+type HomeReachBottomType = {
 	id:number,
 	title:string,
 	isReachBottom:boolean
+}
+export type {
+	ResponseResult,
+	Header,
+	RequestParams,
+	DiscoveryType,
+	HomeReachBottomType
+	
 }

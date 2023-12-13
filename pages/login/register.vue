@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-	import SearchNavbar from '../../components/SearchNavbar.vue'
 	import {
 		computed,
 		ref,
@@ -28,15 +27,6 @@
 </script>
 <template>
 	<view class="register_page">
-		<!-- <SearchNavbar class="register_topBar" :navBarHeight="40" :fixed="true" :statusBar="true">
-			<template>
-				<view class="topBar_back">
-					<navigator style="display: inline-block;" open-type="navigateBack" hover-class="navigator-hover">
-						<text class="cuIcon-back"></text>
-					</navigator>
-				</view>
-			</template>
-		</SearchNavbar> -->
 		<view class="register_page_container">
 			<view class="register_title">
 				<text>注册</text>
@@ -76,7 +66,6 @@
 
 <style lang="scss" scoped>
 .register_page{
-		// background-color: #3295CB;
 		background-image: linear-gradient(#fd8464,#ff639f);
 		position: fixed;
 		top: -44px;

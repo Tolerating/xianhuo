@@ -1,4 +1,4 @@
-import type {ResponseResult} from '@/types/Common'
+import type {ResponseResult} from '@/types/common'
 import useUserStore from '../stores/users'
 const BASEURL = 'http://localhost:8080/api';
 type method = "GET" | "OPTIONS" | "HEAD" | "POST" | "PUT" | "DELETE" | "TRACE" | "CONNECT";

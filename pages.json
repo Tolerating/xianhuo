@@ -44,12 +44,12 @@
 			}
 		},
 		{
-			"path": "pages/search/index",
+			"path": "pages/goods/search",
 			"style": {
 				"app-plus": {
 					"titleNView": {
 						"type": "default",
-						"padding-right": "6px",
+						// "padding-right": "6px",
 						"searchInput": {
 							"backgroundColor": "#fff",
 							"borderRadius": "15px",
@@ -62,7 +62,9 @@
 								"color": "#000",
 								"fontSize": "14px",
 								"width":"48px"
+								
 							}
+							
 						]
 					}
 				}
@@ -70,9 +72,26 @@
 			}
 		},
 		{
-			"path": "pages/search/goodsShow",
+			"path": "pages/goods/goodsFilter",
 			"style": {
-				"navigationStyle": "custom"
+				"app-plus": {
+					"titleNView": {
+						"type": "default",
+						"searchInput": {
+							"backgroundColor": "#fff",
+							"borderRadius": "15px",
+							"align": "left"
+						},
+						"buttons": [
+							{
+								"text": "...",
+								"color": "#000",
+								"fontSize": "14px",
+								"width":"48px"
+							}
+						]
+					}
+				}
 			}
 		}
 	],

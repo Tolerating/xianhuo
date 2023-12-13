@@ -31,7 +31,7 @@
 		</view>
 		<view class="login_page_others">
 			<text>其它登录方式</text>
-			<image src="../../assert/images/微信.png" mode=""></image>
+			<image src="../../static/icon/微信.png" mode=""></image>
 		</view>
 	</view>
 </template>

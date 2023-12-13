@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-	import SearchNavbar from '../../components/SearchNavbar.vue'
 	import {
 		computed,
 		ref, watch
