@@ -116,6 +116,16 @@
 					}
 				}
 			}
+		},
+		{
+			"path": "pages/goods/GoodsType.vue",
+			"style": {
+				"app-plus": {
+					"titleNView":{
+						
+					}
+				}
+			}
 		}
 	],
 	
