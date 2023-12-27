@@ -33,16 +33,16 @@
 
 <style lang="scss" scoped>
 	.goods-wrapper {
-		display: grid;
-		grid-template-columns: auto auto;
-		grid-column-gap: 10px;
+		display: flex;
+		flex-wrap: wrap;
 		max-width: 100%;
 		margin: 0 auto;
 		box-sizing: border-box;
 		padding: 0px 5px 0px 5px;
-
 		.goods-item {
-			// flex: 1;
+			
+			flex: 0 0 50%;
+			// margin: 20px;
 			max-height: 300px;
 			margin-bottom: 10px;
 		}

@@ -5,7 +5,7 @@
 			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
 		}
 	},
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [
 		{
 			"path": "pages/home/index",
 			"style": {
@@ -88,6 +88,23 @@
 							"borderRadius": "15px",
 							"align": "left"
 						},
+						"buttons": [
+							{
+								"text": "...",
+								"color": "#000",
+								"fontSize": "14px",
+								"width":"48px"
+							}
+						]
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/goods/goodDetail",
+			"style": {
+				"app-plus": {
+					"titleNView": {
 						"buttons": [
 							{
 								"text": "...",

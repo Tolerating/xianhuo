@@ -3,7 +3,7 @@ import {ref,reactive} from 'vue'
 
 const useUserStore = defineStore("user",()=>{
 	const userInfo = reactive({})
-	const authorization = ref<string>(null)
+	const authorization = ref<string | null>(null)
 	function updateAuthorization(value:string):void{
 		authorization.value = value
 	}
