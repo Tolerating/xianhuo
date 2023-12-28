@@ -122,7 +122,12 @@
 			"style": {
 				"app-plus": {
 					"titleNView":{
-						
+						"type":"default",
+						"searchInput": {
+							"backgroundColor": "#fff",
+							"borderRadius": "15px",
+							"align": "left"
+						}
 					}
 				}
 			}
