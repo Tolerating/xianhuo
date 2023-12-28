@@ -116,6 +116,16 @@
 					}
 				}
 			}
+		},
+		{
+			"path": "pages/goods/goodsType",
+			"style": {
+				"app-plus": {
+					"titleNView":{
+						
+					}
+				}
+			}
 		}
 	],
 	
