@@ -118,6 +118,7 @@
 			}
 		},
 		{
+<<<<<<< HEAD
 			"path": "pages/goods/goodsType",
 			"style": {
 				"app-plus": {
@@ -128,6 +129,13 @@
 							"borderRadius": "15px",
 							"align": "left"
 						}
+=======
+			"path": "pages/goods/GoodsType.vue",
+			"style": {
+				"app-plus": {
+					"titleNView":{
+						
+>>>>>>> 56435d211fe8d25ff7780cff79efa16a755ad804
 					}
 				}
 			}
