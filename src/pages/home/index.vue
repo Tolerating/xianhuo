@@ -13,7 +13,7 @@
           <uni-easyinput v-model="searchValue" :disabled="true" type="text" suffix-icon="search" placeholder="雨伞"/>
         </view>
         <view class="search-category">
-          <uni-icons type="list" size="25">分类</uni-icons>
+          <uni-icons type="list" size="25" @tap="toGoodsType">分类</uni-icons>
           <text>分类</text>
         </view>
       </view>
@@ -60,6 +60,12 @@ onLoad(() => {
     uni.removeStorageSync("discovery" + item.id)
   })
 })
+const toGoodsType = ()=>{
+  uni.navigateTo({
+    url:"/pages/goods/goodsType",
+    animationDuration:0
+  })
+}
 const jumpSearch = () => {
   console.log("search");
   uni.navigateTo({
