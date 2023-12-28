@@ -86,3 +86,19 @@ $uni-font-size-paragraph:15px;
 uni-app{
 	display: flex;
 }
+
+
+
+
+@for $i from 1 through 10 {
+	.description-#{$i} {
+		width: 100%;
+		overflow: hidden;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: $i;
+		line-clamp: $i;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+	}
+  }
+  
