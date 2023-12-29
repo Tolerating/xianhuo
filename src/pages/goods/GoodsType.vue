@@ -1,39 +1,8 @@
 <script lang="ts" setup>
+import { ref } from 'vue';
 import { reactive } from 'vue';
-
-const topCategory = reactive<{ id: number, name: string }[]>([
-    { id: 1, name: "数码" },
-    { id: 2, name: "技能服务" },
-    { id: 3, name: "生活" },
-    { id: 4, name: "服饰鞋帽" },
-    { id: 5, name: "美容装彩" },
-    { id: 6, name: "优惠券码" },
-    { id: 7, name: "运动户外" },
-    { id: 8, name: "家用电器" },
-    { id: 9, name: "模玩动漫" },
-    { id: 10, name: "宠物花卉" },
-    { id: 11, name: "包表首饰" },
-    { id: 12, name: "游戏装备" },
-    { id: 13, name: "图书音像" },
-    { id: 14, name: "汽摩生活" },
-    { id: 15, name: "手机" },
-    { id: 16, name: "租房" },
-    { id: 17, name: "租房" },
-    { id: 18, name: "租房" },
-    { id: 19, name: "租房" }
-])
-interface SecondCategory {
-    id: number,
-    title: string,
-    child: { id: number, name: string, img: string }[]
-}
-/*
-[
-    [{id:1,name:"平板电脑",child:[{id:11,name:"平板iPad",img:"1.png"}}]]
-]
-*/
-const secondaryCategory = reactive<SecondCategory[][]>([
-    [
+const secondaryCategory = reactive<SecondCategory[]>([
+    
         {
             id: 1,
             title: "平板电脑",
@@ -83,28 +52,64 @@ const secondaryCategory = reactive<SecondCategory[][]>([
                 { id: 44, name: "智能音箱", img: "logo.png" },
             ]
         }
-    ]
+    
 ])
+const topCategory = reactive<{ id: number, name: string,child:SecondCategory[] }[]>([
+    { id: 1, name: "数码",child:secondaryCategory },
+    { id: 2, name: "技能服务",child:secondaryCategory },
+    { id: 3, name: "生活",child:secondaryCategory },
+    { id: 4, name: "服饰鞋帽",child:secondaryCategory },
+    { id: 5, name: "美容装彩",child:secondaryCategory },
+    { id: 6, name: "优惠券码",child:secondaryCategory },
+    { id: 7, name: "运动户外",child:secondaryCategory },
+    { id: 8, name: "家用电器",child:secondaryCategory },
+    { id: 9, name: "模玩动漫",child:secondaryCategory },
+    { id: 10, name: "宠物花卉",child:secondaryCategory },
+    { id: 11, name: "包表首饰",child:secondaryCategory },
+    { id: 12, name: "游戏装备",child:secondaryCategory },
+    { id: 13, name: "图书音像",child:secondaryCategory },
+    { id: 14, name: "汽摩生活",child:secondaryCategory },
+    { id: 15, name: "手机",child:secondaryCategory },
+    { id: 16, name: "租房",child:secondaryCategory },
+    { id: 17, name: "租房",child:secondaryCategory },
+    { id: 18, name: "租房",child:secondaryCategory },
+    { id: 19, name: "租房",child:secondaryCategory }
+])
+interface SecondCategory {
+    id: number,
+    title: string,
+    child: { id: number, name: string, img: string }[]
+}
+/*
+[
+    [{id:1,name:"平板电脑",child:[{id:11,name:"平板iPad",img:"1.png"}}]]
+]
+*/
+const currentTab = ref<number>(0)
+const switchTab = ()=>{
+
+}
+
 </script>
 <template>
     <view class="goods-type-container">
         <view class="goods-type-left"> 
             <scroll-view scroll-y="true" class="left-scroll">
-                <view class="left-scroll-item" v-for="item in topCategory" :key="item.id">{{ item.name }}</view>
+                <view class="left-scroll-item" :style="currentTab==index?'background-color: rgba(241, 110, 132,.4);':''" v-for="(item,index) in topCategory" :key="item.id" @tap="currentTab=index">{{ item.name }}</view>
             </scroll-view>
 
         </view>
         <view class="goods-type-right">
             <scroll-view scroll-y="true" class="right-scroll">
-                <view class="right-card">
-                    <text class="right-card-title">平板电脑</text>
+                <view class="right-card" v-for="(item,index) in topCategory[currentTab].child" :key="index">
+                    <text class="right-card-title">{{ item.title }}</text>
                     <view class="right-card-content">
-                        <view class="category-unit" v-for="item in 10" :key="item">
+                        <view class="category-unit" v-for="item1 in item.child" :key="item1.id">
                             <view class="sub-view ">
-                                <image src="../../static/yifu.jpg" mode="scaleToFill" />
+                                <image :src="'../../static/'+ item1.img" mode="scaleToFill" />
                             </view>
                             <view>
-                                <text class="description-1" style="font-size: 18px;text-align: center;">华为ipad </text>
+                                <text class="description-1" style="font-size: 18px;text-align: center;">{{ item1.name }}</text>
                             </view>
                         </view>
                     </view>
@@ -137,7 +142,8 @@ const secondaryCategory = reactive<SecondCategory[][]>([
 
         .left-scroll-item {
             height: 50px;
-
+            line-height: 50px;
+            
         }
     }
 }
@@ -154,11 +160,13 @@ const secondaryCategory = reactive<SecondCategory[][]>([
     }
 
     .right-card {
+        $padding-left:10px;
         width: 100%;
 
         .right-card-title {
             font-size: 24px;
             color: black;
+            padding-left: $padding-left;
         }
 
         .right-card-content {
@@ -170,7 +178,7 @@ const secondaryCategory = reactive<SecondCategory[][]>([
                 flex: 0 0 33%;
                 max-width: 33%;
                 box-sizing: border-box;
-                padding: 10px;
+                padding:  $padding-left;
                 .sub-view  {
                     padding-bottom: 100%;
                     position: relative;
