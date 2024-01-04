@@ -40,7 +40,7 @@ $icon-size: 25px;
     position: sticky;
     top: 0;
     background-color: white;
-    z-index: 10000;
+    z-index: 100;
   }
 }
 </style>
