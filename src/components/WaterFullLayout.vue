@@ -1,9 +1,8 @@
 <template>
   <view class="water-full-wrapper">
     <view class="top-fixed">
-      <view v-if="statusBar" class="status_bar" :style="{height:statusBarHeight+'px'}">
-        <slot name="statusBar"></slot>
-      </view>
+      <view v-if="statusBar" class="status_bar" :style="{height:statusBarHeight+'px'}"></view>
+      <slot name="navigateBar"></slot>
       <slot name="topFilter"></slot>
     </view>
     <slot></slot>
@@ -33,7 +32,7 @@ $icon-size: 25px;
   width: 100%;
   background-color: white;
   .status_bar {
-    background-color: #d4c9a7;
+    background-color: white;
     //height: var(--status-bar-height);
   }
 
