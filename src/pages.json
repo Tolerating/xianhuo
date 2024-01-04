@@ -38,7 +38,7 @@
 			}
 		},
 		{
-			"path": "pages/home/message",
+			"path": "pages/home/chat/message",
 			"style": {
 				"navigationStyle": "custom"
 			}
@@ -165,7 +165,7 @@
 				"text": "校园"
 			},
 			{
-				"pagePath": "pages/home/message",
+				"pagePath": "pages/home/chat/message",
 				"iconPath": "static/tabbar/chat.png",
 				"selectedIconPath": "static/tabbar/chat_sel.png",
 				"text": "消息"
