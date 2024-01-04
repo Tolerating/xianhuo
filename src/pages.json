@@ -149,7 +149,7 @@
 	"tabBar": {
 		"backgroundColor": "#ffffff",
 		"color": "#000000",
-		"selectedColor": "#00aa00",
+		"selectedColor": "#f5643e",
 		"borderStyle": "white",
 		"list": [
 			{
@@ -178,10 +178,10 @@
 			}
 		],
 		"midButton": {
-			"iconPath": "static/tabbar/release.png",
+			"iconPath": "static/tabbar/add.png",
 			// "backgroundImage": "static/tabbar/release.png",
-			"iconWidth": "55px",
-			"height": "65px"
+			"iconWidth": "65px",
+			"height": "75px"
 			// "text": "发布"
 			
 		}
