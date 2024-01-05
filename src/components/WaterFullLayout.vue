@@ -29,6 +29,7 @@ $icon-size: 25px;
   flex-direction: column;
   box-sizing: border-box;
   justify-content: flex-start;
+  padding: 0 $xianhuo-padding-LR;
   width: 100%;
   background-color: white;
   .status_bar {
