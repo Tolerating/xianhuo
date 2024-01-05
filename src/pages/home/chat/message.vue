@@ -21,7 +21,7 @@
 		<view class="message-list-container">
 			<view v-for="item in 20" :key="item" @tap="toChat" @longpress="isShowMenu=true" class="message-item">
 				<view class="message-item-avatar">
-					<image src="../../static/logo.png" mode="scaleToFill" />
+					<image src="../../../static/logo.png" mode="scaleToFill" />
 				</view>
 				<view class="message-item-contnet">
 					<text class="content-user-name">用户名字</text>
@@ -41,7 +41,7 @@ import { ref } from 'vue';
 const isShowMenu = ref<boolean>(false);
 const toChat = () => {
 	uni.navigateTo({
-		url: "/pages/goods/search",
+		url: "/pages/home/chat/chatView",
 		animationDuration: 0
 	})
 }
@@ -53,7 +53,6 @@ const toChat = () => {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 0 $xianhuo-padding-LR;
 
 	.navigate-bar-left {
 		display: flex;
@@ -61,19 +60,19 @@ const toChat = () => {
 		align-items: center;
 
 		.left-title {
-			font-size: 24px;
+			font-size: $xh-font-size-2xl;
 			font-weight: bold;
-			color: $xh-text-color-A;
+			color: $xh-text-color-highlight;
 		}
 
 		.xh-btn-group {
-			background-color: $xh-theme-color-50;
+			background-color: rgba($color: $xh-color-info, $alpha: .2);
 			display: flex;
 			justify-content: center;
 			align-items: center;
 			overflow: hidden;
 			border-radius: 10px;
-			font-size: 16px;
+			font-size: $xh-font-size-lg;
 			color: gray;
 			padding: 2px 3px;
 		}
@@ -84,14 +83,13 @@ const toChat = () => {
 .message-list-container {
 	display: flex;
 	flex-direction: column;
-	padding: 10px $xianhuo-padding-LR 50px;
+	padding: 10px 0 50px;
 
 	.message-item {
 		$item-height: 80px;
 		$avatar-side: 70px;
 		display: flex;
 		height: $item-height;
-		// background-color: $uni-color-error;
 		margin: 10px 0;
 
 		.message-item-avatar {
@@ -117,8 +115,8 @@ const toChat = () => {
 			border-bottom: 1px solid rgba($color: $xh-border-color, $alpha: .2);
 
 			.content-user-name {
-				font-size: 20px;
-				color: $xh-text-color-A;
+				font-size: $xh-font-size-xl;
+				color: $xh-text-color-highlight;
 			}
 
 			.content-latest-message {
