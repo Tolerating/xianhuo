@@ -44,6 +44,12 @@
 			}
 		},
 		{
+			"path": "pages/home/chat/chatView",
+			"style": {
+				"navigationStyle": "default"
+			}
+		},
+		{
 			"path": "pages/home/releaseGoods",
 			"style": {
 				"navigationStyle": "custom"
@@ -178,7 +184,7 @@
 			}
 		],
 		"midButton": {
-			"iconPath": "static/tabbar/add.png",
+			"iconPath": "/static/tabbar/add.png",
 			// "backgroundImage": "static/tabbar/release.png",
 			"iconWidth": "65px",
 			"height": "75px"
