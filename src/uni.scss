@@ -12,6 +12,8 @@
  * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
  */
 
+ //参考设置
+//https://uniapp.dcloud.net.cn/component/uniui/uni-sass.html
 /* 颜色变量 */
 $input-bgColor: #f5f5f5;
 // 登录注册忘记密码页面统一背景色
@@ -21,6 +23,9 @@ $login-btn-bgColor: linear-gradient(to right, #fe639e, #fd855d);
 $xianhuo-theme-main: #fd8464;
 
 $xianhuo-theme-color: #eae53c;
+
+//状态栏背景色
+$xh-status-bar-color:white;
 
 //主题色相关
 /*
@@ -48,24 +53,49 @@ $xh-theme-color-800:#9e3216;
 $xh-theme-color-900:#832f19;
 $xh-theme-color-950:#471508;
 
+//主色
+$xh-color-primary: $xh-theme-color-500;
+$xh-color-primary-disable:mix(#fff,$xh-color-primary,50%);
+$xh-color-primary-light: mix(#fff,$xh-color-primary,80%);
+
+//辅助色
+$xh-color-success: #18bc37;
+$xh-color-success-disable:mix(#fff,$xh-color-success,50%);
+$xh-color-success-light: mix(#fff,$xh-color-success,80%);
+
+$xh-color-warning: #fffb00;
+$xh-color-warning-disable:mix(#fff,$xh-color-warning,50%);
+$xh-color-warning-light: mix(#fff,$xh-color-warning,80%);
+
+$xh-color-error: #e43d33;
+$xh-color-error-disable:mix(#fff,$xh-color-error,50%);
+$xh-color-error-light: mix(#fff,$xh-color-error,80%);
+
+$xh-color-info: #8f939c;
+$xh-color-info-disable:mix(#fff,$xh-color-info,50%);
+$xh-color-info-light: mix(#fff,$xh-color-info,80%);
+
+
 //文字基本颜色
-$xh-text-color-A:$xh-theme-color-700; 
-$xh-text-color-B:$xh-theme-color-400; 
-$xh-text-color-C:$xh-theme-color-200; 
+$xh-text-color-highlight:$xh-theme-color-700;  //突出显示文本
+$xh-text-color-main: #3a3a3a; 			// 主要文字
+$xh-text-color-base: #6a6a6a;			// 常规文字
+$xh-text-color-secondary: #909399;	// 次要文字
+$xh-text-color-extra: #c7c7c7;			// 辅助说明
 $xh-text-color-placeholder:$xh-theme-color-100;
-$xh-text-color-disable: $xh-theme-color-700;
+$xh-text-color-disable: rgba($xh-theme-color-700,.5);
 
 /* 文字尺寸 */
 $xh-font-size-sm: 12px;
 $xh-font-size-base: 14px;
 $xh-font-size-lg: 16px;
-
+$xh-font-size-xl: 20px;
+$xh-font-size-2xl: 24px;
 //背景色
-$xh-bg-color-A:$xh-theme-color-500;
-$xh-bg-color-B:$xh-theme-color-200;
-$xh-bg-color-C:$xh-theme-color-50;
+// $xh-bg-color-A:rgba($xh-theme-color-500,1);
+// $xh-bg-color-B:$xh-theme-color-200;
+// $xh-bg-color-C:$xh-theme-color-50;
 $xh-bg-color-mask:rgba(75, 72, 72, 0.4);
-
 //边框圆角和颜色
 $xh-border-radius-sm: 5px;
 $xh-border-radius-base: 10px;
@@ -83,6 +113,12 @@ $xh-border-color:$xh-theme-color-700;
 	color: $xh-text-color-disable;
 	opacity: .5;
 }
+//阴影
+$xh-shadow-sm:0 0 5px rgba($color: #d8d8d8, $alpha: 0.5);
+$xh-shadow-base:0 1px 8px 1px rgba($color: #a5a5a5, $alpha: 0.2);
+$xh-shadow-lg:0px 1px 10px 2px rgba($color: #a5a4a4, $alpha: 0.5);
+
+
 $xianhuo-padding-LR:10px;
 /* 行为相关颜色 */
 $uni-color-primary: #007aff;
