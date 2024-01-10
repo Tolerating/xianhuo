@@ -5,7 +5,7 @@
 		<view :style="{ height: statusBarHeight + 'px',backgroundColor:'white' }"></view>
 		<!-- 发布选择 -->
 		<view class="release-select-wrapper">
-			<view class="select-item">
+			<view class="select-item" @tap="goRelease(0)">
 				<uni-icons
 					type="camera-filled"
 					color="black"
@@ -23,7 +23,7 @@
 					class="item-right"
 				/>
 			</view>
-			<view class="select-item">
+			<view class="select-item" @tap="goRelease(1)">
 				<uni-icons
 					type="pyq"
 					color="black"
@@ -61,6 +61,21 @@ let StatusBarHeight = Number(uni.getSystemInfoSync().statusBarHeight);
 const statusBarHeight = ref<number>(StatusBarHeight)
 const goBack = ()=>{
 	uni.navigateBack()
+}
+const goRelease = (path:number)=>{
+	switch (path) {
+		case 0:
+			uni.navigateTo({
+				url:"/pages/home/release/releaseGoods"
+			})
+			break;
+	
+		case 1:
+			// uni.navigateTo({
+			// 	url:"pages/home/release/releaseGoods"
+			// })
+			break;
+	}
 }
 </script>
 
