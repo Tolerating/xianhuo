@@ -58,8 +58,7 @@
 		{
 			"path": "pages/home/release/releaseGoods",
 			"style": {
-				"navigationStyle": "default",
-				"navigationBarTitleText": "商品发布"
+				"navigationStyle": "custom"
 			}
 		},
 		{
