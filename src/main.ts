@@ -3,7 +3,7 @@ import App from '@/App.vue'
 uni.onTabBarMidButtonTap(() => {
     console.log(123);
     uni.navigateTo({
-        url: "/pages/home/releaseGoods"
+        url: "/pages/home/release/releaseIndex"
     })
 })
 

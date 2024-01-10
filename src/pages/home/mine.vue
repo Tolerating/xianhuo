@@ -5,7 +5,7 @@
         </view>
         <view class="mine_top_profile">
             <view class="profile_top">
-                <image src="../../static/goods.png" mode="aspectFill"></image>
+                <image src="../../static/logo.png" mode="aspectFill"></image>
                 <view class="profile_top_right">
                     <text style="font-size: 20px;">我的昵称</text>
                     <text>关注 0 | 粉丝 0</text>

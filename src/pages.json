@@ -50,7 +50,7 @@
 			}
 		},
 		{
-			"path": "pages/home/releaseGoods",
+			"path": "pages/home/release/releaseIndex",
 			"style": {
 				"navigationStyle": "custom"
 			}
