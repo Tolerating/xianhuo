@@ -1,28 +1,44 @@
 <script lang="ts" setup>
 import WaterFullLayoutVue from '@/components/WaterFullLayout.vue';
+import { watch } from 'vue';
 import { reactive } from 'vue';
 import { nextTick, ref, onMounted } from 'vue';
 const emoji = ["😂", "😀", "😃", "😄", "😁", "😆", "😅", "🤣", "😂", "🙂", "🙃", "😉", "😊", "😇", "😕", "😟", "🙁", "😮", "😯", "😲", "😳", "🥺", "😦", "😧", "😨", "😰", "😥", "😢", "😭", "😱", "😖", "😣", "😞", "😓", "😩", "😫", "🥱", "😤", "😡", "😠", "🥰", "😍", "🤩", "😘", "😗", "😚", "😙", "😋", "😛", "😜", "🤪", "😝", "🤑", "🤗", "🤭", "🤫", "🤔", "🤐", "🤨", "😐", "😑", "😶", "😏", "😒", "🙄", "😬", "😌", "😔", "😪", "🤤", "😴", "😷", "🤒", "🤕", "🤢", "🤮", "🤧", "🥵", "🥶", "🥴", "😵", "🤯", "🤠", "🥳", "😎", "🤓", "🧐"]
 const inputValue = ref<string>("")
 const isShowEmoji = ref<boolean>(false);
 const isFocus = ref<boolean>(false)
+const chatListEle = ref<any>()
 const messageList = reactive<any>([
-    { id: 1, message: "你好" },
-    { id: 2, message: "回消息" }
+    { id: 0, message: "你好" },
+    { id: 1, message: "回消息" },
+    { id: 2, message: "回消息" },
+    { id: 3, message: "回消息" },
+    { id: 4, message: "回消息" },
+    { id: 5, message: "回消息" },
+    { id: 6, message: "回消息" },
 ])
+const scrollIntoView = ref<string>("msg"+(messageList.length-1))
+
 const emojiOperation = () => {
     if (isShowEmoji.value) {
         isShowEmoji.value = false
         isFocus.value = true
+        // chatListEle.value.style='height:calc(100vh - 44px - 55px);'
+
     } else {
         isShowEmoji.value = true
         isFocus.value = false
+        console.log(chatListEle.value);
+        
+        // chatListEle.value.style='height:calc(100vh - 44px - 315px);'
         nextTick(() => {
-            uni.pageScrollTo({
-                selector: "#modal",
-                duration: 300
-            })
+            // uni.pageScrollTo({
+            //     selector: "#modal",
+            //     duration: 300
+            // })
+            scrollIntoView.value = 'msg'+(messageList.length-1)
         })
+        scrollIntoView.value = ''
     }
 
 }
@@ -40,18 +56,23 @@ const sendMessage = () => {
         message: inputValue.value
     })
     inputValue.value = ""
+    nextTick(()=>{
+        scrollIntoView.value = 'msg'+(messageList.length-1)
+    })
+    scrollIntoView.value = ''
+    
 }
 
 onMounted(() => {
-    uni.pageScrollTo({
-        selector: "#modal",
-        duration: 0
-    })
+    // uni.pageScrollTo({
+    //     selector: "#modal",
+    //     duration: 0
+    // })
 })
 </script>
 <template>
     <view class="chat-view-container">
-        <view class="chat-view-list" @tap="isShowEmoji = false">
+        <scroll-view ref="chatListEle" scroll-y="true" :style="isShowEmoji?'height:calc(100vh - 44px - 315px);':'height:calc(100vh - 44px - 55px);'" :scroll-into-view="scrollIntoView" :enable-flex="true" class="chat-view-list" @tap="isShowEmoji = false">
             <view class="chat-other-message">
                 <view class="message-avatar">
                     <image src="../../../static/logo.png" style="height: 100%;width: 100%;" mode="scaleToFill" />
@@ -64,6 +85,48 @@ onMounted(() => {
                         Qui.</text>
                 </view>
             </view>
+            <view class="chat-mine-message" v-for="item in messageList" :key="item" :id="'msg'+item.id">
+                <view class="mine-message-content">
+                    <text>{{ item.message }}</text>
+                </view>
+                <view class="message-avatar">
+                    <image src="../../../static/logo.png" style="height: 100%;width: 100%;" mode="scaleToFill" />
+                </view>
+            </view>
+            <view id="modal"></view>
+        </scroll-view>
+        <view class="chat-input-container" style="display: flex;flex-direction: column;">
+            <view style="display: flex;width: 100%;">
+                <uni-icons type="mic-filled" color="black" size="25" class="chat-input-icon" />
+                <uni-easyinput v-model="inputValue" :focus="isFocus" maxlength="-1" type="textarea" confrimType="send"
+                    @confirm="" @focus="hideEmoji" style="height:35px;"
+                    :styles="{ backgroundColor: 'rgba(143, 147, 156, 0.2);' }" :inputBorder="false" class="chat-input" />
+                <image :src="isShowEmoji ? '../../../static/icon/keyboard.png' : '../../../static/icon/biaoqing.png'"
+                    mode="scaleToFill" class="chat-input-icon" @tap="emojiOperation" />
+                <image v-if="inputValue == ''" src="../../../static/icon/add.png" mode="scaleToFill"
+                    class="chat-input-icon" />
+                <button v-else class="chat-send-btn" @tap.stop="sendMessage">发送</button>
+            </view>
+            <scroll-view :enable-flex="true" :scroll-y="true" class="emoji-list-container" v-show="isShowEmoji">
+                <text v-for="item in emoji" :key="item" @tap="inputValue = inputValue + item">
+                    {{ item }}
+                </text>
+            </scroll-view>
+        </view>
+        <!-- <view class="chat-view-list" @tap="isShowEmoji = false">
+            <view class="chat-other-message">
+                <view class="message-avatar">
+                    <image src="../../../static/logo.png" style="height: 100%;width: 100%;" mode="scaleToFill" />
+                </view>
+                <view class="other-message-content">
+                    <text>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Impedit ex exercitationem inventore
+                        repudiandae laboriosam totam similique explicabo esse quasi nobis. Vitae dolor ex voluptas!
+                        Doloribus corporis libero assumenda, soluta aperiam omnis cupiditate quaerat cumque. Aliquam tempora
+                        magnam, labore expedita recusandae nobis autem eos quisquam doloribus ad excepturi deserunt sed.
+                        Qui.</text>
+                </view>
+            </view>
+            
             <view class="chat-mine-message" v-for="item in messageList" :key="item">
                 <view class="mine-message-content">
                     <text>{{ item.message }}</text>
@@ -91,7 +154,7 @@ onMounted(() => {
                     {{ item }}
                 </text>
             </scroll-view>
-        </view>
+        </view> -->
     </view>
 </template>
 <style lang="scss" scoped>
@@ -108,20 +171,24 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    // justify-content: space-evenly;
     padding: 0 10px;
     width: 100%;
     background-color: white;
-
+    .navigator-header{
+        height: 44px;
+        background-color: white;
+        display: flex;
+    }
     .chat-view-list {
         display: flex;
         flex-direction: column;
         padding: 20px 0 15px 0;
-
+        box-sizing: border-box;
+        height: calc(100vh - 44px - 55px);
         .chat-mine-message {
-            align-self: flex-end;
             display: flex;
             margin-bottom: 10px;
+            justify-content: flex-end;
 
             .mine-message-content {
                 @extend .message-content-common;
@@ -157,7 +224,6 @@ onMounted(() => {
         #modal {}
 
         .chat-other-message {
-            align-self: flex-start;
             display: flex;
             margin-bottom: 10px;
 
