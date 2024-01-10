@@ -56,6 +56,13 @@
 			}
 		},
 		{
+			"path": "pages/home/release/releaseGoods",
+			"style": {
+				"navigationStyle": "default",
+				"navigationBarTitleText": "商品发布"
+			}
+		},
+		{
 			"path": "pages/goods/search",
 			"style": {
 				"app-plus": {
