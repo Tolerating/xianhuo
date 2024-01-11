@@ -1,11 +1,9 @@
 type ResponseResult <T = any> = {
 	code:500 | 200 | 411,
-	data:{
-		data:T,
-		token?:string
-	},
+	data: T,
 	message?:string
 }
+
 type Header = {
 	Authorization:string
 }

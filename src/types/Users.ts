@@ -1,13 +1,16 @@
+export type LoginUser = {
+	//电话
+	phone : string;
+//密码
+	password : string;
+}
+
 // 用户信息表
-export type User = {
+export  interface User extends LoginUser {
 	// 用户id
 	id : number;
 	//用户昵称
 	name : string;
-	//电话
-	phone : string;
-	//密码
-	password : string;
 	//学校id
 	schoolId : number;
 	//用户头像
