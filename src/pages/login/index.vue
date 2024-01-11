@@ -46,12 +46,12 @@
 	const {updateAuthorization} = store
 	const loginXH = async ()=>{
 		let result = await login({phone:phone.value,password:password.value});
-		console.log(result);
 		if(result.code==200){
-			let { token } = result.data
+			let  token  = result.data
 			updateAuthorization(token as string)
-			console.log(token);
-			console.log(JSON.stringify(uni.getStorageSync("token")));
+			uni.switchTab({
+				url:"/pages/home/index"
+			})
 			
 		}
 	}
