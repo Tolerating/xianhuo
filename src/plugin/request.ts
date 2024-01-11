@@ -17,7 +17,7 @@ const httpInterceptor = {
 }
 uni.addInterceptor("request",httpInterceptor)
 // const BASEURL =  'http:192.168.1.104:8080/api';
-const request = (url = '', data = {}, type:method = 'GET', header:header = {}):Promise<ResponseResult> => {
+const request = <T = any> (url = '', data = {}, type:method = 'GET', header:header = {}):Promise<ResponseResult<T>> => {
 	// if (uni.getStorageSync("Authorization") != "") {
 	// 	header.Authorization = uni.getStorageSync("authorization");
 	// }
@@ -42,6 +42,8 @@ const request = (url = '', data = {}, type:method = 'GET', header:header = {}):P
 				uni.navigateTo({
 					url:"/pages/login/index"
 				})
+				reject()
+				return
 			}
 			resolve(response.data as ResponseResult)
 		}).catch(error => {
