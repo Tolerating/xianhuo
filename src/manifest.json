@@ -17,7 +17,9 @@
             "delay" : 0
         },
         /* 模块配置 */
-        "modules" : {},
+        "modules" : {
+            "Maps" : {}
+        },
         /* 应用发布信息 */
         "distribute" : {
             /* android打包配置 */
@@ -38,12 +40,25 @@
                     "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
                     "<uses-feature android:name=\"android.hardware.camera\"/>",
                     "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
-                ]
+                ],
+                "abiFilters" : [ "armeabi-v7a", "arm64-v8a", "x86" ],
+                "minSdkVersion" : 21
             },
             /* ios打包配置 */
-            "ios" : {},
+            "ios" : {
+                "dSYMs" : false
+            },
             /* SDK配置 */
-            "sdkConfigs" : {}
+            "sdkConfigs" : {
+                "maps" : {
+                    "amap" : {
+                        "name" : "amapAQiuycmPA",
+                        "appkey_ios" : "151af5f00a5522801e52fe2cafc0663f",
+                        "appkey_android" : "151af5f00a5522801e52fe2cafc0653f"
+                    }
+                },
+                "ad" : {}
+            }
         }
     },
     /* 快应用特有相关 */
@@ -68,5 +83,16 @@
     "uniStatistics" : {
         "enable" : false
     },
-    "vueVersion" : "3"
+    "vueVersion" : "3",
+    "h5" : {
+        "sdkConfigs" : {
+            "maps" : {
+                "amap" : {
+                    "key" : "cf12091503352ae0a2c06d92599db5df",
+                    "securityJsCode" : "42018f1cc976499365733f934bd8e424",
+                    "serviceHost" : ""
+                }
+            }
+        }
+    }
 }

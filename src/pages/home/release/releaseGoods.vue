@@ -5,9 +5,9 @@ import { reactive } from 'vue';
 import { ref } from 'vue';
 import { allCategories } from '@/api/home/goods'
 import type { Category } from '@/types/Category';
-import useUserStore from '@/stores/users';
-import { watch } from 'vue';
 import { nextTick } from 'vue';
+
+//地图经纬度
 
 const StatusBarHeight = uni.getSystemInfoSync().statusBarHeight
 const statusBarHeight = ref<number>(Number(StatusBarHeight))
@@ -105,6 +105,9 @@ const getCategories = async () => {
     categoryList.push(...result.data)
 
 }
+// var main = plus.android.runtimeMainActivity();
+// var pkName = main.getPackageName();
+// console.log(pkName)
 
 onMounted(() => {
     getCategories()
@@ -130,6 +133,7 @@ onMounted(() => {
             <view style="margin-top: 20px;">
                 <!-- 显示自己的学校，不能更改 -->
                 <uni-icons type="location-filled" :size="23" color="gray" /><text>浙江万里学院</text>
+                <map latitude="39.909" longitude="116.39742"></map>
             </view>
         </view>
         <!-- 商品价钱，发货方式 -->
@@ -162,7 +166,7 @@ onMounted(() => {
             </view>
         </view>
         <!-- 价钱弹出层 -->
-        <uni-popup ref="pricePopup" @maskClick="savePrice" type="center">
+        <uni-popup ref="pricePopup" @maskClick="savePrice" type="bottom">
             <view class="input-container">
                 <view class="price-group">
                     <text>现价</text>
@@ -311,6 +315,7 @@ $bg-color: rgba(231, 231, 231, .6);
     .input-container {
         background-color: white;
         padding: 20px;
+        padding-bottom: 100px;
         .price-group {
             display: flex;
             align-items: center;
