@@ -1,6 +1,10 @@
 import type {ResponseResult} from '@/types/common'
 import useUserStore from '@/stores/users'
-const BASEURL = 'http://localhost:8080/api';
+let BASEURL = 'http://localhost:8080/api';
+// #ifdef APP
+BASEURL = 'http://192.168.1.100:8080/api';
+// #endif
+
 type method = "GET" | "OPTIONS" | "HEAD" | "POST" | "PUT" | "DELETE" | "TRACE" | "CONNECT";
 type header = {
 	Authorization?:string
@@ -9,7 +13,7 @@ const httpInterceptor = {
 	invoke(options:UniApp.RequestOptions){
 		const store = useUserStore()
 		const token = store.authorization
-		console.log("token",token);
+		// console.log("token",token);
 		if(token){
 			 options.header.Authorization = token
 		}
@@ -29,7 +33,7 @@ const request = <T = any> (url = '', data = {}, type:method = 'GET', header:head
 			header: header,
 			dataType: 'json',
 		}).then((response) => {
-			console.log(response);
+			// console.log(response);
 			let data = response.data as ResponseResult
 			if(data.code!=200){
 				uni.showToast({

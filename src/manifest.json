@@ -42,7 +42,8 @@
                     "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
                 ],
                 "abiFilters" : [ "armeabi-v7a", "arm64-v8a", "x86" ],
-                "minSdkVersion" : 21
+                "minSdkVersion" : 21,
+                "targetSdkVersion" : 25
             },
             /* ios打包配置 */
             "ios" : {

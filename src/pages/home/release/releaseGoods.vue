@@ -3,45 +3,63 @@
 import { onMounted } from 'vue';
 import { reactive } from 'vue';
 import { ref } from 'vue';
-import { allCategories } from '@/api/home/goods'
+import { allCategories, allSellMode, dispatchModeBySell, productRequireByDispatch } from '@/api/home/goods'
 import type { Category } from '@/types/Category';
 import { nextTick } from 'vue';
+import { timeUnit, type Product } from '@/types/Product'
+import type { SellMode } from '@/types/SellMode';
+import type { DispatchMode } from '@/types/DispatchMode'
+import type { ProductRequire } from '@/types/ProductRequire'
 
-//地图经纬度
+
 
 const StatusBarHeight = uni.getSystemInfoSync().statusBarHeight
 const statusBarHeight = ref<number>(Number(StatusBarHeight))
-const goodsPrice = ref<number>()
 const selectImgs = reactive<Map<string, object>>(new Map())
-const releaseForm = reactive<{
-    category: number,
-    // 现价
-    currentPrice: string,
-    // 原价
-    originPrice: string,
-    // 是否接受砍价
-    bargainDown: { value: number, text: string }[],
-    // 商品图片
-    imageList: any[],
-    // 商品描述
-    description: string,
-    [key:string]:unknown
-}>({
-    category: 1,
+
+// 发布商品表单
+const releaseForm = reactive<Product>({
+    id: null,
+    categoryId: 1,
+    detail: "",
+    images: "",
     currentPrice: "",
+    timeUnit: "时",
     originPrice: "",
-    bargainDown: [{ value: 0, text: "不砍价" }],
-    imageList: [],
-    description: ""
+    sellModeId: 1,
+    dispatchModeId: 1,
+    userId: 1,
+    productRequireId: "",
+    status: 1,
+    location: "",
+    freight: "",
+
+
+    imageList: []
 })
 
 
 
 // 存放商品分类
 const categoryList = reactive<Category[]>([])
+// 存放售卖模式列表
+const sellModeList = reactive<SellMode[]>([])
+// 存放发货方式列表
+const dispatchModeList = reactive<DispatchMode[]>([])
+// 存放商品要求列表
+const productRequireList = reactive<ProductRequire[]>([])
+// 存放选中的商品要求id
+const selectedProductRequire = reactive<number[]>([])
+// 物品出租下拉选择框数据源
+const timeUnitList = reactive<{ value: string, text: string }[]>([])
+timeUnit.forEach((ele) => {
+    timeUnitList.push({ value: ele, text: ele })
+})
+// 发货方式为快递的邮费选项
+const freightSelect = ref<number>(0)
 // 焦点是否在现价输入框内，一开始为null
-const isCurrentPrice = ref<boolean | null>(null)
-const categorySelected = ref<number>(0)
+type PriceType = 0|1|2
+const isCurrentPrice = ref<PriceType>(0)
 // 价钱弹出层引用
 const pricePopup = ref()
 // 发货方式弹出层引用
@@ -60,14 +78,28 @@ const savePrice = () => {
 
 }
 
-const dealFloatNumber = (value:string,property:string)=>{
+// 获取商品要求
+const requestProductRequire = async () => {
+    let productRequire = await productRequireByDispatch(releaseForm.sellModeId, releaseForm.dispatchModeId);
+    productRequireList.length = 0
+    productRequireList.push(...productRequire.data)
+}
+// 获取发货方式
+const requestdispatchMode = async () => {
+    const result = await dispatchModeBySell(releaseForm.sellModeId)
+    dispatchModeList.length = 0
+    dispatchModeList.push(...result.data)
+    // 默认选择第一种发货方式
+    releaseForm.dispatchModeId = dispatchModeList[0].id
+}
+// 处理价钱输入
+const dealFloatNumber = (value: string, property: string) => {
     if (value.indexOf('-') != -1) {
         nextTick(() => {
             releaseForm[property] = ""
         })
         return
     }
-
     if (value.indexOf(".") != -1 && value.split(".")[1].length > 2) {
         nextTick(() => {
             releaseForm[property] = value.split(".")[0] + "." + value.split(".")[1].slice(0, 2)
@@ -75,18 +107,37 @@ const dealFloatNumber = (value:string,property:string)=>{
     }
 }
 
-const dealPrice = (e: Event) => {
-    //@ts-ignore
-    const { value } = e.detail
-    if(isCurrentPrice){
-        dealFloatNumber(value,'currentPrice')
-    }else{
-        dealFloatNumber(value,'originPrice')
+// 售卖模式改变的监听事件
+const getDispatchMode = async () => {
+    await requestdispatchMode()
+    await requestProductRequire()
+}
+
+// 发货方式改变的监听事件
+const getProductRequire = async () => {
+    requestProductRequire()
+}
+
+// 运费方式选择改变时间
+const freightChange = (e:any)=>{
+    const{value} = e.detail;
+    if(value==1){
+        releaseForm.freight="0.0"
     }
     
 }
 
-
+const dealPrice = (e: Event) => {
+    //@ts-ignore
+    const { value } = e.detail
+    if (isCurrentPrice.value==0) {
+        dealFloatNumber(value, 'currentPrice')
+    } else if(isCurrentPrice.value == 1) {
+        dealFloatNumber(value, 'originPrice')
+    }else{
+        dealFloatNumber(value,'freight')
+    }
+}
 
 const showImgList = (e: any) => {
     selectImgs.set(e.tempFiles[0].uuid, e.tempFiles[0])
@@ -100,17 +151,22 @@ const deleteImg = (e: any) => {
 const showTypeRight = () => {
     goodsTypeRight.value.open()
 }
-const getCategories = async () => {
-    const result = await allCategories();
-    categoryList.push(...result.data)
+const initData = async () => {
+    // 获取分类
+    const category = await allCategories();
+    categoryList.push(...category.data)
+    releaseForm.categoryId = category.data[0].id
+    // 获取售卖模式
+    const sellmodes = await allSellMode();
+    sellModeList.push(...sellmodes.data)
+    // 设置默认的售卖模式
+    releaseForm.sellModeId = sellModeList[0].id
+    requestdispatchMode()
+    requestProductRequire()
 
 }
-// var main = plus.android.runtimeMainActivity();
-// var pkName = main.getPackageName();
-// console.log(pkName)
-
 onMounted(() => {
-    getCategories()
+    initData()
 })
 </script>
 <template>
@@ -126,14 +182,13 @@ onMounted(() => {
             </view>
         </view>
         <view class="release-content">
-            <textarea class="content-textarea" maxlength="-1" placeholder-style="font-size:16px;"
-                placeholder="描述下宝贝的品牌型号、货品来源..."></textarea>
+            <textarea class="content-textarea" v-model="releaseForm.detail" maxlength="-1"
+                placeholder-style="font-size:16px;" placeholder="描述下宝贝的品牌型号、货品来源..."></textarea>
             <uni-file-picker @select="showImgList" limit="9" @delete="deleteImg" :auto-upload="false"
                 v-model="releaseForm.imageList" title="选择宝贝图片"></uni-file-picker>
             <view style="margin-top: 20px;">
                 <!-- 显示自己的学校，不能更改 -->
                 <uni-icons type="location-filled" :size="23" color="gray" /><text>浙江万里学院</text>
-                <map latitude="39.909" longitude="116.39742"></map>
             </view>
         </view>
         <!-- 商品价钱，发货方式 -->
@@ -142,12 +197,33 @@ onMounted(() => {
                 <text class="property-item-left">商品分类</text>
                 <view style="flex: 1;"></view>
                 <view class="property-item-right">
-                    <text>{{ categoryList[releaseForm.category - 1]?.name }}</text>
+                    <text>{{ categoryList[releaseForm.categoryId - 1]?.name }}</text>
                     <uni-icons type="right" color="gray" size="24" />
                 </view>
             </view>
             <hr>
-            <view class="property-item" @tap="showuPricePopup">
+            <uni-section type="line" class="sell-item" title="售卖模式">
+                <uni-data-checkbox style="padding-left: 10px;" :localdata="sellModeList"
+                    :map="{ text: 'name', value: 'id' }" v-model="releaseForm.sellModeId" @change="getDispatchMode"
+                    mode="button" />
+            </uni-section>
+            <uni-section type="line" class="sell-item" title="发货方式">
+                <!-- <text style="padding-left: 10px;">自行协商·自提 | 送货上门 | 约定交易地点 | 当面验货交易</text> -->
+                <uni-data-checkbox style="padding-left: 10px;" :localdata="dispatchModeList"
+                    :map="{ text: 'name', value: 'id' }" v-model="releaseForm.dispatchModeId" @change="getProductRequire"
+                    mode="button" />
+                <view v-if="releaseForm.dispatchModeId == 1" style="padding-left: 20px;">
+                    <uni-data-checkbox :localdata="[{ value: 0, text:'自己填'}, {value:1,text:'包邮'}]" @change="freightChange" v-model="freightSelect"/>
+                    <input v-if="!freightSelect" placeholder="￥0.00" @input=" dealPrice " style="border: 1px solid gray;" v-model=" releaseForm.freight "
+                        @focus="isCurrentPrice=2" type="digit">
+                </view>
+            </uni-section>
+            <uni-section type="line" class="sell-item" title="商品要求">
+                <uni-data-checkbox style="padding-left: 10px;" :localdata=" productRequireList "
+                    v-model=" selectedProductRequire " :map="{ text: 'name', value: 'id' }" multiple mode="button" />
+            </uni-section>
+            <hr>
+            <view class="property-item" @tap=" showuPricePopup ">
                 <text class="property-item-left">价格</text>
                 <view style="flex: 1;"></view>
                 <view class="property-item-right">
@@ -156,29 +232,32 @@ onMounted(() => {
                 </view>
             </view>
             <hr />
-            <view class="property-item" @tap="showSellhWay">
+            <!-- <view class="property-item" @tap=" showSellhWay ">
                 <text class="property-item-left">售卖模式</text>
                 <view style="flex: 1;"></view>
                 <view class="property-item-right">
                     <text>邮寄</text>
                     <uni-icons type="right" color="gray" size="24" />
                 </view>
-            </view>
+            </view> -->
         </view>
         <!-- 价钱弹出层 -->
-        <uni-popup ref="pricePopup" @maskClick="savePrice" type="bottom">
+        <uni-popup ref="pricePopup" @maskClick=" savePrice " type="center">
             <view class="input-container">
                 <view class="price-group">
                     <text>现价</text>
-                    <input placeholder="￥0.00" @input="dealPrice" v-model="releaseForm.currentPrice"
-                        @focus="isCurrentPrice = true" type="digit">
-                    <!-- <uni-data-checkbox multiple :localdata="releaseForm.bargainDown"></uni-data-checkbox> -->
+                    <input placeholder="￥0.00" @input=" dealPrice " v-model=" releaseForm.currentPrice "
+                        @focus="isCurrentPrice = 0" type="digit">
+                </view>
+                <view v-if=" releaseForm.sellModeId == 2 " class="price-group">
+                    <text>单位</text>
+                    <uni-data-select v-model=" releaseForm.timeUnit " :localdata=" timeUnitList "></uni-data-select>
                 </view>
                 <hr>
-                <view class="price-group">
+                <view v-if=" releaseForm.sellModeId != 2 " class="price-group">
                     <text style="font-size: 14px;">原价</text>
-                    <input style="font-size: 14px;" @input="dealPrice" @focus="isCurrentPrice = false" v-model="releaseForm.originPrice"
-                        placeholder="￥0.00" type="digit">
+                    <input style="font-size: 14px;" @input=" dealPrice " @focus="isCurrentPrice = 1"
+                        v-model=" releaseForm.originPrice " placeholder="￥0.00" type="digit">
                 </view>
             </view>
         </uni-popup>
@@ -187,30 +266,27 @@ onMounted(() => {
             <view class="sell-container">
                 <view class="sell-item"></view>
                 <uni-section type="line" class="sell-item" title="售卖模式">
-                    <uni-data-checkbox
-                        style="padding-left: 10px;"
-                        :localdata="[{value:0,text:'物品出售'},{value:1,text:'物品出租'},{value:2,text:'物品交换'}]"
-                        mode="button"
-                    />
+                    <uni-data-checkbox style="padding-left: 10px;" :localdata=" sellModeList "
+                        :map="{ text: 'name', value: 'id' }" v-model=" releaseForm.sellModeId " @change=" getDispatchMode "
+                        mode="button" />
                 </uni-section>
                 <uni-section type="line" class="sell-item" title="发货方式">
-                    <text style="padding-left: 10px;">自行协商·自提 | 送货上门 | 约定交易地点 | 当面验货交易</text>
+                    <!-- <text style="padding-left: 10px;">自行协商·自提 | 送货上门 | 约定交易地点 | 当面验货交易</text> -->
+                    <uni-data-checkbox style="padding-left: 10px;" :localdata=" dispatchModeList "
+                        :map="{ text: 'name', value: 'id' }" v-model=" releaseForm.dispatchModeId "
+                        @change=" getProductRequire " mode="button" />
                 </uni-section>
                 <uni-section type="line" class="sell-item" title="商品要求">
-                    <uni-data-checkbox
-                        style="padding-left: 10px;"
-                        :localdata="[{value:0,text:'不砍价'},{value:1,text:'仅限本校'},{value:2,text:'不支持退换货'}]"
-                        multiple
-                        mode="button"
-                    />
+                    <uni-data-checkbox style="padding-left: 10px;" :localdata=" productRequireList "
+                        v-model=" selectedProductRequire " :map="{ text: 'name', value: 'id' }" multiple mode="button" />
                 </uni-section>
             </view>
         </uni-popup>
         <!-- 商品类别弹出层 -->
         <uni-popup ref="goodsTypeRight" type="bottom">
             <view class="goods-category-container">
-                <view :class="{ 'category-selected': item.id == categorySelected }" class="category-item "
-                    v-for="item in categoryList" @tap="categorySelected = item.id" :key="item.id">
+                <view :class="{ 'category-selected': item.id == releaseForm.categoryId }" class="category-item "
+                    v-for=" item  in  categoryList " @tap="releaseForm.categoryId = item.id" :key=" item.id ">
                     {{ item.name }}
                 </view>
             </view>
@@ -294,7 +370,7 @@ $bg-color: rgba(231, 231, 231, .6);
         .property-item {
             display: flex;
             align-items: center;
-            height: 50px;
+            min-height: 50px;
 
             .property-item-left {
                 font-weight: bold;
@@ -315,7 +391,7 @@ $bg-color: rgba(231, 231, 231, .6);
     .input-container {
         background-color: white;
         padding: 20px;
-        padding-bottom: 100px;
+
         .price-group {
             display: flex;
             align-items: center;
@@ -331,6 +407,8 @@ $bg-color: rgba(231, 231, 231, .6);
                 padding-left: 5px;
             }
         }
+
+        .freight-group {}
 
         hr {
             opacity: .3;
@@ -351,7 +429,7 @@ $bg-color: rgba(231, 231, 231, .6);
             border-radius: 15px;
             padding: 5px;
             text-align: center;
-            flex: 0 0 calc(90%/3)
+            flex: 0 0 calc(85%/3)
         }
 
         .category-item.category-selected {
@@ -360,12 +438,12 @@ $bg-color: rgba(231, 231, 231, .6);
         }
     }
 
-    .sell-container{
+    .sell-container {
         background-color: white;
         padding-bottom: 100px;
         // display: flex;
 
-        .sell-item{
+        .sell-item {
             margin-bottom: 15px;
         }
     }
