@@ -10,7 +10,7 @@ export type Product = {
     // 商品现价，保留两位小数
     currentPrice:string,
     // 物品出租时间计量单位
-    timeUnit?:"时"|"天"|"周"|"月"|"年"| "学期",
+    timeUnit:"时"|"天"|"周"|"月"|"年"| "学期",
     // 商品原价
     originPrice:string,
     // 出售方式id

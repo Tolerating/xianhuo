@@ -3,19 +3,20 @@
 import { onMounted } from 'vue';
 import { reactive } from 'vue';
 import { ref } from 'vue';
-import { allCategories, allSellMode, dispatchModeBySell, productRequireByDispatch } from '@/api/home/goods'
+import { allCategories, allSellMode, dispatchModeBySell, productRequireByDispatch, uploadImg, releaseGoods } from '@/api/home/goods'
 import type { Category } from '@/types/Category';
 import { nextTick } from 'vue';
 import { timeUnit, type Product } from '@/types/Product'
 import type { SellMode } from '@/types/SellMode';
 import type { DispatchMode } from '@/types/DispatchMode'
 import type { ProductRequire } from '@/types/ProductRequire'
-
-
+import { computed } from 'vue';
 
 const StatusBarHeight = uni.getSystemInfoSync().statusBarHeight
 const statusBarHeight = ref<number>(Number(StatusBarHeight))
-const selectImgs = reactive<Map<string, object>>(new Map())
+
+// 存放已经上传的图片的网络地址
+const selectImgs = reactive<Map<string, string>>(new Map())
 
 // 发布商品表单
 const releaseForm = reactive<Product>({
@@ -31,13 +32,9 @@ const releaseForm = reactive<Product>({
     userId: 1,
     productRequireId: "",
     status: 1,
-    location: "",
-    freight: "",
-
-
-    imageList: []
+    location: "123,122",
+    freight: ""
 })
-
 
 
 // 存放商品分类
@@ -58,25 +55,39 @@ timeUnit.forEach((ele) => {
 // 发货方式为快递的邮费选项
 const freightSelect = ref<number>(0)
 // 焦点是否在现价输入框内，一开始为null
-type PriceType = 0|1|2
+type PriceType = 0 | 1 | 2
 const isCurrentPrice = ref<PriceType>(0)
 // 价钱弹出层引用
 const pricePopup = ref()
-// 发货方式弹出层引用
-const sellPopup = ref()
 // 商品类别右侧抽屉
 const goodsTypeRight = ref()
 const showuPricePopup = () => {
     pricePopup.value.open()
 }
-const showSellhWay = () => {
-    sellPopup.value.open()
+
+
+// 发布商品
+const releaseProduct = async () => {
+    let imgArr: string[] = []
+    selectImgs.forEach((el) => {
+        imgArr.push(el)
+    })
+    releaseForm.images = imgArr.join()
+    console.log(imgArr.join());
+    let result = await releaseGoods(releaseForm)
+    const { message } = result
+    uni.showToast({
+        title: message,
+        duration: 2000
+    });
+    uni.navigateBack()
 }
 
-// 点击价格输入弹出层弹窗触发
-const savePrice = () => {
+// 计算发布按钮是否可用
+const isRelease = computed((): boolean => {
+    return !(Boolean(releaseForm.detail) && Boolean(selectImgs.size) && Boolean(releaseForm.currentPrice))
+})
 
-}
 
 // 获取商品要求
 const requestProductRequire = async () => {
@@ -119,30 +130,32 @@ const getProductRequire = async () => {
 }
 
 // 运费方式选择改变时间
-const freightChange = (e:any)=>{
-    const{value} = e.detail;
-    if(value==1){
-        releaseForm.freight="0.0"
+const freightChange = (e: any) => {
+    const { value } = e.detail;
+    if (value == 1) {
+        releaseForm.freight = "0.0"
     }
-    
 }
 
 const dealPrice = (e: Event) => {
     //@ts-ignore
     const { value } = e.detail
-    if (isCurrentPrice.value==0) {
+    if (isCurrentPrice.value == 0) {
         dealFloatNumber(value, 'currentPrice')
-    } else if(isCurrentPrice.value == 1) {
+    } else if (isCurrentPrice.value == 1) {
         dealFloatNumber(value, 'originPrice')
-    }else{
-        dealFloatNumber(value,'freight')
+    } else {
+        dealFloatNumber(value, 'freight')
     }
 }
 
-const showImgList = (e: any) => {
-    selectImgs.set(e.tempFiles[0].uuid, e.tempFiles[0])
-
-
+const selectedImage = async (e: any) => {
+    console.log(e);
+    // let arr:any = []
+    // arr.push({name:"file",file:e.tempFiles[0].file,uri:e.tempFiles[0].path})
+    let result = await uploadImg({ name: "file", file: e.tempFiles[0].file, uri: e.tempFiles[0].path })
+    console.log(result);
+    selectImgs.set(e.tempFiles[0].uuid, result.data)
 }
 const deleteImg = (e: any) => {
     selectImgs.delete(e.tempFile.uuid)
@@ -177,15 +190,15 @@ onMounted(() => {
                 <uni-icons type="closeempty" color="black" size="24" style="padding-right: 5px;" />
                 <view class="navigator-rihgt">
                     <text>发闲置</text>
-                    <button>发布</button>
+                    <button :disabled="isRelease" @tap="releaseProduct">发布</button>
                 </view>
             </view>
         </view>
         <view class="release-content">
             <textarea class="content-textarea" v-model="releaseForm.detail" maxlength="-1"
                 placeholder-style="font-size:16px;" placeholder="描述下宝贝的品牌型号、货品来源..."></textarea>
-            <uni-file-picker @select="showImgList" limit="9" @delete="deleteImg" :auto-upload="false"
-                v-model="releaseForm.imageList" title="选择宝贝图片"></uni-file-picker>
+            <uni-file-picker @select="selectedImage" limit="5" @delete="deleteImg" :auto-upload="false"
+                file-mediatype="image" file-extname="png,jpg" title="选择宝贝图片"></uni-file-picker>
             <view style="margin-top: 20px;">
                 <!-- 显示自己的学校，不能更改 -->
                 <uni-icons type="location-filled" :size="23" color="gray" /><text>浙江万里学院</text>
@@ -208,22 +221,25 @@ onMounted(() => {
                     mode="button" />
             </uni-section>
             <uni-section type="line" class="sell-item" title="发货方式">
-                <!-- <text style="padding-left: 10px;">自行协商·自提 | 送货上门 | 约定交易地点 | 当面验货交易</text> -->
                 <uni-data-checkbox style="padding-left: 10px;" :localdata="dispatchModeList"
                     :map="{ text: 'name', value: 'id' }" v-model="releaseForm.dispatchModeId" @change="getProductRequire"
                     mode="button" />
-                <view v-if="releaseForm.dispatchModeId == 1" style="padding-left: 20px;">
-                    <uni-data-checkbox :localdata="[{ value: 0, text:'自己填'}, {value:1,text:'包邮'}]" @change="freightChange" v-model="freightSelect"/>
-                    <input v-if="!freightSelect" placeholder="￥0.00" @input=" dealPrice " style="border: 1px solid gray;" v-model=" releaseForm.freight "
-                        @focus="isCurrentPrice=2" type="digit">
-                </view>
+                <uni-section type="line" v-if="releaseForm.dispatchModeId == 1" class="sell-item" title="运费">
+                    <view style="padding-left: 20px;">
+                        <uni-data-checkbox :localdata="[{ value: 0, text: '自己填' }, { value: 1, text: '包邮' }]"
+                            @change="freightChange" v-model="freightSelect" />
+                        <input v-if="!freightSelect" placeholder="￥0.00" @input="dealPrice"
+                            style="width:200px;background-color: #b5adad59;padding: 5px;border-radius: 10px;"
+                            v-model="releaseForm.freight" @focus="isCurrentPrice = 2" type="digit">
+                    </view>
+                </uni-section>
             </uni-section>
             <uni-section type="line" class="sell-item" title="商品要求">
-                <uni-data-checkbox style="padding-left: 10px;" :localdata=" productRequireList "
-                    v-model=" selectedProductRequire " :map="{ text: 'name', value: 'id' }" multiple mode="button" />
+                <uni-data-checkbox style="padding-left: 10px;" :localdata="productRequireList"
+                    v-model="selectedProductRequire" :map="{ text: 'name', value: 'id' }" multiple mode="button" />
             </uni-section>
             <hr>
-            <view class="property-item" @tap=" showuPricePopup ">
+            <view class="property-item" @tap="showuPricePopup">
                 <text class="property-item-left">价格</text>
                 <view style="flex: 1;"></view>
                 <view class="property-item-right">
@@ -231,62 +247,33 @@ onMounted(() => {
                     <uni-icons type="right" color="gray" size="24" />
                 </view>
             </view>
-            <hr />
-            <!-- <view class="property-item" @tap=" showSellhWay ">
-                <text class="property-item-left">售卖模式</text>
-                <view style="flex: 1;"></view>
-                <view class="property-item-right">
-                    <text>邮寄</text>
-                    <uni-icons type="right" color="gray" size="24" />
-                </view>
-            </view> -->
+
         </view>
         <!-- 价钱弹出层 -->
-        <uni-popup ref="pricePopup" @maskClick=" savePrice " type="center">
+        <uni-popup ref="pricePopup" type="center">
             <view class="input-container">
                 <view class="price-group">
                     <text>现价</text>
-                    <input placeholder="￥0.00" @input=" dealPrice " v-model=" releaseForm.currentPrice "
+                    <input placeholder="￥0.00" @input="dealPrice" v-model="releaseForm.currentPrice"
                         @focus="isCurrentPrice = 0" type="digit">
                 </view>
-                <view v-if=" releaseForm.sellModeId == 2 " class="price-group">
+                <view v-if="releaseForm.sellModeId == 2" class="price-group">
                     <text>单位</text>
-                    <uni-data-select v-model=" releaseForm.timeUnit " :localdata=" timeUnitList "></uni-data-select>
+                    <uni-data-select v-model="releaseForm.timeUnit" :localdata="timeUnitList"></uni-data-select>
                 </view>
                 <hr>
-                <view v-if=" releaseForm.sellModeId != 2 " class="price-group">
+                <view v-if="releaseForm.sellModeId != 2" class="price-group">
                     <text style="font-size: 14px;">原价</text>
-                    <input style="font-size: 14px;" @input=" dealPrice " @focus="isCurrentPrice = 1"
-                        v-model=" releaseForm.originPrice " placeholder="￥0.00" type="digit">
+                    <input style="font-size: 14px;" @input="dealPrice" @focus="isCurrentPrice = 1"
+                        v-model="releaseForm.originPrice" placeholder="￥0.00" type="digit">
                 </view>
-            </view>
-        </uni-popup>
-        <!-- 售卖方式弹出层 -->
-        <uni-popup ref="sellPopup" type="bottom">
-            <view class="sell-container">
-                <view class="sell-item"></view>
-                <uni-section type="line" class="sell-item" title="售卖模式">
-                    <uni-data-checkbox style="padding-left: 10px;" :localdata=" sellModeList "
-                        :map="{ text: 'name', value: 'id' }" v-model=" releaseForm.sellModeId " @change=" getDispatchMode "
-                        mode="button" />
-                </uni-section>
-                <uni-section type="line" class="sell-item" title="发货方式">
-                    <!-- <text style="padding-left: 10px;">自行协商·自提 | 送货上门 | 约定交易地点 | 当面验货交易</text> -->
-                    <uni-data-checkbox style="padding-left: 10px;" :localdata=" dispatchModeList "
-                        :map="{ text: 'name', value: 'id' }" v-model=" releaseForm.dispatchModeId "
-                        @change=" getProductRequire " mode="button" />
-                </uni-section>
-                <uni-section type="line" class="sell-item" title="商品要求">
-                    <uni-data-checkbox style="padding-left: 10px;" :localdata=" productRequireList "
-                        v-model=" selectedProductRequire " :map="{ text: 'name', value: 'id' }" multiple mode="button" />
-                </uni-section>
             </view>
         </uni-popup>
         <!-- 商品类别弹出层 -->
         <uni-popup ref="goodsTypeRight" type="bottom">
             <view class="goods-category-container">
                 <view :class="{ 'category-selected': item.id == releaseForm.categoryId }" class="category-item "
-                    v-for=" item  in  categoryList " @tap="releaseForm.categoryId = item.id" :key=" item.id ">
+                    v-for=" item  in  categoryList " @tap="releaseForm.categoryId = item.id" :key="item.id">
                     {{ item.name }}
                 </view>
             </view>
@@ -294,16 +281,21 @@ onMounted(() => {
     </view>
 </template>
 <style scoped lang="scss">
-$bg-color: rgba(231, 231, 231, .6);
+$bg-color: #e7e7e7;
 
 .release-goods-container {
-    height: 100vh;
     display: flex;
     flex-direction: column;
-    background-color: $bg-color;
+    background-color: rgba($color: $bg-color, $alpha: .6);
     padding: 0 $xianhuo-padding-LR;
+    padding-bottom: 10px;
 
     .release-navigator {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
 
         .status-bar {
             background-color: $bg-color;
@@ -348,7 +340,7 @@ $bg-color: rgba(231, 231, 231, .6);
         border-radius: 15px;
         box-sizing: border-box;
         padding: 10px;
-        margin: 10px 0 15px 0;
+        margin: calc(44px + var(--status-bar-height) + 10px) 0 15px 0;
 
         .content-textarea {
             width: 100%;
