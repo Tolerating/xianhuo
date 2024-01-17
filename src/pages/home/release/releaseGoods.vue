@@ -3,14 +3,14 @@
 import { onMounted } from 'vue';
 import { reactive } from 'vue';
 import { ref } from 'vue';
-import { allCategories, allSellMode, dispatchModeBySell, productRequireByDispatch, uploadImg, releaseGoods } from '@/api/home/goods'
-import type { Category } from '@/types/Category';
+import {  uploadImg, releaseGoods } from '@/api/home/goods'
 import { nextTick } from 'vue';
 import { timeUnit, type Product } from '@/types/Product'
-import type { SellMode } from '@/types/SellMode';
-import type { DispatchMode } from '@/types/DispatchMode'
-import type { ProductRequire } from '@/types/ProductRequire'
 import { computed } from 'vue';
+import {useCategory} from '@/hooks/product/useCategory'
+import {useSellMode} from '@/hooks/product/useSellMode'
+import {useDispatchMode} from '@/hooks/product/useDispatchMode'
+import {useProductRequire} from '@/hooks/product/useProductRequire'
 
 const StatusBarHeight = uni.getSystemInfoSync().statusBarHeight
 const statusBarHeight = ref<number>(Number(StatusBarHeight))
@@ -37,15 +37,15 @@ const releaseForm = reactive<Product>({
 })
 
 
-// 存放商品分类
-const categoryList = reactive<Category[]>([])
-// 存放售卖模式列表
-const sellModeList = reactive<SellMode[]>([])
+// 商品分类hook
+const {categoryList,requestCategory} = useCategory()
+// 售卖模式hook
+const {sellModeList,requestSellMode} = useSellMode()
 // 存放发货方式列表
-const dispatchModeList = reactive<DispatchMode[]>([])
+const {dispatchModeList,requestDispatchMode} = useDispatchMode()
 // 存放商品要求列表
-const productRequireList = reactive<ProductRequire[]>([])
-// 存放选中的商品要求id
+const {productRequireList,requestProductRequire} = useProductRequire()
+// checkbox存放选中的商品要求id
 const selectedProductRequire = reactive<number[]>([])
 // 物品出租下拉选择框数据源
 const timeUnitList = reactive<{ value: string, text: string }[]>([])
@@ -60,11 +60,17 @@ const isCurrentPrice = ref<PriceType>(0)
 // 价钱弹出层引用
 const pricePopup = ref()
 // 商品类别右侧抽屉
-const goodsTypeRight = ref()
+const categoryPopup = ref()
 const showuPricePopup = () => {
     pricePopup.value.open()
 }
 
+const productRequireChange = (e:any)=>{
+    releaseForm.productRequireId = e.detail.value.join()
+    console.log(releaseForm.productRequireId);
+    
+
+}
 
 // 发布商品
 const releaseProduct = async () => {
@@ -88,21 +94,6 @@ const isRelease = computed((): boolean => {
     return !(Boolean(releaseForm.detail) && Boolean(selectImgs.size) && Boolean(releaseForm.currentPrice))
 })
 
-
-// 获取商品要求
-const requestProductRequire = async () => {
-    let productRequire = await productRequireByDispatch(releaseForm.sellModeId, releaseForm.dispatchModeId);
-    productRequireList.length = 0
-    productRequireList.push(...productRequire.data)
-}
-// 获取发货方式
-const requestdispatchMode = async () => {
-    const result = await dispatchModeBySell(releaseForm.sellModeId)
-    dispatchModeList.length = 0
-    dispatchModeList.push(...result.data)
-    // 默认选择第一种发货方式
-    releaseForm.dispatchModeId = dispatchModeList[0].id
-}
 // 处理价钱输入
 const dealFloatNumber = (value: string, property: string) => {
     if (value.indexOf('-') != -1) {
@@ -120,13 +111,15 @@ const dealFloatNumber = (value: string, property: string) => {
 
 // 售卖模式改变的监听事件
 const getDispatchMode = async () => {
-    await requestdispatchMode()
-    await requestProductRequire()
+    const result = await requestDispatchMode(releaseForm.sellModeId)
+    // 默认选择第一种发货方式
+    releaseForm.dispatchModeId = result[0].id
+    await requestProductRequire(releaseForm.sellModeId,releaseForm.dispatchModeId)
 }
 
 // 发货方式改变的监听事件
-const getProductRequire = async () => {
-    requestProductRequire()
+const getProductRequire = () => {
+    requestProductRequire(releaseForm.sellModeId,releaseForm.dispatchModeId)
 }
 
 // 运费方式选择改变时间
@@ -162,20 +155,20 @@ const deleteImg = (e: any) => {
 
 }
 const showTypeRight = () => {
-    goodsTypeRight.value.open()
+    categoryPopup.value.open()
 }
 const initData = async () => {
     // 获取分类
-    const category = await allCategories();
-    categoryList.push(...category.data)
-    releaseForm.categoryId = category.data[0].id
+    const category = await requestCategory()
+    releaseForm.categoryId = category[0].id
     // 获取售卖模式
-    const sellmodes = await allSellMode();
-    sellModeList.push(...sellmodes.data)
+    const sellmodes = await requestSellMode()
     // 设置默认的售卖模式
-    releaseForm.sellModeId = sellModeList[0].id
-    requestdispatchMode()
-    requestProductRequire()
+    releaseForm.sellModeId = sellmodes[0].id
+    const result = await requestDispatchMode(releaseForm.sellModeId)
+    // 默认选择第一种发货方式
+    releaseForm.dispatchModeId = result[0].id
+    requestProductRequire(releaseForm.sellModeId,releaseForm.dispatchModeId)
 
 }
 onMounted(() => {
@@ -236,7 +229,7 @@ onMounted(() => {
             </uni-section>
             <uni-section type="line" class="sell-item" title="商品要求">
                 <uni-data-checkbox style="padding-left: 10px;" :localdata="productRequireList"
-                    v-model="selectedProductRequire" :map="{ text: 'name', value: 'id' }" multiple mode="button" />
+                    v-model="selectedProductRequire" :map="{ text: 'name', value: 'id' }" multiple @change="productRequireChange" mode="button" />
             </uni-section>
             <hr>
             <view class="property-item" @tap="showuPricePopup">
@@ -270,7 +263,7 @@ onMounted(() => {
             </view>
         </uni-popup>
         <!-- 商品类别弹出层 -->
-        <uni-popup ref="goodsTypeRight" type="bottom">
+        <uni-popup ref="categoryPopup" type="bottom">
             <view class="goods-category-container">
                 <view :class="{ 'category-selected': item.id == releaseForm.categoryId }" class="category-item "
                     v-for=" item  in  categoryList " @tap="releaseForm.categoryId = item.id" :key="item.id">
@@ -399,8 +392,6 @@ $bg-color: #e7e7e7;
                 padding-left: 5px;
             }
         }
-
-        .freight-group {}
 
         hr {
             opacity: .3;
