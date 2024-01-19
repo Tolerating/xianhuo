@@ -1,11 +1,11 @@
-import request from '@/plugin/request'
+import {request} from '@/plugin/request'
 import type { LoginUser } from '@/types/Users';
 import type { ResponseResult } from '@/types/common';
 
 
 
 //登录
-const login = (data:LoginUser)=>request<string>("/user/login",data,"POST");
+const login = (data:LoginUser)=>request<string>("/login",data,"POST");
 
 // 注册API
 /* data结构
