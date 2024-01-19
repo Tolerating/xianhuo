@@ -7,29 +7,39 @@ import type { SellMode } from '@/types/SellMode';
 import type { Product } from '@/types/Product';
 const Authorization = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxIiwiaWF0IjoxNzA0OTQxMjg1LCJzdWIiOiIiLCJpc3MiOiIiLCJleHAiOjE3MDc2MTk2ODV9.ly8_wfQs8yCRhr3806AjhfqIQWywfPMzWWc9eybvnOs"
 // 获得所有分类
-const allCategories = () => request<Category[]>('/categories', {}, "GET"
-    , { Authorization })
+const allCategories = () => request<Category[]>('/categories', {}, "GET")
 
 // 获得售卖模式
-const allSellMode = ()=>request<SellMode[]>('/sellMode/1',{},"GET",{Authorization})
+const allSellMode = ()=>request<SellMode[]>('/sellMode/1',{},"GET")
 
 // 根据售卖模式获取发货方式
-const dispatchModeBySell = (sellModeId:number)=>request<DispatchMode[]>(`/dispatchMode/${sellModeId}`,{},"GET",{Authorization})
+const dispatchModeBySell = (sellModeId:number)=>request<DispatchMode[]>(`/dispatchMode/${sellModeId}`,{},"GET")
 
 // 根据售卖模式id和发货方式id获取商品要求
-const productRequireByDispatch = (sellModeId:number,dispatchModeId:number)=>request<ProductRequire[]>(`/productRequire/${sellModeId}/${dispatchModeId}`,{},"GET",{Authorization})
+const productRequireByDispatch = (sellModeId:number,dispatchModeId:number)=>request<ProductRequire[]>(`/productRequire/${sellModeId}/${dispatchModeId}`,{},"GET")
 
 // 上传单张图片
-const uploadImg = (data:Files)=>uploadFile<string>("/upload",data,{Authorization})
+const uploadImg = (data:Files)=>uploadFile<string>("/upload",data)
 
 // 发布
-const releaseGoods = (data:Product)=>request("/product",data,"POST",{Authorization})
+const releaseGoods = (data:Product)=>request("/product",data,"POST")
 
+// 根据商品id获取商品详情
+const requestProductById = (productId:number)=>request<Product>(`/product/${productId}`,{},"GET")
+
+// 获取全部的分类
+const allDispatchMode = ()=>request<DispatchMode[]>("/dispatchMode",{},"GET")
+
+// 获取所有的商品要求
+const allProductRequire = ()=>request<ProductRequire[]>("/productRequire",{},"GET")
 export {
     allCategories,
     allSellMode,
     dispatchModeBySell,
     productRequireByDispatch,
     uploadImg,
-    releaseGoods
+    releaseGoods,
+    requestProductById,
+    allDispatchMode,
+    allProductRequire
 }
