@@ -22,11 +22,7 @@
     <template v-for="(item) in tabList" :key="item.id">
       <GoodsWaterFallFlow :disCoveryType="item" v-show="currentTab.id==item.id"></GoodsWaterFallFlow>
     </template>
-    <!-- <view class="goods-wrapper">
-      <keep-alive>
-        <GoodCard v-for="key in goodsNum" :key="key" class="goods-item"></GoodCard>
-      </keep-alive>
-    </view> -->
+    <CategoryPopup ref="categoryPopup" type="bottom" :category-id="-1"></CategoryPopup>
   </view>
 
 </template>
@@ -37,14 +33,14 @@ import {onReachBottom, onPageScroll, onLoad} from '@dcloudio/uni-app'
 import type {DiscoveryType} from '@/types/common'
 import DiscoverySwiper from '@/components/goods/DiscoverySwiper.vue'
 import GoodsWaterFallFlow from '@/components/goods/GoodsWaterFallFlow.vue'
+import CategoryPopup from '@/components/goods/CategoryPopup.vue'
 import useCommonStore from "@/stores/common"
 import {storeToRefs} from 'pinia'
-
 const searchValue = ref<string>("")
 const store = useCommonStore()
 const {reachBottom} = storeToRefs(store)
 const {tabList, currentTab} = store
-
+const categoryPopup = ref()
 onReachBottom(() => {
   store.updateReachBottom(!reachBottom.value)
 })
@@ -56,15 +52,16 @@ onPageScroll((e) => {
 })
 onLoad(() => {
   tabList.forEach((item) => {
-
     uni.removeStorageSync("discovery" + item.id)
   })
+
 })
 const toGoodsType = ()=>{
-  uni.navigateTo({
-    url:"/pages/goods/goodsType",
-    animationDuration:0
-  })
+  categoryPopup.value.show()
+  // uni.navigateTo({
+  //   url:"/pages/goods/goodsType",
+  //   animationDuration:0
+  // })
 }
 const jumpSearch = () => {
   console.log("search");

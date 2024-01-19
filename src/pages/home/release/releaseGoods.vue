@@ -11,6 +11,7 @@ import {useCategory} from '@/hooks/product/useCategory'
 import {useSellMode} from '@/hooks/product/useSellMode'
 import {useDispatchMode} from '@/hooks/product/useDispatchMode'
 import {useProductRequire} from '@/hooks/product/useProductRequire'
+import CategoryPopup from '@/components/goods/CategoryPopup.vue'
 
 const StatusBarHeight = uni.getSystemInfoSync().statusBarHeight
 const statusBarHeight = ref<number>(Number(StatusBarHeight))
@@ -59,7 +60,7 @@ type PriceType = 0 | 1 | 2
 const isCurrentPrice = ref<PriceType>(0)
 // 价钱弹出层引用
 const pricePopup = ref()
-// 商品类别右侧抽屉
+// 商品类别popup
 const categoryPopup = ref()
 const showuPricePopup = () => {
     pricePopup.value.open()
@@ -152,10 +153,14 @@ const selectedImage = async (e: any) => {
 }
 const deleteImg = (e: any) => {
     selectImgs.delete(e.tempFile.uuid)
+}
 
+const categoryPopupChange = (categoryId:number)=>{
+    releaseForm.categoryId = categoryId
 }
 const showTypeRight = () => {
-    categoryPopup.value.open()
+    console.log(categoryPopup);
+    categoryPopup.value.show()
 }
 const initData = async () => {
     // 获取分类
@@ -263,14 +268,15 @@ onMounted(() => {
             </view>
         </uni-popup>
         <!-- 商品类别弹出层 -->
-        <uni-popup ref="categoryPopup" type="bottom">
+        <CategoryPopup ref="categoryPopup" @change="categoryPopupChange" type="bottom" :category-id="releaseForm.categoryId"></CategoryPopup>
+        <!-- <uni-popup ref="categoryPopup" type="bottom">
             <view class="goods-category-container">
                 <view :class="{ 'category-selected': item.id == releaseForm.categoryId }" class="category-item "
                     v-for=" item  in  categoryList " @tap="releaseForm.categoryId = item.id" :key="item.id">
                     {{ item.name }}
                 </view>
             </view>
-        </uni-popup>
+        </uni-popup> -->
     </view>
 </template>
 <style scoped lang="scss">
