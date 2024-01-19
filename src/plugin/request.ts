@@ -1,9 +1,7 @@
 import type { ResponseResult, Files } from '@/types/common'
+import {APP_BASE_URL} from '@/config/index'
 import useUserStore from '@/stores/users'
-let BASEURL = 'http://localhost:8080/api';
-// #ifdef APP
-BASEURL = 'http://192.168.1.100:8080/api';
-// #endif
+let BASEURL = APP_BASE_URL +'/api';
 
 type method = "GET" | "OPTIONS" | "HEAD" | "POST" | "PUT" | "DELETE" | "TRACE" | "CONNECT";
 type header = {
@@ -17,6 +15,9 @@ const httpInterceptor = {
 		if (token) {
 			options.header.Authorization = token
 		}
+		// 开发阶段用
+		options.header.Authorization = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxIiwiaWF0IjoxNzA0OTQxMjg1LCJzdWIiOiIiLCJpc3MiOiIiLCJleHAiOjE3MDc2MTk2ODV9.ly8_wfQs8yCRhr3806AjhfqIQWywfPMzWWc9eybvnOs"
+
 	}
 }
 uni.addInterceptor("request", httpInterceptor)
@@ -54,7 +55,7 @@ const request = <T = any>(url = '', data = {}, type: method = 'GET', header: hea
 			dataType: 'json',
 		}).then((response) => {
 			dealRespoonse(response)
-			resolve(response.data as ResponseResult)
+			resolve(response.data as ResponseResult<T>)
 		}).catch(error => {
 			console.log(error);
 			uni.showToast({
