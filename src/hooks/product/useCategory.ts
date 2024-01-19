@@ -8,10 +8,9 @@ export function useCategory() {
     async function requestCategory():Promise<Category[]>{
         // 获取分类
         const category = await allCategories();
+        categoryList.length = 0
         categoryList.push(...category.data)
-        return new Promise((resolve,reject)=>{
-            resolve(category.data)
-        })
+        return category.data
     }
 
     return {
