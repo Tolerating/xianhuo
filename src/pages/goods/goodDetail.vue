@@ -11,40 +11,77 @@
         </view>
       </view>
       <view>
-        信用：100
+        <!-- <text>信用：100</text> -->
+        <view class="store-button">进入TA的仓库</view>
       </view>
     </view>
     <!--  商品信息  -->
     <view class="goods-info">
-      <!--   价格、发布模式、服务保障等   -->
+      <!--   价格、售卖模式   -->
       <view class="base-info">
         <view class="base-info-left">
-          <text>￥68</text>
+          <text>￥{{ product.currentPrice }}</text>
         </view>
         <view class="base-info-right">
-          <!--    交易类别（发布模式）      -->
-          <text>出 售</text>
-          <text>13浏览</text>
+          <!--   售卖模式      -->
+          <SellModeIcon type="出售"></SellModeIcon>
+          <!-- <text>13浏览</text> -->
         </view>
       </view>
     </view>
     <!--  商品描述  -->
-    <textarea class="goods-description" :disabled="true">
-      闲鱼网，也有称闲鱼官网、咸鱼网官网、闲鱼网站二手市场、咸鱼网二手交易平台。闲鱼网（2.taobao.com）      是阿里巴巴淘宝旗下一个社区化的二手闲置交易市场，闲鱼网支持各种同城及线上的担保交易，闲鱼网站二手市场让你轻松在这买卖二手闲置物品...
-    </textarea>
-    <view class="goods-type">
-      <text class="type-title">商品类别</text>
-      <view class="type-list">
-        <text>衣服</text>
-      </view>
-    </view>
-    <!--  商品图片  -->
-    <view class="goods-image" @tap="previewImg">
+    <uni-section type="line" padding="0 0 0 20px" class="sell-item" title="商品描述">
+      <text class="goods-description">
+      {{ product.detail }}
+    </text>
+    </uni-section>
+    <uni-section type="line" padding="0 0 0 20px" class="sell-item" title="商品类别">
+      <template v-slot:right>
+					{{ categoryName }}
+				</template>
+    </uni-section>
+    <uni-section type="line" padding="0 0 0 20px" class="sell-item" title="发货方式">
+      <template v-slot:right>
+        <text style="color: red;">{{ dispatchName }}</text>
+				</template>
+    </uni-section>
+    <uni-section v-if="product.productRequireId" type="line" padding="0 0 0 20px" class="sell-item" title="商品要求">
+      <uni-tag v-for="item in productRequireNameList" :key="item"
+        :text="item"
+        size="normal"
+        type="warning"
+        style="margin-right: 5px;color: black;"
+      />
+    </uni-section>
+    <uni-section type="square" class="sell-item" title="商品图片">
+      <view class="goods-image" @tap="previewImg">
       <image v-for="item in imgList" :key="item" :src="item" mode="widthFix"></image>
     </view>
+    </uni-section>
+   
+
+
+
     <!--  页脚操作栏  -->
     <view class="goods-detail-footer">
-      <view class="footer-icon">
+      <uni-goods-nav :options="[
+        {
+          icon: 'star',
+          text: '收藏'
+        }
+      ]" :button-group="[
+  {
+    text: '咨询卖家',
+    backgroundColor: '#fd8464',
+    color: '#fff'
+  },
+  {
+    text: '立即购买',
+    backgroundColor: '#bf3916',
+    color: '#fff'
+  }
+]" :fill="true" @click="" @button-click="" />
+      <!-- <view class="footer-icon">
         <uni-icons type="star" color="black" size="24" />
         <text>
           收藏
@@ -61,31 +98,83 @@
         <text>
           我想要
         </text>
-      </view>
+      </view> -->
 
     </view>
   </view>
 </template>
 
 <script lang="ts" setup>
+import SellModeIcon from '@/components/goods/SellModeIcon.vue'
+import { requestProductById } from '@/api/home/goods'
 import { ref } from "vue";
+import { onMounted } from 'vue';
+import { reactive } from 'vue';
+import type { Product } from '@/types/Product';
+import useProductStore from '@/stores/product';
+import useUserStore from '@/stores/users';
+import { onLoad } from '@dcloudio/uni-app';
+import {APP_BASE_URL} from '@/config/index'
 
-const imgList = ref<string[]>(["/static/yifu.jpg", "/static/kuzi.webp", "/static/kuzi.webp"])
+// 商品图片列表
+const imgList = reactive<string[]>([])
+const product = reactive<Product>({
+  id: null,
+  categoryId: -1,
+  detail: "",
+  images: "",
+  currentPrice: "",
+  timeUnit: "时",
+  originPrice: "",
+  sellModeId: -1,
+  dispatchModeId: -1,
+  userId: -1,
+  productRequireId: "",
+  status: 1,
+  location: "",
+})
+const productStore = useProductStore()
+// 商品分类名字
+const categoryName = ref<string>("")
+// 商品发货方式名字
+const dispatchName = ref<string>("")
+
+const productRequireNameList:string[] = []
+
+
 //预览图片
 const previewImg = () => {
   uni.previewImage({
-    urls: imgList.value
+    urls: imgList
   })
 }
-
+const init = async () => {
+  const result = await requestProductById(1)
+  console.log(result);
+  Object.assign(product, result.data)
+  console.log(productStore.categoryList);
+  categoryName.value = productStore.categoryNameById(product.categoryId) || ""
+  console.log(categoryName.value);
+  imgList.length = 0
+  imgList.push(...product.images.split(",").map(value=>APP_BASE_URL + value));
+  dispatchName.value = productStore.dispatchModeNameById(product.dispatchModeId) || ""
+  productRequireNameList.length = 0
+  productRequireNameList.push(...productStore.productRequireNameById(product.productRequireId.split(",")))
+  
+}
+onLoad(()=>{
+  init()
+})
 </script>
 
 <style lang="scss" scoped>
+$footer-height: 50px;
+
 .goods-detail-container {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding: 5px 15px;
+  padding: 5px $xianhuo-padding-LR $footer-height;
 }
 
 .publish-info {
@@ -114,6 +203,13 @@ const previewImg = () => {
     height: $info-height;
     align-items: center;
     font-size: 12px;
+  }
+
+  .store-button {
+    background-color: $xh-color-primary;
+    padding: 5px;
+    border-radius: 15px;
+
   }
 }
 
@@ -151,22 +247,20 @@ const previewImg = () => {
 
 }
 
-.goods-type{
+.goods-type {
   display: flex;
   height: 50px;
   flex-direction: column;
-  .type-title{
+
+  .type-title {
     font-size: 15px;
     font-weight: bold;
   }
-  .type-list{
-    
-  }
+
+  .type-list {}
 
 }
-.goods-description {
-  width: 100%;
-}
+
 
 .goods-image {
   display: flex;
@@ -183,8 +277,12 @@ const previewImg = () => {
 .goods-detail-footer {
   position: fixed;
   z-index: 1000;
-  inset: 93% 0 0 0;
-  background-color: $xianhuo-theme-main;
+  // inset: 93% 0 0 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  min-height: $footer-height;
+  background-color: white;
   display: flex;
   align-items: center;
   padding: 0 $xianhuo-padding-LR;
@@ -208,4 +306,5 @@ const previewImg = () => {
     }
   }
 
-}</style>
+}
+</style>
