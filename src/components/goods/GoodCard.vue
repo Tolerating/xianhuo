@@ -19,7 +19,7 @@ withDefaults(defineProps<{saleType?:string}>(),{
 })
 const toGoodsDetail = ()=>{
   uni.navigateTo({
-    url:"/pages/goods/goodDetail"
+    url:"/pages/goods/goodDetail?uId=1"
   })
 }
 </script>
