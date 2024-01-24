@@ -1,32 +1,28 @@
 <template>
     <view class="mine_page_wrapper">
-        <view class="status_bar" :style="{height: statusBarHeight+'px'}">
+        <view class="status_bar" :style="{ height: statusBarHeight + 'px' }">
 
         </view>
         <view class="mine_top_profile">
             <view class="profile_top">
-                <image src="../../static/logo.png" mode="aspectFill"></image>
+                <image :src="userInfo.avatar" mode="aspectFill"></image>
                 <view class="profile_top_right">
-                    <text style="font-size: 20px;">我的昵称</text>
-                    <text>关注 0 | 粉丝 0</text>
+                    <text style="font-size: 20px;">{{ userInfo.name }}</text>
+                    <!-- <text>关注 0 | 粉丝 0</text> -->
                 </view>
             </view>
             <view class="profile_bottom">
                 <view class="bottom_operation">
                     <text style="font-size: 20px;">0</text>
-                    <text style="font-size: 12px;">收藏</text>
+                    <text style="font-size: 12px;">我的收藏</text>
                 </view>
                 <view class="bottom_operation">
                     <text style="font-size: 20px;">0</text>
-                    <text style="font-size: 12px;">店铺</text>
+                    <text style="font-size: 12px;">我的仓库</text>
                 </view>
                 <view class="bottom_operation">
                     <text style="font-size: 20px;">0</text>
-                    <text style="font-size: 12px;">暂定</text>
-                </view>
-                <view class="bottom_operation">
-                    <text style="font-size: 20px;">0</text>
-                    <text style="font-size: 12px;">暂定</text>
+                    <text style="font-size: 12px;">我的帖子</text>
                 </view>
             </view>
         </view>
@@ -46,13 +42,25 @@
                 </view>
             </view>
         </view>
+        <uni-list>
+            <uni-list-item showArrow title="我的收货地址" />
+            <uni-list-item showArrow title="修改学校" />
+            <uni-list-item showArrow title="修改主题" />
+            <uni-list-item showArrow title="建议意见反馈" />
+            <uni-list-item showArrow title="在线客服" />
+            <uni-list-item showArrow title="用户服务协议" />
+        </uni-list>
     </view>
 </template>
 
 <script lang="ts" setup>
 import { reactive } from 'vue';
 import { ref } from 'vue';
+import useUserStore from '@/stores/users/index'
+import { storeToRefs } from 'pinia';
 const statusBarHeight = ref<number>(Number(uni.getSystemInfoSync().statusBarHeight));
+const userStore = useUserStore()
+const { userInfo } = storeToRefs(userStore)
 const dealItem = reactive([
     {
         name: "待付款",
@@ -69,7 +77,8 @@ const dealItem = reactive([
     {
         name: "退款/售后",
         icon: 'refund'
-    }
+    },
+
 ])
 </script>
 
@@ -77,7 +86,8 @@ const dealItem = reactive([
 .mine_page_wrapper {
     height: 100%;
     background-color: #F0F0F0;
-    .status_bar{
+
+    .status_bar {
         position: sticky;
         top: 0;
     }
