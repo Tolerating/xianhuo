@@ -1,7 +1,7 @@
 import type { ResponseResult, Files } from '@/types/common'
-import {APP_BASE_URL} from '@/config/index'
+import {APP_BASE_URL,APP_URL_PORT} from '@/config/index'
 import useUserStore from '@/stores/users'
-let BASEURL = APP_BASE_URL +'/api';
+let BASEURL = APP_BASE_URL +':'+ APP_URL_PORT +'/api';
 
 type method = "GET" | "OPTIONS" | "HEAD" | "POST" | "PUT" | "DELETE" | "TRACE" | "CONNECT";
 type header = {
