@@ -4,10 +4,10 @@
     <!--	发布者信息	-->
     <view class="publish-info">
       <view>
-        <image src="/static/logo.png"></image>
+        <image :src="partUserInfo.avatar"></image>
         <view class="info-right">
-          <text style="font-size:15px"><b>很好的卖家</b></text>
-          <text style="align-self: center">浙江万里学院</text>
+          <text style="font-size:15px"><b>{{ partUserInfo.name }}</b></text>
+          <text style="align-self: center">{{ partUserInfo.school }}</text>
         </view>
       </view>
       <view>
@@ -32,33 +32,30 @@
     <!--  商品描述  -->
     <uni-section type="line" padding="0 0 0 20px" class="sell-item" title="商品描述">
       <text class="goods-description">
-      {{ product.detail }}
-    </text>
+        {{ product.detail }}
+      </text>
     </uni-section>
     <uni-section type="line" padding="0 0 0 20px" class="sell-item" title="商品类别">
       <template v-slot:right>
-					{{ categoryName }}
-				</template>
+        {{ categoryName }}
+      </template>
     </uni-section>
     <uni-section type="line" padding="0 0 0 20px" class="sell-item" title="发货方式">
       <template v-slot:right>
-        <text style="color: red;">{{ dispatchName }}</text>
-				</template>
+        <text style="color: red;">{{ dispatchName }}({{ product.freight?'￥'+product.freight:'包邮' }})</text>
+      </template>
+
     </uni-section>
     <uni-section v-if="product.productRequireId" type="line" padding="0 0 0 20px" class="sell-item" title="商品要求">
-      <uni-tag v-for="item in productRequireNameList" :key="item"
-        :text="item"
-        size="normal"
-        type="warning"
-        style="margin-right: 5px;color: black;"
-      />
+      <uni-tag v-for="item in productRequireNameList" :key="item" :text="item" size="normal" type="warning"
+        style="margin-right: 5px;color: black;" />
     </uni-section>
     <uni-section type="square" class="sell-item" title="商品图片">
       <view class="goods-image" @tap="previewImg">
-      <image v-for="item in imgList" :key="item" :src="item" mode="widthFix"></image>
-    </view>
+        <image v-for="item in imgList" :key="item" :src="item" mode="widthFix"></image>
+      </view>
     </uni-section>
-   
+
 
 
 
@@ -114,7 +111,8 @@ import type { Product } from '@/types/Product';
 import useProductStore from '@/stores/product';
 import useUserStore from '@/stores/users';
 import { onLoad } from '@dcloudio/uni-app';
-import {APP_BASE_URL} from '@/config/index'
+import { APP_BASE_URL } from '@/config/index'
+import { usePartUserInfo } from '@/hooks/user/usePartUserInfo'
 
 // 商品图片列表
 const imgList = reactive<string[]>([])
@@ -138,9 +136,11 @@ const productStore = useProductStore()
 const categoryName = ref<string>("")
 // 商品发货方式名字
 const dispatchName = ref<string>("")
+// 商品要求列表
+const productRequireNameList: string[] = []
 
-const productRequireNameList:string[] = []
-
+// 获取商品发布者部分信息
+const { partUserInfo, requestPartUserInfo } = usePartUserInfo()
 
 //预览图片
 const previewImg = () => {
@@ -156,14 +156,19 @@ const init = async () => {
   categoryName.value = productStore.categoryNameById(product.categoryId) || ""
   console.log(categoryName.value);
   imgList.length = 0
-  imgList.push(...product.images.split(",").map(value=>APP_BASE_URL + value));
+  imgList.push(...product.images.split(",").map(value => APP_BASE_URL + value));
   dispatchName.value = productStore.dispatchModeNameById(product.dispatchModeId) || ""
   productRequireNameList.length = 0
   productRequireNameList.push(...productStore.productRequireNameById(product.productRequireId.split(",")))
-  
+
+
+
 }
-onLoad(()=>{
+onLoad((options) => {
   init()
+  requestPartUserInfo(options?.uId)
+  console.log(options);
+
 })
 </script>
 
