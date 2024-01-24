@@ -115,8 +115,14 @@
 		{
 			"path": "pages/goods/goodDetail",
 			"style": {
+				"h5": {
+					"titleNView": {
+						"titleText":""
+					}
+				},
 				"app-plus": {
 					"titleNView": {
+						"navigationBarTitleText":"",
 						"buttons": [
 							{
 								"text": "...",
