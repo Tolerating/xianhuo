@@ -5,16 +5,19 @@ export type LoginUser = {
 	password: string;
 }
 
-// 用户信息表
-export interface User extends LoginUser {
-	// 用户id
-	id: number;
+export interface UserPart{
 	//用户昵称
 	name: string;
 	//学校名字
 	school: String;
 	//用户头像
 	avatar: string;
+}
+
+// 用户信息表
+export interface User extends LoginUser,UserPart {
+	// 用户id
+	id: number;
 	//邮箱地址
 	email: string;
 	//身份证
