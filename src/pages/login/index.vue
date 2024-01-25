@@ -6,7 +6,7 @@
 					<text>登录</text>
 				</view>
 				<view class="login_input">
-					<input placeholder="手机号" v-model.number.trim="phone" type="text">
+					<input placeholder="邮箱" v-model.number.trim="phone" type="email">
 				</view>
 				<view class="login_input">
 					<input placeholder="密码" v-model.trim="password" type="password">

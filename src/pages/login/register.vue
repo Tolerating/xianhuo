@@ -34,7 +34,7 @@
 			<view class="register_item">
 				<text>账户</text>
 				<view class="">
-					<input placeholder="手机号" v-model="phone" name="input" />
+					<input placeholder="邮箱" v-model="phone" type="email" name="input" />
 				</view>
 			</view>
 			<view class="register_item">
