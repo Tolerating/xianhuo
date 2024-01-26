@@ -6,7 +6,7 @@
 					<text>登录</text>
 				</view>
 				<view class="login_input">
-					<input placeholder="邮箱" v-model.number.trim="phone" type="email">
+					<input placeholder="邮箱" v-model.trim="email" type="email">
 				</view>
 				<view class="login_input">
 					<input placeholder="密码" v-model.trim="password" type="password">
@@ -16,7 +16,7 @@
 					   <text>忘记密码？</text>
 					</navigator>
 				</view>
-				<button class="cu-btn margin-tb-sm lg login_button" :disabled="(phone != '' && password!= '')?false:true" @tap="loginXH">登录</button>
+				<button class="cu-btn margin-tb-sm lg login_button" :disabled="isLogin" @tap="loginXH">登录</button>
 			</view>
 			<view class="login_page_container_bottom">
 				没有账户？
@@ -40,12 +40,15 @@
 	import {ref} from 'vue'
 	import {login} from '@/api/user/login'
 	import useUserStore from '@/stores/users'
-	const phone = ref<string>("")
+	import validator from 'validator'
+import { computed } from 'vue';
+	const email = ref<string>("")
 	const password = ref<string>("")
 	const store = useUserStore()
 	const {updateAuthorization} = store
 	const loginXH = async ()=>{
-		let result = await login({phone:phone.value,password:password.value});
+		console.log(validator.isEmail(email.value),validator.isEmpty(password.value));
+		let result = await login({email:email.value,password:password.value});
 		if(result.code==200){
 			let  token  = result.data
 			updateAuthorization(token as string)
@@ -55,6 +58,9 @@
 			
 		}
 	}
+	const isLogin = computed(()=>{
+		return !(validator.isEmail(email.value) && !validator.isEmpty(password.value))
+	})
 </script>
 
 <style lang='scss' scoped>
