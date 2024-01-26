@@ -1,6 +1,6 @@
 export type LoginUser = {
-	//电话
-	phone: string;
+	//邮箱地址
+	email: string;
 	//密码
 	password: string;
 }
@@ -18,8 +18,8 @@ export interface UserPart{
 export interface User extends LoginUser,UserPart {
 	// 用户id
 	id: number;
-	//邮箱地址
-	email: string;
+	//电话
+	phone: string;
 	//身份证
 	identityCard: string;
 	//学生学号
