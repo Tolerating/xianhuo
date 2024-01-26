@@ -4,23 +4,46 @@
 		ref,
 		watch
 	} from "vue";
-	const phone = ref < string> ("")
+	import validator from 'validator'
+	import {useEmailCode} from '@/hooks/user/useEmailCode'
+	const email = ref < string> ("")
 	const code = ref < string> ("")
+	const countDown = ref<number>(60)
+	// false显示'发送验证码'，true显示'秒后重发'
+	const countDownFlag = ref<boolean>(false)
+	const emailCode = ref<string>("")
 	const pwd = ref < string > ("")
 	const rePwd = ref < string > ("")
 	const showInputPwd = ref < boolean > (false)
+	const {requestEmailCode} = useEmailCode()
 	watch(code, (newValue) => {
-		if (newValue == "1111") {
+		if (newValue == emailCode.value) {
 			showInputPwd.value = true;
 		}
 	})
 	const isRegister = computed(()=>{
-		const result = phone.value != "" && code.value!= "" && (pwd.value != "" && rePwd.value != "" && pwd.value == rePwd.value);
+		const result = validator.isEmail(email.value) && code.value!= "" && (pwd.value != "" && rePwd.value != "" && pwd.value == rePwd.value);
 		return !result;
 	})
 	const isCode = computed(()=>{
 		
 	})
+	// 获取验证码
+	const getCode = async ()=>{
+		if(!countDownFlag.value){
+			// emailCode.value = await requestEmailCode(email.value)
+			emailCode.value = "123123"
+			countDown.value = 60
+			countDownFlag.value = true
+			setInterval(()=>{
+				if(countDown.value){
+					countDown.value--
+				}else{
+					countDownFlag.value = false
+				}
+			},1000)
+		}
+	}
 	const registerZX = ()=>{
 		
 	}
@@ -34,7 +57,7 @@
 			<view class="register_item">
 				<text>账户</text>
 				<view class="">
-					<input placeholder="邮箱" v-model="phone" type="email" name="input" />
+					<input placeholder="邮箱" v-model.trim="email" type="email" name="input" />
 				</view>
 			</view>
 			<view class="register_item">
@@ -42,7 +65,7 @@
 				<view class="message_group">
 					<input :disabled="showInputPwd" placeholder="短信验证码" v-model="code" name="input"/>
 					<view style="flex: 1;" class=""></view>
-					<button class="cu-btn sm message_button">发送短信</button>
+					<button class="cu-btn sm message_button" @tap="getCode">{{countDownFlag?countDown + '秒后重发':'发送验证码'}}</button>
 				</view>
 			</view>
 			<view v-show="showInputPwd" class="register_item">

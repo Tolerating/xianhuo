@@ -1,30 +1,21 @@
-import {request} from '@/plugin/request'
+import { request } from '@/plugin/request'
 import type { LoginUser } from '@/types/Users';
-import type { ResponseResult } from '@/types/common';
 
 
 
 //登录
-const login = (data:LoginUser)=>request<string>("/login",data,"POST");
+const login = (data: LoginUser) => request<string>("/login", data, "POST");
+
+// 获取验证码
+const getCheckCode = (email: string) => request<string>(`/mailCode?email=${email}`, {}, "GET")
 
 // 注册API
-/* data结构
-{
-	phone:"",
-	password:"",
-	nickname:"",
-	code:""
-}
-*/
-// const register = (data)=>request('/user/register',data,"POST");
+
 
 // 修改密码
-/*data结构
-{
-	phone:"",
-	password:"",
-	code:""
-}
-*/
+
 // const changePassword = (data)=>request('/user/modifyPassword/phone',data,"POST");
-export {login}
+export {
+	login,
+	getCheckCode
+}
