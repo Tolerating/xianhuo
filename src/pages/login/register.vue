@@ -6,6 +6,8 @@
 	} from "vue";
 	import validator from 'validator'
 	import {useEmailCode} from '@/hooks/user/useEmailCode'
+	import {registerXH} from '@/api/user/login'
+import type { User } from "@/types/Users";
 	const email = ref < string> ("")
 	const code = ref < string> ("")
 	const countDown = ref<number>(60)
@@ -44,8 +46,19 @@
 			},1000)
 		}
 	}
-	const registerZX = ()=>{
-		
+	const registerZX = async()=>{
+		const user = {} as User
+		user.email = email.value
+		user.password = rePwd.value
+		const result = await registerXH(user)
+		uni.showToast({
+			title:result.message,
+			success(){
+				uni.switchTab({
+					url:"/pages/home/index"
+				})
+			}
+		})
 	}
 </script>
 <template>
@@ -63,7 +76,7 @@
 			<view class="register_item">
 				<text>验证码</text>
 				<view class="message_group">
-					<input :disabled="showInputPwd" placeholder="短信验证码" v-model="code" name="input"/>
+					<input :disabled="showInputPwd" placeholder="短信验证码" v-model.trim="code" name="input"/>
 					<view style="flex: 1;" class=""></view>
 					<button class="cu-btn sm message_button" @tap="getCode">{{countDownFlag?countDown + '秒后重发':'发送验证码'}}</button>
 				</view>
