@@ -22,6 +22,7 @@ const httpInterceptor = {
 }
 uni.addInterceptor("request", httpInterceptor)
 
+uni.addInterceptor("uploadFile", httpInterceptor)
 const dealRespoonse = (response: any) => {
 	let data = response.data as ResponseResult
 	if (data.code != 200) {
