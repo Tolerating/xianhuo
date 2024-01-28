@@ -6,6 +6,7 @@ import { ref } from 'vue';
 import {  uploadImg, releaseGoods } from '@/api/home/goods'
 import { nextTick } from 'vue';
 import { timeUnit, type Product } from '@/types/Product'
+import type {FileSelect} from '@/types/common'
 import { computed } from 'vue';
 import {useCategory} from '@/hooks/product/useCategory'
 import {useSellMode} from '@/hooks/product/useSellMode'
@@ -143,13 +144,13 @@ const dealPrice = (e: Event) => {
     }
 }
 
-const selectedImage = async (e: any) => {
+const selectedImage = async (e:FileSelect) => {
     console.log(e);
     // let arr:any = []
     // arr.push({name:"file",file:e.tempFiles[0].file,uri:e.tempFiles[0].path})
     let result = await uploadImg({ name: "file", file: e.tempFiles[0].file, uri: e.tempFiles[0].path })
     console.log(result);
-    selectImgs.set(e.tempFiles[0].uuid, result.data)
+    selectImgs.set(String(e.tempFiles[0].uuid), result.data)
 }
 const deleteImg = (e: any) => {
     selectImgs.delete(e.tempFile.uuid)

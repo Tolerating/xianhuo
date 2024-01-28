@@ -30,10 +30,22 @@ type HomeReachBottomType = {
 // 上传文件类型
 type Files = {
 	// 后端上传接口中对应的参数名
-	name?: string,
+	name?: "file",
 	file?: any,
 	// 例如：blob:http://localhost:5173/96ce0485-2932-4ff9-afb4-7c99e00084c4
 	uri: string
+}
+
+type FileSelect = {
+	tempFilePaths:string[],
+	tempFiles:{
+		extname:string,
+		file:File,
+		name:string,
+		path:string,
+		url:string,
+		uuid:number
+	}[]
 }
 export type {
 	ResponseResult,
@@ -41,6 +53,6 @@ export type {
 	RequestParams,
 	DiscoveryType,
 	HomeReachBottomType,
-	Files
-	
+	Files,
+	FileSelect
 }
