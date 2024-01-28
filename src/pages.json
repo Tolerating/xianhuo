@@ -24,6 +24,12 @@
 		{
 			"path": "pages/login/register"
 		},
+		{
+			"path": "pages/login/setPersonalInfo",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
 		
 		{
 			"path": "pages/home/mine",
