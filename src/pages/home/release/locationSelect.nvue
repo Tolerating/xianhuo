@@ -1,0 +1,66 @@
+<script setup>
+import { reactive,ref } from 'vue';
+import {onReady} from '@dcloudio/uni-app'
+const map = ref()
+const mapSearch = weex.requireModule('mapSearch')  
+const mapcontext = uni.createMapContext("map")
+const centerLocation = reactive({
+    latitude:39.909,
+    longitude:116.39742
+})
+const marks = reactive([{
+    id:1,
+    latitude: 39.909,
+    longitude: 116.39742,
+    width:35,
+    height:35,
+    iconPath: '../../../static/location.png'
+}])
+
+// 监听地图视野变化
+const regionChange = (e) => {
+    // console.log(e);
+    // 获取当前地图中心点
+    mapcontext.getCenterLocation({
+        success(res){
+            console.log(res);
+            // marks[0].latitude = res.latitude
+            // marks[0].longitude = res.longitude
+            mapcontext.translateMarker({
+                markerId:1,
+                destination:{
+                    latitude:res.latitude,
+                    longitude:res.longitude
+                },
+                autoRotate:false,
+                rotate:0,
+                duration:500
+            })
+            mapSearch.poiSearchNearBy({  
+                    point: {  
+                        latitude: res.latitude,
+                        longitude: res.longitude  
+                    },  
+                    key: '高等院校',  
+                    // radius: 1000  
+                }, ret => {  
+                    console.log(ret);  
+                    // uni.showModal({  
+                    //     content: JSON.stringify(ret)  
+                    // })  
+                })  
+        }
+    })
+}
+onReady(()=>{
+    
+})
+</script>
+<template>
+    <view>
+        <map id="map" ref="map" style="width: 100%; height: 300px;" @regionchange="regionChange" latitude="39.909"
+            longitude="116.39742" :markers="marks">
+        </map>
+    </view>
+</template>
+<style scoped></style>

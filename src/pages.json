@@ -68,6 +68,9 @@
 			}
 		},
 		{
+			"path": "pages/home/release/locationSelect"
+		},
+		{
 			"path": "pages/goods/search",
 			"style": {
 				"app-plus": {
