@@ -200,7 +200,16 @@ onMounted(() => {
                 file-mediatype="image" file-extname="png,jpg" title="选择宝贝图片"></uni-file-picker>
             <view style="margin-top: 20px;">
                 <!-- 显示自己的学校，不能更改 -->
+                <navigator
+                url="/pages/home/release/locationSelect"
+                open-type="navigate"
+                hover-class="navigator-hover"
+                >
                 <uni-icons type="location-filled" :size="23" color="gray" /><text>浙江万里学院</text>
+                    
+                </navigator>
+				<map style="width: 100%; height: 300px;" latitude="39.909" longitude="116.39742">
+								</map>
             </view>
         </view>
         <!-- 商品价钱，发货方式 -->
