@@ -11,6 +11,13 @@ onLaunch(() => {
 	productStore.requestAllDispatchMode()
 	productStore.requestAllProductRequire()
 	userStore.getUserInfo()
+	uni.getSystemInfo({
+    success(res) {
+        console.log(res.windowWidth);
+        uni.setStorageSync("windowWidth",res.windowWidth / 2 - 38 + 19)
+		
+    }
+})
 })
 
 </script>
