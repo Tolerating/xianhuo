@@ -3,20 +3,26 @@
 import { onMounted } from 'vue';
 import { reactive } from 'vue';
 import { ref } from 'vue';
-import {  uploadImg, releaseGoods } from '@/api/home/goods'
+import { uploadImg, releaseGoods } from '@/api/home/goods'
 import { nextTick } from 'vue';
 import { timeUnit, type Product } from '@/types/Product'
-import type {FileSelect} from '@/types/common'
+import type { FileSelect } from '@/types/common'
 import { computed } from 'vue';
-import {useCategory} from '@/hooks/product/useCategory'
-import {useSellMode} from '@/hooks/product/useSellMode'
-import {useDispatchMode} from '@/hooks/product/useDispatchMode'
-import {useProductRequire} from '@/hooks/product/useProductRequire'
+import { useCategory } from '@/hooks/product/useCategory'
+import { useSellMode } from '@/hooks/product/useSellMode'
+import { useDispatchMode } from '@/hooks/product/useDispatchMode'
+import { useProductRequire } from '@/hooks/product/useProductRequire'
 import CategoryPopup from '@/components/goods/CategoryPopup.vue'
+import { onShow } from '@dcloudio/uni-app';
 
 const StatusBarHeight = uni.getSystemInfoSync().statusBarHeight
 const statusBarHeight = ref<number>(Number(StatusBarHeight))
+onShow(() => {
+    uni.$on("school-location", (data) => {
+        console.log("页面通信", data);
 
+    })
+})
 // 存放已经上传的图片的网络地址
 const selectImgs = reactive<Map<string, string>>(new Map())
 
@@ -40,13 +46,13 @@ const releaseForm = reactive<Product>({
 
 
 // 商品分类hook
-const {categoryList,requestCategory} = useCategory()
+const { categoryList, requestCategory } = useCategory()
 // 售卖模式hook
-const {sellModeList,requestSellMode} = useSellMode()
+const { sellModeList, requestSellMode } = useSellMode()
 // 存放发货方式列表
-const {dispatchModeList,requestDispatchMode} = useDispatchMode()
+const { dispatchModeList, requestDispatchMode } = useDispatchMode()
 // 存放商品要求列表
-const {productRequireList,requestProductRequire} = useProductRequire()
+const { productRequireList, requestProductRequire } = useProductRequire()
 // checkbox存放选中的商品要求id
 const selectedProductRequire = reactive<number[]>([])
 // 物品出租下拉选择框数据源
@@ -67,10 +73,10 @@ const showuPricePopup = () => {
     pricePopup.value.open()
 }
 
-const productRequireChange = (e:any)=>{
+const productRequireChange = (e: any) => {
     releaseForm.productRequireId = e.detail.value.join()
     console.log(releaseForm.productRequireId);
-    
+
 
 }
 
@@ -116,12 +122,12 @@ const getDispatchMode = async () => {
     const result = await requestDispatchMode(releaseForm.sellModeId)
     // 默认选择第一种发货方式
     releaseForm.dispatchModeId = result[0].id
-    await requestProductRequire(releaseForm.sellModeId,releaseForm.dispatchModeId)
+    await requestProductRequire(releaseForm.sellModeId, releaseForm.dispatchModeId)
 }
 
 // 发货方式改变的监听事件
 const getProductRequire = () => {
-    requestProductRequire(releaseForm.sellModeId,releaseForm.dispatchModeId)
+    requestProductRequire(releaseForm.sellModeId, releaseForm.dispatchModeId)
 }
 
 // 运费方式选择改变时间
@@ -144,7 +150,7 @@ const dealPrice = (e: Event) => {
     }
 }
 
-const selectedImage = async (e:FileSelect) => {
+const selectedImage = async (e: FileSelect) => {
     console.log(e);
     // let arr:any = []
     // arr.push({name:"file",file:e.tempFiles[0].file,uri:e.tempFiles[0].path})
@@ -156,7 +162,7 @@ const deleteImg = (e: any) => {
     selectImgs.delete(e.tempFile.uuid)
 }
 
-const categoryPopupChange = (categoryId:number)=>{
+const categoryPopupChange = (categoryId: number) => {
     releaseForm.categoryId = categoryId
 }
 const showTypeRight = () => {
@@ -174,7 +180,7 @@ const initData = async () => {
     const result = await requestDispatchMode(releaseForm.sellModeId)
     // 默认选择第一种发货方式
     releaseForm.dispatchModeId = result[0].id
-    requestProductRequire(releaseForm.sellModeId,releaseForm.dispatchModeId)
+    requestProductRequire(releaseForm.sellModeId, releaseForm.dispatchModeId)
 
 }
 onMounted(() => {
@@ -200,16 +206,9 @@ onMounted(() => {
                 file-mediatype="image" file-extname="png,jpg" title="选择宝贝图片"></uni-file-picker>
             <view style="margin-top: 20px;">
                 <!-- 显示自己的学校，不能更改 -->
-                <navigator
-                url="/pages/home/release/locationSelect"
-                open-type="navigate"
-                hover-class="navigator-hover"
-                >
-                <uni-icons type="location-filled" :size="23" color="gray" /><text>浙江万里学院</text>
-                    
+                <navigator url="/pages/home/release/locationSelect" open-type="navigate" hover-class="navigator-hover">
+                    <uni-icons type="location-filled" :size="23" color="gray" /><text>选择地址</text>
                 </navigator>
-				<map style="width: 100%; height: 300px;" latitude="39.909" longitude="116.39742">
-								</map>
             </view>
         </view>
         <!-- 商品价钱，发货方式 -->
@@ -244,7 +243,8 @@ onMounted(() => {
             </uni-section>
             <uni-section type="line" class="sell-item" title="商品要求">
                 <uni-data-checkbox style="padding-left: 10px;" :localdata="productRequireList"
-                    v-model="selectedProductRequire" :map="{ text: 'name', value: 'id' }" multiple @change="productRequireChange" mode="button" />
+                    v-model="selectedProductRequire" :map="{ text: 'name', value: 'id' }" multiple
+                    @change="productRequireChange" mode="button" />
             </uni-section>
             <hr>
             <view class="property-item" @tap="showuPricePopup">
@@ -278,7 +278,8 @@ onMounted(() => {
             </view>
         </uni-popup>
         <!-- 商品类别弹出层 -->
-        <CategoryPopup ref="categoryPopup" @change="categoryPopupChange" type="bottom" :category-id="releaseForm.categoryId"></CategoryPopup>
+        <CategoryPopup ref="categoryPopup" @change="categoryPopupChange" type="bottom"
+            :category-id="releaseForm.categoryId"></CategoryPopup>
         <!-- <uni-popup ref="categoryPopup" type="bottom">
             <view class="goods-category-container">
                 <view :class="{ 'category-selected': item.id == releaseForm.categoryId }" class="category-item "
