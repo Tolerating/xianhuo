@@ -68,7 +68,24 @@
 			}
 		},
 		{
-			"path": "pages/home/release/locationSelect"
+			"path": "pages/home/release/locationSelect",
+			"style": {
+				"app-plus": {
+					"titleNView":{
+						"type":"transparent",
+						"backgroundColor":"#d3d3d3",
+						"buttons": [ 
+							{
+								"text": "完成",
+								"color": "#000",
+								"fontSize": "14px",
+								"width":"48px",
+								"background":"#42b983"
+							}
+						]
+					}
+				}
+			}
 		},
 		{
 			"path": "pages/goods/search",
