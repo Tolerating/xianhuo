@@ -48,8 +48,10 @@
             <uni-list-item showArrow title="修改主题" />
             <uni-list-item showArrow title="建议意见反馈" />
             <uni-list-item showArrow title="在线客服" />
+            <uni-list-item showArrow title="退出登录" clickable  @click="logoutXH"/>
             <uni-list-item showArrow title="用户服务协议" />
         </uni-list>
+        <button type="primary" @tap="logoutXH">页面主操作 Normal</button>
     </view>
 </template>
 
@@ -80,6 +82,15 @@ const dealItem = reactive([
     },
 
 ])
+const logoutXH = ()=>{
+    // 清除用户信息缓存
+    console.log(11111);
+    
+    uni.clearStorageSync()
+    uni.redirectTo({
+        url:"/pages/login/index"
+    })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -90,27 +101,17 @@ const dealItem = reactive([
     .status_bar {
         position: sticky;
         top: 0;
+        background-color: #5290FF;
     }
 }
 
-.goods_details_navBar_container {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 0 15px;
-    font-size: 18px;
-    background-color: blue;
-    color: white !important;
-    // flex-direction: column;
-    min-height: 45px;
-}
 
 .mine_top_profile {
     display: flex;
     flex-direction: column;
     justify-content: center;
     background-color: #5290FF;
-    padding: 0 5px;
+    padding: 5px 5px 0;
     padding-bottom: 35px;
     color: white;
     transform: translateY(-1px);
