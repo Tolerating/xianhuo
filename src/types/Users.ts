@@ -12,6 +12,8 @@ export interface UserPart{
 	school: String;
 	//用户头像
 	avatar: string;
+	// 学校定位
+	location: string;
 }
 
 // 用户信息表
@@ -32,8 +34,6 @@ export interface User extends LoginUser,UserPart {
 	major: string;
 	//生日
 	birthday: string;
-	// 学校定位
-	location: string;
 	//信誉分
 	score: number;
 	//创建时间
