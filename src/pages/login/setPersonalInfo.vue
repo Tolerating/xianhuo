@@ -2,10 +2,12 @@
 import { uploadImg } from '@/api/home/goods';
 import StatusBar from '@/components/StatusBar.vue'
 import type { User } from '@/types/Users';
-import type { FileSelect } from '@/types/common';
-import { onReady } from '@dcloudio/uni-app';
+import type { AMAPLocation, FileSelect } from '@/types/common';
+import { onHide, onReady, onShow } from '@dcloudio/uni-app';
 import { reactive } from 'vue';
 import { ref } from 'vue';
+import {DEFAULT_AVATAR,APP_BASE_URL} from '@/config/index'
+import { improveInfo } from '@/api/user/user'
 const formData = reactive<{
     name: string,
     avatar: string,
@@ -13,9 +15,22 @@ const formData = reactive<{
     location: string
 }>({
     name: "",
-    avatar: "",
+    avatar: APP_BASE_URL + DEFAULT_AVATAR,
     school: "",
     location: ""
+})
+// 存储地址选择界面传回的地址信息
+const selectedLocation = reactive<AMAPLocation>({} as AMAPLocation)
+onShow(()=>{
+    console.log("设置用户信息---显示");
+    
+    uni.$once("school-location", (data) => {
+        Object.assign(selectedLocation, data)
+        // 处理发布商品定位，格式为 "经度,维度"
+        const { name,location:{longitude,latitude} } = data
+        formData.school = name.replace(/\\/g,"")
+        formData.location = `${longitude},${latitude}`
+    })
 })
 const imageStyles = reactive({
     width: 150,
@@ -28,28 +43,27 @@ const avatarPreview = reactive([
     {
         "name": "avatar.png",
         "extname": "png",
-        "url": "http://localhost/img/avatar.png",
+        "url": APP_BASE_URL + DEFAULT_AVATAR,
     }
 ])
-const avatar = ref<string>("")
 const setAvatar = async (e: FileSelect) => {
-    console.log(e);
     const result = await uploadImg({ name: "file", file: e.tempFiles[0].file, uri: e.tempFilePaths[0] })
-    avatar.value = result.data
+    console.log(result);
+    formData.avatar = result.data
 
 }
-const birthday = ref<string>("1998-05-12")
+// 表单验证规则
 const formRules = {
     name: {
         rules: [{
             required: true,
             errorMessage: '姓名不能为空'
         }, {
-            validateFunction(rule: Object, value: any, data: Object, callback: Function) {
-                const reg = /^[a-zA-Z0-9_\u4e00-\u9fa5]{4,16}$/
-                console.log(reg.test(value));
+            validateFunction(rule: Object, value: string, data: Object, callback: Function) {
+                const reg = /^[\u4e00-\u9fa5\w]{1,16}$/g
+                console.log(value);
                 if (!reg.test(value)) {
-                    callback("昵称仅支持字母、数字、下划线")
+                    callback("昵称仅支持汉字，字母、数字、下划线，长度不超过16个字符")
                 }
                 return true
 
@@ -65,10 +79,17 @@ const formRules = {
 }
 // 表单元素的引用
 const form = ref()
+// 提交更新信息
 const submit = () => {
-    form.value.validate().then((res: any) => {
-        console.log(res);
+    // 表单校验
+    form.value.validate().then(async (res: any) => {
+        // 校验成功
+        console.log(formData);
+        const result = await improveInfo(formData)
+        console.log("更新结果",result);
+        
     }).catch((res: any) => {
+        // 校验失败
         console.log(res);
 
     })
@@ -92,7 +113,16 @@ const submit = () => {
             </uni-section>
             <uni-section type="line" class="property-item" title="选择学校">
                 <uni-forms-item required name="school">
-                    <uni-easyinput v-model.trim="formData.school" type="text" placeholder="选择您的学校" @confirm="" />
+                    <navigator url="/pages/home/release/locationSelect" open-type="navigate" hover-class="navigator-hover">
+                    <uni-easyinput
+                        v-model="formData.school"
+                        prefixIcon="location-filled"
+                        type="text"
+                        placeholder="选择你的学校"
+                        :disabled="true"
+                        :clearable="false"
+                    />
+                </navigator>
                 </uni-forms-item>
             </uni-section>
             <button @click="submit" class="submit-btn">提交</button>
