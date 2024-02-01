@@ -23,10 +23,17 @@ onMounted(() => {
     })
 })
 onNavigationBarButtonTap((e) => {
-    console.log(e);
     if (e.text == "完成") {
-        uni.$emit("school-location", selectedTag)
-        uni.navigateBack()
+        console.log(selectedTag.hasOwnProperty("typecode"));
+        if(selectedTag.hasOwnProperty("typecode")){
+            uni.$emit("school-location", selectedTag)
+            uni.navigateBack()
+        }else{
+            uni.showToast({
+                title:"请选择一个学校",
+                icon:"error"
+            })
+        }
     }
 })
 const poiList = reactive([])
@@ -62,10 +69,11 @@ const regionChange = (e) => {
                         latitude: res.latitude,
                         longitude: res.longitude
                     },
-                    key: '学校',
-                    radius: 3000,
+                    key: '高等院校',
+                    radius: 1000,
                     offset: 100
                 }, ret => {
+                    console.log(ret);
                     poiList.length = 0
                     poiList.push(...ret.poiList)
                 })
@@ -100,13 +108,18 @@ const searchPoi = (value) => {
 const chooseSchoolTag = (item) => {
     console.log(item);
     Object.assign(selectedTag, item)
+    mapcontext.moveToLocation({
+        longitude:item.location.longitude,
+        latitude:item.location.latitude
+    })
+
 }
 </script>
 <template>
     <view>
         <view class="map-container">
-            <map id="map" ref="map" @regionchange="regionChange" :latitude="location.latitude"
-                :longitude="location.longitude" class="amap" :class="{ 'amap-active': isFocus }" :markers="marks">
+            <map id="map" ref="map" :show-location="true" @regionchange="regionChange" :latitude="location.latitude"
+                :longitude="location.longitude" class="amap" :class="{ 'amap-active': isFocus }">
             </map>
             <image src="../../../static/location.png" mode="scaleToFill" class="hover-image"
                 :style="{ left: windowWidth + 'px' }" v-if="!isFocus" />
