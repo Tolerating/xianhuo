@@ -6,25 +6,30 @@ import { ref } from 'vue';
 import { uploadImg, releaseGoods } from '@/api/home/goods'
 import { nextTick } from 'vue';
 import { timeUnit, type Product } from '@/types/Product'
-import type { FileSelect } from '@/types/common'
+import type { AMAPLocation, FileSelect } from '@/types/common'
 import { computed } from 'vue';
 import { useCategory } from '@/hooks/product/useCategory'
 import { useSellMode } from '@/hooks/product/useSellMode'
 import { useDispatchMode } from '@/hooks/product/useDispatchMode'
 import { useProductRequire } from '@/hooks/product/useProductRequire'
 import CategoryPopup from '@/components/goods/CategoryPopup.vue'
-import { onShow } from '@dcloudio/uni-app';
+import { onHide, onShow } from '@dcloudio/uni-app';
 
 const StatusBarHeight = uni.getSystemInfoSync().statusBarHeight
 const statusBarHeight = ref<number>(Number(StatusBarHeight))
+// 存储地址选择界面传回的地址信息
+const selectedLocation = reactive<AMAPLocation>({} as AMAPLocation)
 onShow(() => {
-    uni.$on("school-location", (data) => {
-        console.log("页面通信", data);
-
+    uni.$once("school-location", (data) => {
+        Object.assign(selectedLocation, data)
+        // 处理发布商品定位，格式为 "经度,维度"
+        const { longitude, latitude } = data.location
+        releaseForm.location = `${longitude},${latitude}`
     })
 })
 // 存放已经上传的图片的网络地址
 const selectImgs = reactive<Map<string, string>>(new Map())
+
 
 // 发布商品表单
 const releaseForm = reactive<Product>({
@@ -40,7 +45,7 @@ const releaseForm = reactive<Product>({
     userId: 1,
     productRequireId: "",
     status: 1,
-    location: "123,122",
+    location: "",
     freight: ""
 })
 
@@ -82,12 +87,12 @@ const productRequireChange = (e: any) => {
 
 // 发布商品
 const releaseProduct = async () => {
+    // 处理上传图片服务器路径为字符串，以逗号拼接
     let imgArr: string[] = []
     selectImgs.forEach((el) => {
         imgArr.push(el)
     })
     releaseForm.images = imgArr.join()
-    console.log(imgArr.join());
     let result = await releaseGoods(releaseForm)
     const { message } = result
     uni.showToast({
@@ -99,7 +104,7 @@ const releaseProduct = async () => {
 
 // 计算发布按钮是否可用
 const isRelease = computed((): boolean => {
-    return !(Boolean(releaseForm.detail) && Boolean(selectImgs.size) && Boolean(releaseForm.currentPrice))
+    return !(Boolean(releaseForm.detail) && Boolean(selectImgs.size) && Boolean(releaseForm.currentPrice)) && Boolean(releaseForm.location)
 })
 
 // 处理价钱输入
@@ -183,6 +188,13 @@ const initData = async () => {
     requestProductRequire(releaseForm.sellModeId, releaseForm.dispatchModeId)
 
 }
+// 计算所选地点的完整地址
+const dispatchAddress = computed(() => {
+    const { city, district, address, name } = selectedLocation
+    console.log();
+
+    return city + district + address + name.replace(/\\/g, '')
+})
 onMounted(() => {
     initData()
 })
@@ -205,9 +217,10 @@ onMounted(() => {
             <uni-file-picker @select="selectedImage" limit="5" @delete="deleteImg" :auto-upload="false"
                 file-mediatype="image" file-extname="png,jpg" title="选择宝贝图片"></uni-file-picker>
             <view style="margin-top: 20px;">
-                <!-- 显示自己的学校，不能更改 -->
                 <navigator url="/pages/home/release/locationSelect" open-type="navigate" hover-class="navigator-hover">
-                    <uni-icons type="location-filled" :size="23" color="gray" /><text>选择地址</text>
+                    <uni-icons type="location-filled" :size="23" color="gray" />
+                    <text style="color: rgb(15, 105, 241);text-decoration: underline solid rgb(15, 105, 241);">
+                        {{ selectedLocation?.name ? dispatchAddress : "选择地址" }}</text>
                 </navigator>
             </view>
         </view>
