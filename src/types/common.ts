@@ -1,11 +1,11 @@
-type ResponseResult <T = any> = {
-	code:500 | 200 | 411,
+type ResponseResult<T = any> = {
+	code: 500 | 200 | 411,
 	data: T,
-	message?:string
+	message?: string
 }
 
 type Header = {
-	Authorization:string
+	Authorization: string
 }
 type RequestParams = {
 	url: string,
@@ -15,16 +15,16 @@ type RequestParams = {
 }
 
 // 咸货首页的商品分类（横向滑动块），例如：猜你喜欢、最近发布.....
- type DiscoveryType = {
-	id:number,
-	title:string
+type DiscoveryType = {
+	id: number,
+	title: string
 }
 
 
 type HomeReachBottomType = {
-	id:number,
-	title:string,
-	isReachBottom:boolean
+	id: number,
+	title: string,
+	isReachBottom: boolean
 }
 
 // 上传文件类型
@@ -37,16 +37,43 @@ type Files = {
 }
 
 type FileSelect = {
-	tempFilePaths:string[],
-	tempFiles:{
-		extname:string,
-		file:File,
-		name:string,
-		path:string,
-		url:string,
-		uuid:number
+	tempFilePaths: string[],
+	tempFiles: {
+		extname: string,
+		file: File,
+		name: string,
+		path: string,
+		url: string,
+		uuid: number
 	}[]
 }
+
+export type AMAPLocation = {
+	typecode: string,
+	// 区县
+	district: string,
+	adcode: string,
+	// 联系方式
+	phone: string,
+	// poi类别
+	type: string,
+	// 所在城市
+	city: string,
+	// poi名字
+	name: string,
+	// 定位
+	location: {
+		longitude: number,
+		latitude: number
+	},
+	distance: -1,
+	postcode: string,
+	// 详细地址
+	address:string,
+	// 省份
+	province: string
+}
+
 export type {
 	ResponseResult,
 	Header,
