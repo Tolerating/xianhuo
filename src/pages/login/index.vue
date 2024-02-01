@@ -43,6 +43,7 @@ import { login } from '@/api/user/login'
 import useUserStore from '@/stores/users'
 import validator from 'validator'
 import { computed } from 'vue';
+import { onBackPress } from '@dcloudio/uni-app';
 const email = ref<string>("")
 const password = ref<string>("")
 const store = useUserStore()
@@ -62,6 +63,9 @@ const loginXH = async () => {
 		})
 	}
 }
+onBackPress(()=>{
+	return true
+})
 const isLogin = computed(() => {
 	return !(validator.isEmail(email.value) && !validator.isEmpty(password.value))
 })
