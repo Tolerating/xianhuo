@@ -48,7 +48,7 @@ type FileSelect = {
 	}[]
 }
 
-export type AMAPLocation = {
+type AMAPLocation = {
 	typecode: string,
 	// 区县
 	district: string,
@@ -74,6 +74,14 @@ export type AMAPLocation = {
 	province: string
 }
 
+// 跳转到商品筛选页面的传参列表类型
+type ProductFilterPrams ={
+	key:string,
+	category:number,
+	// 售卖模式
+	sell:number,
+}
+
 export type {
 	ResponseResult,
 	Header,
@@ -81,5 +89,7 @@ export type {
 	DiscoveryType,
 	HomeReachBottomType,
 	Files,
-	FileSelect
+	FileSelect,
+	ProductFilterPrams,
+	AMAPLocation
 }

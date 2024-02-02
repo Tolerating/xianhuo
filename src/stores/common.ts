@@ -49,11 +49,10 @@ const useCommonStore = defineStore("common", () => {
 	const tabList = reactive<DiscoveryType[]>([
 		{ id: 0, title: "最新发布" },
 		{ id: 1, title: "猜你喜欢" },
-		{ id: 2, title: "以物换物" },
-		{ id: 3, title: "物品出租" },
-		{ id: 4, title: "物品出售" },
-		{ id: 5, title: "二手书籍" },
-		{ id: 6, title: "电子产品" },
+		{ id: 2, title: "物品出租" },
+		{ id: 3, title: "物品出售" },
+		{ id: 4, title: "书籍资料" },
+		{ id: 5, title: "数码产品" }
 	])
 	const updateTabList = (val : DiscoveryType) : void => {
 		tabList.push(val)
