@@ -1,29 +1,34 @@
 <script lang="ts" setup>
 import useProductStore from '@/stores/product';
+import type { Category } from '@/types/Category';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 const store = useProductStore()
 const {categoryList} = storeToRefs(store)
 const emits = defineEmits<{
-    (e: "change", categoryId: number): void
+    (e: "change", category: Category): void
 }>()
 const categoryPopup = ref()
 const show = () => {
     categoryPopup.value.open()
+}
+const close = ()=>{
+    categoryPopup.value.close()
 }
 const props = defineProps<{
     categoryId: number,
     type:string
 }>()
 defineExpose({
-    show
+    show,
+    close
 })
 </script>
 <template>
     <uni-popup ref="categoryPopup" :type="type">
         <view class="goods-category-container">
             <view :class="{ 'category-selected': item.id == categoryId }" class="category-item "
-                v-for=" item  in  categoryList " @tap="$emit('change', item.id)" :key="item.id">
+                v-for=" item  in  categoryList " @tap="$emit('change', item)" :key="item.id">
                 {{ item.name }}
             </view>
         </view>
