@@ -22,7 +22,7 @@
     <template v-for="(item) in tabList" :key="item.id">
       <GoodsWaterFallFlow :disCoveryType="item" v-show="currentTab.id==item.id"></GoodsWaterFallFlow>
     </template>
-    <CategoryPopup ref="categoryPopup" type="bottom" :category-id="-1"></CategoryPopup>
+    <CategoryPopup ref="categoryPopup" type="bottom" @change="navigateToFilter" :category-id="-1"></CategoryPopup>
   </view>
 
 </template>
@@ -36,6 +36,7 @@ import GoodsWaterFallFlow from '@/components/goods/GoodsWaterFallFlow.vue'
 import CategoryPopup from '@/components/goods/CategoryPopup.vue'
 import useCommonStore from "@/stores/common"
 import {storeToRefs} from 'pinia'
+import type { Category } from '@/types/Category'
 const searchValue = ref<string>("")
 const store = useCommonStore()
 const {reachBottom} = storeToRefs(store)
@@ -89,6 +90,15 @@ const getTabSelectedGoods = (val: DiscoveryType) => {
   }, 10)
 
   store.updateCurrentTab(val)
+}
+const navigateToFilter = (e:Category)=>{
+  uni.navigateTo({
+			url: `/pages/goods/goodsFilter?key=${e.name}&category=${e.id}&sell=0`,
+      success(){
+        categoryPopup.value.close()
+      }
+
+		})
 }
 </script>
 

@@ -52,6 +52,8 @@ const loginXH = async () => {
 	console.log(validator.isEmail(email.value), validator.isEmpty(password.value));
 	let result = await login({ email: email.value, password: password.value });
 	let arr = result.data.split(",")
+	console.log(arr);
+	
 	updateAuthorization(arr[1] as string)
 	if(arr[0] == 'null'){
 		uni.navigateTo({

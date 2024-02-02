@@ -12,16 +12,20 @@
                 </view>
             </view>
             <view class="profile_bottom">
-                <view class="bottom_operation">
-                    <text style="font-size: 20px;">0</text>
+                <view class="bottom_operation" @tap="countsNavigate(1)">
+                    <text style="font-size: 20px;">{{ counts.star }}</text>
                     <text style="font-size: 12px;">我的收藏</text>
                 </view>
-                <view class="bottom_operation">
-                    <text style="font-size: 20px;">0</text>
+                <view class="bottom_operation" @tap="countsNavigate(2)">
+                    <text style="font-size: 20px;">{{ counts.released }}</text>
+                    <text style="font-size: 12px;">我的闲置</text>
+                </view>
+                <view class="bottom_operation" @tap="countsNavigate(3)">
+                    <text style="font-size: 20px;">{{ counts.released }}</text>
                     <text style="font-size: 12px;">我的仓库</text>
                 </view>
-                <view class="bottom_operation">
-                    <text style="font-size: 20px;">0</text>
+                <view class="bottom_operation" @tap="countsNavigate(4)">
+                    <text style="font-size: 20px;">{{ counts.article }}</text>
                     <text style="font-size: 12px;">我的帖子</text>
                 </view>
             </view>
@@ -48,10 +52,10 @@
             <uni-list-item showArrow title="修改主题" />
             <uni-list-item showArrow title="建议意见反馈" />
             <uni-list-item showArrow title="在线客服" />
-            <uni-list-item showArrow title="退出登录" clickable  @click="logoutXH"/>
+            <uni-list-item showArrow title="退出登录" clickable @click="logoutXH" />
             <uni-list-item showArrow title="用户服务协议" />
         </uni-list>
-        <button type="primary" @tap="logoutXH">页面主操作 Normal</button>
+        <!-- <button type="primary" @tap="logoutXH">页面主操作 Normal</button> -->
     </view>
 </template>
 
@@ -60,9 +64,11 @@ import { reactive } from 'vue';
 import { ref } from 'vue';
 import useUserStore from '@/stores/users/index'
 import { storeToRefs } from 'pinia';
+import { onMounted } from 'vue';
+import { releasedCount } from '@/api/user/user'
 const statusBarHeight = ref<number>(Number(uni.getSystemInfoSync().statusBarHeight));
 const userStore = useUserStore()
-const { userInfo } = storeToRefs(userStore)
+const { userInfo, counts } = storeToRefs(userStore)
 const dealItem = reactive([
     {
         name: "待付款",
@@ -82,15 +88,52 @@ const dealItem = reactive([
     },
 
 ])
-const logoutXH = ()=>{
-    // 清除用户信息缓存
-    console.log(11111);
-    
-    uni.clearStorageSync()
-    uni.redirectTo({
-        url:"/pages/login/index"
-    })
+// 我的收藏，我的帖子，我的发布页面跳转函数
+const countsNavigate = (flag: number) => {
+    switch (flag) {
+        case 1:
+            uni.navigateTo({
+                url: "/pages/home/mine/myStoresHouse"
+            })
+            break;
+        case 2:
+            uni.navigateTo({
+                url: "/pages/home/mine/myStoresHouse"
+            })
+            break;
+        case 3:
+            uni.navigateTo({
+                url: "/pages/home/mine/myStoresHouse"
+            })
+            break;
+        case 4:
+            uni.navigateTo({
+                url: "/pages/home/mine/myStoresHouse"
+            })
+            break;
+        default:
+            break;
+    }
 }
+const logoutXH = () => {
+    uni.showModal({
+        title: '提示',
+        content: '确定退出',
+        success: function (res) {
+            if (res.confirm) {
+                uni.removeStorageSync("xh_user")
+                uni.redirectTo({
+                    url: "/pages/login/index"
+                })
+            } else if (res.cancel) {
+            }
+        }
+    });
+
+}
+onMounted(() => {
+    userStore.initCounts()
+})
 </script>
 
 <style lang="scss" scoped>

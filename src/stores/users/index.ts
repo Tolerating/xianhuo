@@ -1,12 +1,20 @@
 import type { User } from '@/types/Users'
 import {defineStore} from 'pinia'
 import {ref,reactive} from 'vue'
-import {requestUserInfo} from '@/api/user/user'
+import {releasedCount, requestUserInfo} from '@/api/user/user'
 import {APP_BASE_URL} from '@/config/index'
 
 const useUserStore = defineStore("user",()=>{
+	// 用户个人信息
 	const userInfo = reactive<User>({} as User)
+	// token
 	const authorization = ref<string | null>(null)
+	// 我的页面，收藏、发布商品、帖子数量
+	const counts = reactive<{star:number,released:number,article:number}>({
+		star:0,
+		released:0,
+		article:0
+	})
 
 	function updateAuthorization(value:string):void{
 		authorization.value = value
@@ -21,12 +29,19 @@ const useUserStore = defineStore("user",()=>{
 		return result.data
 
 	}
+	async function initCounts() {
+		const released = await releasedCount()
+		counts.released = released.data
+		
+	}
 	return{
 		userInfo,
 		authorization,
+		counts,
 		deleteAuthorization,
 		updateAuthorization,
-		getUserInfo
+		getUserInfo,
+		initCounts
 	}
 },{
 	persist:{

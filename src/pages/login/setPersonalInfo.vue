@@ -8,6 +8,8 @@ import { reactive } from 'vue';
 import { ref } from 'vue';
 import {DEFAULT_AVATAR,APP_BASE_URL} from '@/config/index'
 import { improveInfo } from '@/api/user/user'
+import useUserStore from '@/stores/users/index'
+const userStore = useUserStore()
 const formData = reactive<{
     name: string,
     avatar: string,
@@ -84,9 +86,19 @@ const submit = () => {
     // 表单校验
     form.value.validate().then(async (res: any) => {
         // 校验成功
-        console.log(formData);
+        if(formData.avatar == APP_BASE_URL + DEFAULT_AVATAR){
+            formData.avatar = DEFAULT_AVATAR
+        }
         const result = await improveInfo(formData)
-        console.log("更新结果",result);
+        userStore.getUserInfo()
+        uni.showToast({
+            title:result.message,
+            success(){
+                uni.switchTab({
+                    url:"/pages/home/index"
+                })
+            }
+        })
         
     }).catch((res: any) => {
         // 校验失败
@@ -121,6 +133,7 @@ const submit = () => {
                         placeholder="选择你的学校"
                         :disabled="true"
                         :clearable="false"
+                        :readonly="true"
                     />
                 </navigator>
                 </uni-forms-item>

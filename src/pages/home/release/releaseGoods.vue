@@ -14,6 +14,7 @@ import { useDispatchMode } from '@/hooks/product/useDispatchMode'
 import { useProductRequire } from '@/hooks/product/useProductRequire'
 import CategoryPopup from '@/components/goods/CategoryPopup.vue'
 import { onHide, onShow } from '@dcloudio/uni-app';
+import type { Category } from '@/types/Category';
 
 const StatusBarHeight = uni.getSystemInfoSync().statusBarHeight
 const statusBarHeight = ref<number>(Number(StatusBarHeight))
@@ -167,8 +168,8 @@ const deleteImg = (e: any) => {
     selectImgs.delete(e.tempFile.uuid)
 }
 
-const categoryPopupChange = (categoryId: number) => {
-    releaseForm.categoryId = categoryId
+const categoryPopupChange = (e: Category) => {
+    releaseForm.categoryId = e.id
 }
 const showTypeRight = () => {
     console.log(categoryPopup);

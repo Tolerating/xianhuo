@@ -11,13 +11,19 @@ onLaunch(() => {
 	productStore.requestAllDispatchMode()
 	productStore.requestAllProductRequire()
 	userStore.getUserInfo()
+	// 用户第一次登录后没有完善用户信息就退出应用，再次打开应用后的判断
+	if(userStore.userInfo.name == ""){
+		uni.redirectTo({
+			url:"/pages/login/setPersonalInfo"
+		})
+	}
 	uni.getSystemInfo({
-    success(res) {
-        console.log(res.windowWidth);
-        uni.setStorageSync("windowWidth",res.windowWidth / 2 - 38 + 19)
-		
-    }
-})
+		success(res) {
+			console.log(res.windowWidth);
+			uni.setStorageSync("windowWidth", res.windowWidth / 2 - 38 + 19)
+
+		}
+	})
 })
 
 </script>
