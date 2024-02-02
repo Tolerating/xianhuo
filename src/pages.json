@@ -98,7 +98,8 @@
 							"backgroundColor": "#fff",
 							"borderRadius": "15px",
 							"placeholder": "请输入搜索内容",
-							"align": "left"
+							"align": "left",
+							"autoFocus":true							
 						},
 						"buttons": [
 							{
@@ -124,11 +125,12 @@
 						"searchInput": {
 							"backgroundColor": "#fff",
 							"borderRadius": "15px",
-							"align": "left"
+							"align": "left",
+							"disabled":true
 						},
 						"buttons": [
 							{
-								"text": "...",
+								"text": "筛选",
 								"color": "#000",
 								"fontSize": "14px",
 								"width":"48px"
@@ -175,6 +177,9 @@
 					}
 				}
 			}
+		},
+		{
+			"path": "pages/home/mine/myStoresHouse"
 		}
 	],
 	
