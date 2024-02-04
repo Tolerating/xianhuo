@@ -48,7 +48,7 @@ const avatarPreview = reactive([
         "url": APP_BASE_URL + DEFAULT_AVATAR,
     }
 ])
-const setAvatar = async (e: FileSelect) => {
+const setAvatar = async (e:any) => {
     const result = await uploadImg({ name: "file", file: e.tempFiles[0].file, uri: e.tempFilePaths[0] })
     console.log(result);
     formData.avatar = result.data
