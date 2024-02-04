@@ -65,9 +65,11 @@ import { ref } from 'vue';
 import useUserStore from '@/stores/users/index'
 import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
+import useProductStore from '@/stores/product/index'
 import { releasedCount } from '@/api/user/user'
 const statusBarHeight = ref<number>(Number(uni.getSystemInfoSync().statusBarHeight));
 const userStore = useUserStore()
+const productStore = useProductStore()
 const { userInfo, counts } = storeToRefs(userStore)
 const dealItem = reactive([
     {
@@ -98,7 +100,7 @@ const countsNavigate = (flag: number) => {
             break;
         case 2:
             uni.navigateTo({
-                url: "/pages/home/mine/myStoresHouse"
+                url: "/pages/home/mine/releasedProductList"
             })
             break;
         case 3:
@@ -122,6 +124,8 @@ const logoutXH = () => {
         success: function (res) {
             if (res.confirm) {
                 uni.removeStorageSync("xh_user")
+                console.log("退出前",uni.getStorageSync("xh_user"));
+                
                 uni.redirectTo({
                     url: "/pages/login/index"
                 })
@@ -132,7 +136,10 @@ const logoutXH = () => {
 
 }
 onMounted(() => {
+    console.log("登录页挂载");
+    
     userStore.initCounts()
+    productStore.requestProductList()
 })
 </script>
 
