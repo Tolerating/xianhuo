@@ -13,11 +13,27 @@ import { useSellMode } from '@/hooks/product/useSellMode'
 import { useDispatchMode } from '@/hooks/product/useDispatchMode'
 import { useProductRequire } from '@/hooks/product/useProductRequire'
 import CategoryPopup from '@/components/goods/CategoryPopup.vue'
-import { onHide, onShow } from '@dcloudio/uni-app';
+import { onHide, onLoad, onShow } from '@dcloudio/uni-app';
 import type { Category } from '@/types/Category';
+import { requestProductById } from '@/api/home/goods'
+import useUserStore from '@/stores/users/index'
+import { APP_BASE_URL } from '@/config/index'
+import { toRef } from 'vue';
+
 
 const StatusBarHeight = uni.getSystemInfoSync().statusBarHeight
 const statusBarHeight = ref<number>(Number(StatusBarHeight))
+// 是否为编辑状态
+const isEdit = ref<boolean>(false)
+// 要编辑商品的id
+const productId = ref<number>(-1)
+const userStore = useUserStore()
+onLoad((option: any) => {
+    if (Object.keys(option).length) {
+        isEdit.value = true
+        productId.value = option.productId
+    }
+})
 // 存储地址选择界面传回的地址信息
 const selectedLocation = reactive<AMAPLocation>({} as AMAPLocation)
 onShow(() => {
@@ -47,9 +63,13 @@ const releaseForm = reactive<Product>({
     productRequireId: "",
     status: 1,
     location: "",
-    freight: ""
+    freight: "",
+    address: ""
 })
 
+// 售卖模式，发货模式，放在reactive中数据初始化无效
+const sellMode = ref(0)
+const dispatchMode = ref(0)
 
 // 商品分类hook
 const { categoryList, requestCategory } = useCategory()
@@ -79,6 +99,8 @@ const showuPricePopup = () => {
     pricePopup.value.open()
 }
 
+const preImage = reactive<any>([])
+
 const productRequireChange = (e: any) => {
     releaseForm.productRequireId = e.detail.value.join()
     console.log(releaseForm.productRequireId);
@@ -94,6 +116,13 @@ const releaseProduct = async () => {
         imgArr.push(el)
     })
     releaseForm.images = imgArr.join()
+    // 设置完整地址
+    releaseForm.address = dispatchAddress.value
+    // 设置发布者id
+    releaseForm.userId = userStore.userInfo.id
+    // 设置售卖模式，发货模式
+    releaseForm.sellModeId = sellMode.value
+    releaseForm.dispatchModeId = dispatchMode.value
     let result = await releaseGoods(releaseForm)
     const { message } = result
     uni.showToast({
@@ -125,15 +154,15 @@ const dealFloatNumber = (value: string, property: string) => {
 
 // 售卖模式改变的监听事件
 const getDispatchMode = async () => {
-    const result = await requestDispatchMode(releaseForm.sellModeId)
+    const result = await requestDispatchMode(sellMode.value)
     // 默认选择第一种发货方式
-    releaseForm.dispatchModeId = result[0].id
-    await requestProductRequire(releaseForm.sellModeId, releaseForm.dispatchModeId)
+    dispatchMode.value = result[0].id
+    await requestProductRequire(sellMode.value, dispatchMode.value)
 }
 
 // 发货方式改变的监听事件
 const getProductRequire = () => {
-    requestProductRequire(releaseForm.sellModeId, releaseForm.dispatchModeId)
+    requestProductRequire(sellMode.value, dispatchMode.value)
 }
 
 // 运费方式选择改变时间
@@ -157,22 +186,33 @@ const dealPrice = (e: Event) => {
 }
 
 const selectedImage = async (e: FileSelect) => {
-    console.log(e);
-    // let arr:any = []
-    // arr.push({name:"file",file:e.tempFiles[0].file,uri:e.tempFiles[0].path})
-    let result = await uploadImg({ name: "file", file: e.tempFiles[0].file, uri: e.tempFiles[0].path })
+    const { file } = e
+    let result = await uploadImg({ name: "file", uri: file[0].url })
     console.log(result);
-    selectImgs.set(String(e.tempFiles[0].uuid), result.data)
+    if (selectImgs.has(result.data)) {
+        uni.showToast({
+            title: "该图片已经上传过"
+        })
+    } else {
+        preImage.push({
+            status: "success",
+            name: result.data,
+            url: APP_BASE_URL + result.data
+        })
+        selectImgs.set(result.data, result.data)
+    }
 }
 const deleteImg = (e: any) => {
-    selectImgs.delete(e.tempFile.uuid)
+    console.log(e.file.url);
+
+    selectImgs.delete(e.file.name)
 }
 
+// 监听分类改变
 const categoryPopupChange = (e: Category) => {
     releaseForm.categoryId = e.id
 }
 const showTypeRight = () => {
-    console.log(categoryPopup);
     categoryPopup.value.show()
 }
 const initData = async () => {
@@ -182,22 +222,43 @@ const initData = async () => {
     // 获取售卖模式
     const sellmodes = await requestSellMode()
     // 设置默认的售卖模式
-    releaseForm.sellModeId = sellmodes[0].id
-    const result = await requestDispatchMode(releaseForm.sellModeId)
+    sellMode.value = sellmodes[0].id
+    const result = await requestDispatchMode(sellMode.value)
     // 默认选择第一种发货方式
-    releaseForm.dispatchModeId = result[0].id
-    requestProductRequire(releaseForm.sellModeId, releaseForm.dispatchModeId)
+    dispatchMode.value = result[0].id
+    requestProductRequire(sellMode.value, dispatchMode.value)
+
 
 }
 // 计算所选地点的完整地址
 const dispatchAddress = computed(() => {
-    const { city, district, address, name } = selectedLocation
-    console.log();
-
-    return city + district + address + name.replace(/\\/g, '')
+    const { city, district, address, name, province } = selectedLocation
+    return `${province}-${city}-${district}-${address}-${name.replace(/\\/g, '')}`
 })
-onMounted(() => {
+onLoad(async (option: any) => {
     initData()
+    if (Object.keys(option).length) {
+        isEdit.value = true
+        productId.value = option.productId
+        console.log("sfasdfasf");
+    }
+})
+onMounted(async () => {
+    // initData()
+    if (isEdit.value) {
+        const data = await requestProductById(productId.value)
+        console.log("要编辑的数据：", data);
+        await Object.assign(releaseForm, data.data)
+        sellMode.value = Number(data.data.sellModeId)
+        dispatchMode.value = Number(data.data.dispatchModeId)
+        releaseForm.images.split(",").forEach(item => {
+            preImage.push({
+                status: "success",
+                name: item,
+                url: APP_BASE_URL + item
+            })
+        })
+    }
 })
 </script>
 <template>
@@ -205,23 +266,31 @@ onMounted(() => {
         <view class="release-navigator">
             <view class="status-bar" :style="{ height: statusBarHeight + 'px' }"></view>
             <view class="navigator-bar">
-                <uni-icons type="closeempty" color="black" size="24" style="padding-right: 5px;" />
+                <navigator open-type="navigateBack" :delta="1" hover-class="navigator-hover">
+
+                    <uni-icons type="closeempty" color="black" size="24" style="padding-right: 5px;" />
+                </navigator>
                 <view class="navigator-rihgt">
-                    <text>发闲置</text>
-                    <button :disabled="isRelease" @tap="releaseProduct">发布</button>
+                    <text>{{ isEdit ? "编辑商品" : "发闲置" }}</text>
+                    <button :disabled="isRelease" @tap="releaseProduct">{{ isEdit ? "完成" : "发布" }}</button>
                 </view>
             </view>
         </view>
         <view class="release-content">
             <textarea class="content-textarea" v-model="releaseForm.detail" maxlength="-1"
                 placeholder-style="font-size:16px;" placeholder="描述下宝贝的品牌型号、货品来源..."></textarea>
-            <uni-file-picker @select="selectedImage" limit="5" @delete="deleteImg" :auto-upload="false"
-                file-mediatype="image" file-extname="png,jpg" title="选择宝贝图片"></uni-file-picker>
+            <!-- <uni-file-picker @select="selectedImage" limit="5" @delete="deleteImg" :auto-upload="false"
+                file-mediatype="image" file-extname="png,jpg" :value="preImage" title="选择宝贝图片"></uni-file-picker> -->
+            <uv-upload :fileList="preImage" name="1" multiple :previewFullImage="true" :maxCount="5"
+                @afterRead="selectedImage" @delete="deleteImg" uploadText="选择宝贝图片"></uv-upload>
             <view style="margin-top: 20px;">
                 <navigator url="/pages/home/release/locationSelect" open-type="navigate" hover-class="navigator-hover">
                     <uni-icons type="location-filled" :size="23" color="gray" />
-                    <text style="color: rgb(15, 105, 241);text-decoration: underline solid rgb(15, 105, 241);">
+                    <text v-if="!isEdit"
+                        style="color: rgb(15, 105, 241);text-decoration: underline solid rgb(15, 105, 241);">
                         {{ selectedLocation?.name ? dispatchAddress : "选择地址" }}</text>
+                    <text v-else style="color: rgb(15, 105, 241);text-decoration: underline solid rgb(15, 105, 241);">
+                        {{ releaseForm.address }}</text>
                 </navigator>
             </view>
         </view>
@@ -238,14 +307,12 @@ onMounted(() => {
             <hr>
             <uni-section type="line" class="sell-item" title="售卖模式">
                 <uni-data-checkbox style="padding-left: 10px;" :localdata="sellModeList"
-                    :map="{ text: 'name', value: 'id' }" v-model="releaseForm.sellModeId" @change="getDispatchMode"
-                    mode="button" />
+                    :map="{ text: 'name', value: 'id' }" v-model="sellMode" @change="getDispatchMode" mode="button" />
             </uni-section>
             <uni-section type="line" class="sell-item" title="发货方式">
                 <uni-data-checkbox style="padding-left: 10px;" :localdata="dispatchModeList"
-                    :map="{ text: 'name', value: 'id' }" v-model="releaseForm.dispatchModeId" @change="getProductRequire"
-                    mode="button" />
-                <uni-section type="line" v-if="releaseForm.dispatchModeId == 1" class="sell-item" title="运费">
+                    :map="{ text: 'name', value: 'id' }" v-model="dispatchMode" @change="getProductRequire" mode="button" />
+                <uni-section type="line" v-if="dispatchMode == 1" class="sell-item" title="运费">
                     <view style="padding-left: 20px;">
                         <uni-data-checkbox :localdata="[{ value: 0, text: '自己填' }, { value: 1, text: '包邮' }]"
                             @change="freightChange" v-model="freightSelect" />
