@@ -3,20 +3,22 @@
 		<view style="margin: 0 5px;">
 			<image src="../../static/yifu.jpg" class="good-image" mode=""></image>
 		<text class="goods-title">
-			<span>{{saleType}}</span>
+			<span>{{sellModeMap[product.sellModeId]}}</span>
 			我是标题
 		</text>
 		<view class="goods-price">
-			<text><span>￥</span>680</text>
+			<text><span>￥</span>{{ product.currentPrice }}</text>
 		</view>
 		</view>
 	</view>
 </template>
 
 <script lang="ts" setup>
-withDefaults(defineProps<{saleType?:string}>(),{
-	saleType:"售"
-})
+import type { Product } from '@/types/Product';
+
+const sellModeMap = ["售","租"]
+defineProps<{product:Product}>()
+
 const toGoodsDetail = ()=>{
   uni.navigateTo({
     url:"/pages/goods/goodDetail?uId=1"

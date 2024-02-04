@@ -1,6 +1,6 @@
 <template>
 	<view ref="goodsWrapper" class="goods-wrapper">
-		<GoodCard v-for="key in goodsNum" :key="key" class="goods-item"></GoodCard>
+		<GoodCard v-for="item in productList" :key="item.detail" :product="item" class="goods-item"></GoodCard>
 	</view>
 </template>
 
@@ -10,9 +10,11 @@
 	import useCommonStore from "@/stores/common"
 	import type { DiscoveryType } from '@/types/common'
 	import { storeToRefs } from 'pinia';
+import { reactive } from 'vue';
+import type { Product } from '@/types/Product';
 	const store = useCommonStore()
 	const { reachBottom,currentTab} = storeToRefs(store)
-	
+	const productList = reactive<Product[]>([])
 	const goodsWrapper = ref<HTMLElement>()
 	// 测试数据，模拟商品数据
 	const goodsNum = ref<number>(5)

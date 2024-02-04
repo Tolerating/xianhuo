@@ -7,11 +7,14 @@ import { useDispatchMode } from "@/hooks/product/useDispatchMode";
 import type { DispatchMode } from "@/types/DispatchMode";
 import {allDispatchMode,allProductRequire} from '@/api/home/goods'
 import type { ProductRequire } from "@/types/ProductRequire";
+import type { Product } from "@/types/Product";
+import {releasedProducts} from '@/api/user/user'
 const useProductStore =  defineStore("product",()=>{
     const {sellModeList,requestSellMode} = useSellMode()
     const {categoryList,requestCategory} = useCategory()
     const dispatchModeList = reactive<DispatchMode[]>([])
     const productRequireList = reactive<ProductRequire[]>([])
+    const productList = reactive<Product[]>([])
     const categoryNameById = (cId:number):string | undefined=>{
         return categoryList.find((value)=>{
             return value.id == cId
@@ -43,18 +46,27 @@ const useProductStore =  defineStore("product",()=>{
         })
         return result
     }
+
+    const requestProductList = async ()=>{
+        const result = await releasedProducts()
+        productList.length = 0
+        productList.push(...result.data)
+    }
+
     return{
         sellModeList,
-        requestSellMode,
         categoryList,
+        dispatchModeList,
+        productRequireList,
+        productList,
+        requestSellMode,
         requestCategory,
         categoryNameById,
-        dispatchModeList,
         requestAllDispatchMode,
         dispatchModeNameById,
-        productRequireList,
         requestAllProductRequire,
-        productRequireNameById
+        productRequireNameById,
+        requestProductList
     }
     
 },{
