@@ -37,15 +37,54 @@ type Files = {
 }
 
 type FileSelect = {
-	tempFilePaths: string[],
-	tempFiles: {
-		extname: string,
-		file: File,
-		name: string,
-		path: string,
-		url: string,
-		uuid: number
-	}[]
+	file: {
+		
+		/**
+		 *文件名
+		 *
+		 * @type {string}
+		 */
+		name:string,
+		size:number,
+		
+		/**
+		 *通url一样，是一个blob流
+		 *
+		 * @type {string}
+		 */
+		thumb:string,
+		/**
+		 *文件类型
+		 *
+		 * @type {string}
+		 */
+		type:string,
+		url:string
+	}[],
+	index: number,
+	/**
+	 *uv-upload组件上的name属性值
+	 *
+	 * @type {string}
+	 */
+	name:string
+}
+
+type UVFileList = {
+
+	/**
+	 *图片状态
+	 *
+	 * @type {("uploading" |"success" |"failed")}
+	 */
+	status:"uploading" |"success" |"failed" ,
+	/**
+	 * 文件名字
+	 *
+	 * @type {string}
+	 */
+	name:string,
+	url:string
 }
 
 type AMAPLocation = {
@@ -91,5 +130,6 @@ export type {
 	Files,
 	FileSelect,
 	ProductFilterPrams,
-	AMAPLocation
+	AMAPLocation,
+	UVFileList
 }

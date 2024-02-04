@@ -15,7 +15,7 @@ const useUserStore = defineStore("user",()=>{
 		released:0,
 		article:0
 	})
-
+	
 	function updateAuthorization(value:string):void{
 		authorization.value = value
 	}

@@ -5,7 +5,6 @@ import type { DispatchMode } from '@/types/DispatchMode';
 import type { ProductRequire } from '@/types/ProductRequire';
 import type { SellMode } from '@/types/SellMode';
 import type { Product } from '@/types/Product';
-const Authorization = "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIxIiwiaWF0IjoxNzA0OTQxMjg1LCJzdWIiOiIiLCJpc3MiOiIiLCJleHAiOjE3MDc2MTk2ODV9.ly8_wfQs8yCRhr3806AjhfqIQWywfPMzWWc9eybvnOs"
 // 获得所有分类
 const allCategories = () => request<Category[]>('/categories', {}, "GET")
 

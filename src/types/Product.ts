@@ -27,6 +27,8 @@ export type Product = {
     location:string,
     // 运费
     freight?:string,
+    // 完整
+    address:string,
     // 创建时间
     createTime?:string,
     // 更新时间
