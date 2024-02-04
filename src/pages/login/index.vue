@@ -55,6 +55,10 @@ const loginXH = async () => {
 	console.log(arr);
 	
 	updateAuthorization(arr[1] as string)
+	console.log("返回的token：",arr[1]);
+	
+	console.log("userStore中的token",store.authorization);
+	
 	if(arr[0] == 'null'){
 		uni.navigateTo({
 			url:"/pages/login/setPersonalInfo"
