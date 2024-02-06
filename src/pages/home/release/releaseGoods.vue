@@ -8,17 +8,15 @@ import { nextTick } from 'vue';
 import { timeUnit, type Product } from '@/types/Product'
 import type { AMAPLocation, FileSelect } from '@/types/common'
 import { computed } from 'vue';
-import { useCategory } from '@/hooks/product/useCategory'
-import { useSellMode } from '@/hooks/product/useSellMode'
-import { useDispatchMode } from '@/hooks/product/useDispatchMode'
-import { useProductRequire } from '@/hooks/product/useProductRequire'
 import CategoryPopup from '@/components/goods/CategoryPopup.vue'
 import { onHide, onLoad, onShow } from '@dcloudio/uni-app';
 import type { Category } from '@/types/Category';
-import { requestProductById } from '@/api/home/goods'
+import { requestProductById,allMode } from '@/api/home/goods'
 import useUserStore from '@/stores/users/index'
+import useProductStore from '@/stores/product';
 import { APP_BASE_URL } from '@/config/index'
-import { toRef } from 'vue';
+import { storeToRefs } from 'pinia';
+import type {SellModeProductRequire} from '@/types/SellModeProductRequire'
 
 
 const StatusBarHeight = uni.getSystemInfoSync().statusBarHeight
@@ -28,12 +26,10 @@ const isEdit = ref<boolean>(false)
 // 要编辑商品的id
 const productId = ref<number>(-1)
 const userStore = useUserStore()
-onLoad((option: any) => {
-    if (Object.keys(option).length) {
-        isEdit.value = true
-        productId.value = option.productId
-    }
-})
+const productStore = useProductStore()
+const { sellModeList,categoryList,dispatchModeList,productRequireList} = storeToRefs(productStore)
+// 存放最新的全部售卖、发货、商品要求对应关系列表
+const requireRuleList = reactive<SellModeProductRequire[]>([])
 // 存储地址选择界面传回的地址信息
 const selectedLocation = reactive<AMAPLocation>({} as AMAPLocation)
 onShow(() => {
@@ -66,19 +62,9 @@ const releaseForm = reactive<Product>({
     freight: "",
     address: ""
 })
-
 // 售卖模式，发货模式，放在reactive中数据初始化无效
-const sellMode = ref(0)
-const dispatchMode = ref(0)
-
-// 商品分类hook
-const { categoryList, requestCategory } = useCategory()
-// 售卖模式hook
-const { sellModeList, requestSellMode } = useSellMode()
-// 存放发货方式列表
-const { dispatchModeList, requestDispatchMode } = useDispatchMode()
-// 存放商品要求列表
-const { productRequireList, requestProductRequire } = useProductRequire()
+const sellMode = ref(1)
+const dispatchMode = ref(1)
 // checkbox存放选中的商品要求id
 const selectedProductRequire = reactive<number[]>([])
 // 物品出租下拉选择框数据源
@@ -88,7 +74,6 @@ timeUnit.forEach((ele) => {
 })
 // 发货方式为快递的邮费选项
 const freightSelect = ref<number>(0)
-// 焦点是否在现价输入框内，一开始为null
 type PriceType = 0 | 1 | 2
 const isCurrentPrice = ref<PriceType>(0)
 // 价钱弹出层引用
@@ -104,7 +89,6 @@ const preImage = reactive<any>([])
 const productRequireChange = (e: any) => {
     releaseForm.productRequireId = e.detail.value.join()
     console.log(releaseForm.productRequireId);
-
 
 }
 
@@ -152,18 +136,37 @@ const dealFloatNumber = (value: string, property: string) => {
     }
 }
 
-// 售卖模式改变的监听事件
-const getDispatchMode = async () => {
-    const result = await requestDispatchMode(sellMode.value)
-    // 默认选择第一种发货方式
-    dispatchMode.value = result[0].id
-    await requestProductRequire(sellMode.value, dispatchMode.value)
-}
 
-// 发货方式改变的监听事件
-const getProductRequire = () => {
-    requestProductRequire(sellMode.value, dispatchMode.value)
-}
+const dispatchComputed = computed(() => {
+    let arr:any = []
+    requireRuleList.filter(item=>{
+        return item.sellModeId == sellMode.value
+    }).forEach(item=>{
+        arr.push(item.dispatchId)
+    })
+    let result = dispatchModeList.value.filter(item=>{
+        return arr.indexOf(item.id) != -1
+    })
+    if(result.length == 1){
+        dispatchMode.value = result[0].id
+    }
+    return result
+
+})
+const requireComputed = computed(()=>{
+    let arr:number[] = []
+    requireRuleList.filter(item=>{
+        return item.sellModeId == sellMode.value && item.dispatchId == dispatchMode.value
+    }).forEach(item=>{
+        arr.push(item.productRequireId)
+    })
+    return productRequireList.value.filter(item=>{
+        return arr.indexOf(item.id) != -1
+    })
+})
+
+
+
 
 // 运费方式选择改变时间
 const freightChange = (e: any) => {
@@ -202,10 +205,18 @@ const selectedImage = async (e: FileSelect) => {
         selectImgs.set(result.data, result.data)
     }
 }
-const deleteImg = (e: any) => {
-    console.log(e.file.url);
 
-    selectImgs.delete(e.file.name)
+//删除图片 
+const deleteImg = (e: any) => {
+    console.log(e.file.name);
+    let imgIndex;
+    for(let index in preImage){
+        if(preImage[index].name == e.file.name){
+            imgIndex = index
+            break
+        }
+    }
+    preImage.splice(imgIndex,1)
 }
 
 // 监听分类改变
@@ -216,41 +227,18 @@ const showTypeRight = () => {
     categoryPopup.value.show()
 }
 const initData = async () => {
-    // 获取分类
-    const category = await requestCategory()
-    releaseForm.categoryId = category[0].id
-    // 获取售卖模式
-    const sellmodes = await requestSellMode()
-    // 设置默认的售卖模式
-    sellMode.value = sellmodes[0].id
-    const result = await requestDispatchMode(sellMode.value)
-    // 默认选择第一种发货方式
-    dispatchMode.value = result[0].id
-    requestProductRequire(sellMode.value, dispatchMode.value)
-
-
-}
-// 计算所选地点的完整地址
-const dispatchAddress = computed(() => {
-    const { city, district, address, name, province } = selectedLocation
-    return `${province}-${city}-${district}-${address}-${name.replace(/\\/g, '')}`
-})
-onLoad(async (option: any) => {
-    initData()
-    if (Object.keys(option).length) {
-        isEdit.value = true
-        productId.value = option.productId
-        console.log("sfasdfasf");
-    }
-})
-onMounted(async () => {
-    // initData()
+    // 编辑状态的数据回显
     if (isEdit.value) {
         const data = await requestProductById(productId.value)
         console.log("要编辑的数据：", data);
-        await Object.assign(releaseForm, data.data)
+        Object.assign(releaseForm, data.data)
+        // 商品要求选中
+        selectedProductRequire.length = 0
+        selectedProductRequire.push(...releaseForm.productRequireId.split(",").map(item=>Number(item)))
+        // 设置售卖与发货模式
         sellMode.value = Number(data.data.sellModeId)
         dispatchMode.value = Number(data.data.dispatchModeId)
+
         releaseForm.images.split(",").forEach(item => {
             preImage.push({
                 status: "success",
@@ -259,6 +247,25 @@ onMounted(async () => {
             })
         })
     }
+
+}
+// 计算所选地点的完整地址
+const dispatchAddress = computed(() => {
+    const { city, district, address, name, province } = selectedLocation
+    return `${province}-${city}-${district}-${address}-${name.replace(/\\/g, '')}`
+})
+onLoad((option: any) => {
+    productStore.requestAllProductRequire()
+    allMode().then(res=>{
+        Object.assign(requireRuleList,res.data)
+    });
+    if (Object.keys(option).length) {
+        isEdit.value = true
+        productId.value = option.productId
+    }
+})
+onMounted(() => {
+    initData()
 })
 </script>
 <template>
@@ -279,8 +286,6 @@ onMounted(async () => {
         <view class="release-content">
             <textarea class="content-textarea" v-model="releaseForm.detail" maxlength="-1"
                 placeholder-style="font-size:16px;" placeholder="描述下宝贝的品牌型号、货品来源..."></textarea>
-            <!-- <uni-file-picker @select="selectedImage" limit="5" @delete="deleteImg" :auto-upload="false"
-                file-mediatype="image" file-extname="png,jpg" :value="preImage" title="选择宝贝图片"></uni-file-picker> -->
             <uv-upload :fileList="preImage" name="1" multiple :previewFullImage="true" :maxCount="5"
                 @afterRead="selectedImage" @delete="deleteImg" uploadText="选择宝贝图片"></uv-upload>
             <view style="margin-top: 20px;">
@@ -307,11 +312,11 @@ onMounted(async () => {
             <hr>
             <uni-section type="line" class="sell-item" title="售卖模式">
                 <uni-data-checkbox style="padding-left: 10px;" :localdata="sellModeList"
-                    :map="{ text: 'name', value: 'id' }" v-model="sellMode" @change="getDispatchMode" mode="button" />
+                    :map="{ text: 'name', value: 'id' }" v-model="sellMode" mode="button" />
             </uni-section>
             <uni-section type="line" class="sell-item" title="发货方式">
-                <uni-data-checkbox style="padding-left: 10px;" :localdata="dispatchModeList"
-                    :map="{ text: 'name', value: 'id' }" v-model="dispatchMode" @change="getProductRequire" mode="button" />
+                <uni-data-checkbox style="padding-left: 10px;" :localdata="dispatchComputed"
+                    :map="{ text: 'name', value: 'id' }" v-model="dispatchMode" mode="button" />
                 <uni-section type="line" v-if="dispatchMode == 1" class="sell-item" title="运费">
                     <view style="padding-left: 20px;">
                         <uni-data-checkbox :localdata="[{ value: 0, text: '自己填' }, { value: 1, text: '包邮' }]"
@@ -323,7 +328,7 @@ onMounted(async () => {
                 </uni-section>
             </uni-section>
             <uni-section type="line" class="sell-item" title="商品要求">
-                <uni-data-checkbox style="padding-left: 10px;" :localdata="productRequireList"
+                <uni-data-checkbox style="padding-left: 10px;" :localdata="requireComputed"
                     v-model="selectedProductRequire" :map="{ text: 'name', value: 'id' }" multiple
                     @change="productRequireChange" mode="button" />
             </uni-section>

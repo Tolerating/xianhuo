@@ -9,7 +9,7 @@ onLaunch(() => {
 	productStore.requestSellMode()
 	productStore.requestCategory()
 	productStore.requestAllDispatchMode()
-	productStore.requestAllProductRequire()
+	// productStore.requestAllProductRequire()
 	userStore.getUserInfo()
 	// 用户第一次登录后没有完善用户信息就退出应用，再次打开应用后的判断
 	if(userStore.userInfo.name == ""){

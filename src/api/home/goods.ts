@@ -13,6 +13,8 @@ const allSellMode = ()=>request<SellMode[]>('/sellMode/1',{},"GET")
 
 // 根据售卖模式获取发货方式
 const dispatchModeBySell = (sellModeId:number)=>request<DispatchMode[]>(`/dispatchMode/${sellModeId}`,{},"GET")
+// 获取所有售卖规则对应关系
+const allMode = ()=>request("/modes",{},"GET")
 
 // 根据售卖模式id和发货方式id获取商品要求
 const productRequireByDispatch = (sellModeId:number,dispatchModeId:number)=>request<ProductRequire[]>(`/productRequire/${sellModeId}/${dispatchModeId}`,{},"GET")
@@ -40,5 +42,6 @@ export {
     releaseGoods,
     requestProductById,
     allDispatchMode,
-    allProductRequire
+    allProductRequire,
+    allMode
 }
