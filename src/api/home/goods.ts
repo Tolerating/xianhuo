@@ -25,6 +25,11 @@ const uploadImg = (data:Files)=>uploadFile<string>("/upload",data)
 // 发布
 const releaseGoods = (data:Product)=>request("/product",data,"POST")
 
+// 更新商品
+const updateProduct = (data:Product)=>request("/product",data,"PUT")
+
+// 根据id删除商品
+const deleteProduct = (id:number)=>request(`/product/${id}`,{},"DELETE")
 // 根据商品id获取商品详情
 const requestProductById = (productId:number)=>request<Product>(`/product/${productId}`,{},"GET")
 
@@ -43,5 +48,7 @@ export {
     requestProductById,
     allDispatchMode,
     allProductRequire,
-    allMode
+    allMode,
+    updateProduct,
+    deleteProduct
 }
