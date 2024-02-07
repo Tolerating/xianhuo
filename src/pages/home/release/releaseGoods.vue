@@ -3,7 +3,7 @@
 import { onMounted } from 'vue';
 import { reactive } from 'vue';
 import { ref } from 'vue';
-import { uploadImg, releaseGoods } from '@/api/home/goods'
+import { uploadImg, releaseGoods, updateProduct } from '@/api/home/goods'
 import { nextTick } from 'vue';
 import { timeUnit, type Product } from '@/types/Product'
 import type { AMAPLocation, FileSelect } from '@/types/common'
@@ -11,12 +11,13 @@ import { computed } from 'vue';
 import CategoryPopup from '@/components/goods/CategoryPopup.vue'
 import { onHide, onLoad, onShow } from '@dcloudio/uni-app';
 import type { Category } from '@/types/Category';
-import { requestProductById,allMode } from '@/api/home/goods'
+import { requestProductById, allMode } from '@/api/home/goods'
 import useUserStore from '@/stores/users/index'
 import useProductStore from '@/stores/product';
 import { APP_BASE_URL } from '@/config/index'
 import { storeToRefs } from 'pinia';
-import type {SellModeProductRequire} from '@/types/SellModeProductRequire'
+import type { SellModeProductRequire } from '@/types/SellModeProductRequire'
+import { watch } from 'vue';
 
 
 const StatusBarHeight = uni.getSystemInfoSync().statusBarHeight
@@ -27,11 +28,16 @@ const isEdit = ref<boolean>(false)
 const productId = ref<number>(-1)
 const userStore = useUserStore()
 const productStore = useProductStore()
-const { sellModeList,categoryList,dispatchModeList,productRequireList} = storeToRefs(productStore)
+const { sellModeList, categoryList, dispatchModeList, productRequireList } = storeToRefs(productStore)
 // 存放最新的全部售卖、发货、商品要求对应关系列表
 const requireRuleList = reactive<SellModeProductRequire[]>([])
 // 存储地址选择界面传回的地址信息
 const selectedLocation = reactive<AMAPLocation>({} as AMAPLocation)
+const wholeAddress = ref<string>("")
+watch(()=>selectedLocation.name,(newValue)=>{
+    const { city, district, address, name, province } = selectedLocation
+    releaseForm.address = `${province}-${city}-${district}-${address}-${name.replace(/\\/g, '')}`
+})
 onShow(() => {
     uni.$once("school-location", (data) => {
         Object.assign(selectedLocation, data)
@@ -63,8 +69,8 @@ const releaseForm = reactive<Product>({
     address: ""
 })
 // 售卖模式，发货模式，放在reactive中数据初始化无效
-const sellMode = ref(1)
-const dispatchMode = ref(1)
+const sellMode = ref(0)
+const dispatchMode = ref(0)
 // checkbox存放选中的商品要求id
 const selectedProductRequire = reactive<number[]>([])
 // 物品出租下拉选择框数据源
@@ -84,36 +90,40 @@ const showuPricePopup = () => {
     pricePopup.value.open()
 }
 
+// 图片预览数据源
 const preImage = reactive<any>([])
 
+// 
 const productRequireChange = (e: any) => {
     releaseForm.productRequireId = e.detail.value.join()
-    console.log(releaseForm.productRequireId);
-
 }
 
 // 发布商品
 const releaseProduct = async () => {
-    // 处理上传图片服务器路径为字符串，以逗号拼接
     let imgArr: string[] = []
     selectImgs.forEach((el) => {
         imgArr.push(el)
     })
     releaseForm.images = imgArr.join()
-    // 设置完整地址
-    releaseForm.address = dispatchAddress.value
     // 设置发布者id
     releaseForm.userId = userStore.userInfo.id
     // 设置售卖模式，发货模式
     releaseForm.sellModeId = sellMode.value
     releaseForm.dispatchModeId = dispatchMode.value
-    let result = await releaseGoods(releaseForm)
+    let result
+    if (isEdit.value) {
+        result = await updateProduct(releaseForm)
+    } else {
+        // 处理上传图片服务器路径为字符串，以逗号拼接
+        result = await releaseGoods(releaseForm)
+    }
     const { message } = result
     uni.showToast({
         title: message,
         duration: 2000
     });
     uni.navigateBack()
+
 }
 
 // 计算发布按钮是否可用
@@ -137,30 +147,31 @@ const dealFloatNumber = (value: string, property: string) => {
 }
 
 
+// 发货方式单选框计算属性
 const dispatchComputed = computed(() => {
-    let arr:any = []
-    requireRuleList.filter(item=>{
+    let arr: any = []
+    requireRuleList.filter(item => {
         return item.sellModeId == sellMode.value
-    }).forEach(item=>{
+    }).forEach(item => {
         arr.push(item.dispatchId)
     })
-    let result = dispatchModeList.value.filter(item=>{
+    let result = dispatchModeList.value.filter(item => {
         return arr.indexOf(item.id) != -1
     })
-    if(result.length == 1){
+    if (result.length == 1) {
         dispatchMode.value = result[0].id
     }
     return result
 
 })
-const requireComputed = computed(()=>{
-    let arr:number[] = []
-    requireRuleList.filter(item=>{
+const requireComputed = computed(() => {
+    let arr: number[] = []
+    requireRuleList.filter(item => {
         return item.sellModeId == sellMode.value && item.dispatchId == dispatchMode.value
-    }).forEach(item=>{
+    }).forEach(item => {
         arr.push(item.productRequireId)
     })
-    return productRequireList.value.filter(item=>{
+    return productRequireList.value.filter(item => {
         return arr.indexOf(item.id) != -1
     })
 })
@@ -210,13 +221,13 @@ const selectedImage = async (e: FileSelect) => {
 const deleteImg = (e: any) => {
     console.log(e.file.name);
     let imgIndex;
-    for(let index in preImage){
-        if(preImage[index].name == e.file.name){
+    for (let index in preImage) {
+        if (preImage[index].name == e.file.name) {
             imgIndex = index
             break
         }
     }
-    preImage.splice(imgIndex,1)
+    preImage.splice(imgIndex, 1)
 }
 
 // 监听分类改变
@@ -227,25 +238,41 @@ const showTypeRight = () => {
     categoryPopup.value.show()
 }
 const initData = async () => {
+    console.log("dispatch", dispatchMode.value);
+
     // 编辑状态的数据回显
     if (isEdit.value) {
         const data = await requestProductById(productId.value)
         console.log("要编辑的数据：", data);
         Object.assign(releaseForm, data.data)
-        // 商品要求选中
-        selectedProductRequire.length = 0
-        selectedProductRequire.push(...releaseForm.productRequireId.split(",").map(item=>Number(item)))
         // 设置售卖与发货模式
         sellMode.value = Number(data.data.sellModeId)
-        dispatchMode.value = Number(data.data.dispatchModeId)
+        // 商品要求选中
+        selectedProductRequire.length = 0
+        console.log(...releaseForm.productRequireId.split(",").map(item => Number(item)));
 
+        selectedProductRequire.push(...releaseForm.productRequireId.split(",").map(item => Number(item)))
+
+        // 设置是否包邮
+        if (releaseForm.freight as string == "0") {
+            freightSelect.value = 1
+        }
+        // 设置完整地址计算的值
         releaseForm.images.split(",").forEach(item => {
             preImage.push({
                 status: "success",
                 name: item,
                 url: APP_BASE_URL + item
             })
+            selectImgs.set(item, item)
         })
+        dispatchMode.value = Number(data.data.dispatchModeId)
+        nextTick(() => {
+
+        })
+    } else {
+        sellMode.value = sellModeList.value[0].id
+        dispatchMode.value = dispatchModeList.value[0].id
     }
 
 }
@@ -254,10 +281,12 @@ const dispatchAddress = computed(() => {
     const { city, district, address, name, province } = selectedLocation
     return `${province}-${city}-${district}-${address}-${name.replace(/\\/g, '')}`
 })
+
+
 onLoad((option: any) => {
     productStore.requestAllProductRequire()
-    allMode().then(res=>{
-        Object.assign(requireRuleList,res.data)
+    allMode().then(res => {
+        Object.assign(requireRuleList, res.data)
     });
     if (Object.keys(option).length) {
         isEdit.value = true
@@ -291,11 +320,8 @@ onMounted(() => {
             <view style="margin-top: 20px;">
                 <navigator url="/pages/home/release/locationSelect" open-type="navigate" hover-class="navigator-hover">
                     <uni-icons type="location-filled" :size="23" color="gray" />
-                    <text v-if="!isEdit"
-                        style="color: rgb(15, 105, 241);text-decoration: underline solid rgb(15, 105, 241);">
-                        {{ selectedLocation?.name ? dispatchAddress : "选择地址" }}</text>
-                    <text v-else style="color: rgb(15, 105, 241);text-decoration: underline solid rgb(15, 105, 241);">
-                        {{ releaseForm.address }}</text>
+                    <text style="color: rgb(15, 105, 241);text-decoration: underline solid rgb(15, 105, 241);">
+                        {{ releaseForm.address?releaseForm.address:"选择地址" }}</text>
                 </navigator>
             </view>
         </view>
@@ -328,9 +354,8 @@ onMounted(() => {
                 </uni-section>
             </uni-section>
             <uni-section type="line" class="sell-item" title="商品要求">
-                <uni-data-checkbox style="padding-left: 10px;" :localdata="requireComputed"
-                    v-model="selectedProductRequire" :map="{ text: 'name', value: 'id' }" multiple
-                    @change="productRequireChange" mode="button" />
+                <uni-data-checkbox style="padding-left: 10px;" :localdata="requireComputed" v-model="selectedProductRequire"
+                    :map="{ text: 'name', value: 'id' }" multiple @change="productRequireChange" mode="button" />
             </uni-section>
             <hr>
             <view class="property-item" @tap="showuPricePopup">
@@ -366,14 +391,6 @@ onMounted(() => {
         <!-- 商品类别弹出层 -->
         <CategoryPopup ref="categoryPopup" @change="categoryPopupChange" type="bottom"
             :category-id="releaseForm.categoryId"></CategoryPopup>
-        <!-- <uni-popup ref="categoryPopup" type="bottom">
-            <view class="goods-category-container">
-                <view :class="{ 'category-selected': item.id == releaseForm.categoryId }" class="category-item "
-                    v-for=" item  in  categoryList " @tap="releaseForm.categoryId = item.id" :key="item.id">
-                    {{ item.name }}
-                </view>
-            </view>
-        </uni-popup> -->
     </view>
 </template>
 <style scoped lang="scss">
