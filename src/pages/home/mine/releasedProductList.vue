@@ -1,77 +1,78 @@
 <script lang="ts" setup>
 import useProductStore from '@/stores/product/index'
 import { storeToRefs } from 'pinia';
-import {APP_BASE_URL} from '@/config/index'
+import { APP_BASE_URL } from '@/config/index'
+import { onMounted } from 'vue';
+import { reactive } from 'vue';
+import { deleteProduct } from '@/api/home/goods'
 const productStore = useProductStore()
-const {productList}  = storeToRefs(productStore)
-const navigateToDetail = (productId:number)=>{
+const { productList, sellModeList } = storeToRefs(productStore)
+const sellModeMap = reactive<string[]>([])
+sellModeList.value.forEach(item => {
+    sellModeMap[item.id] = item.name
+})
+const navigateToDetail = (productId: number) => {
     uni.navigateTo({
-        url:`/pages/home/release/releaseGoods?productId=${productId}`
+        url: `/pages/home/release/releaseGoods?productId=${productId}`
     })
 }
+const deleteP = (id:number,index:number)=>{
+    uni.showModal({
+        title: '提示',
+        content: '确定下架',
+        success: function (res) {
+            if (res.confirm) {
+                deleteProduct(id).then(res=>{
+                    uni.showToast({
+                        title:res.message
+                    })
+                    productList.value.splice(index,1)
+                })
+            }
+        }
+    });
+}
+onMounted(() => {
+    productStore.requestProductList()
+})
 </script>
 <template>
     <view class="released-list-container">
         <uni-notice-bar text="温馨提示：如果填写信息有误可以点击商品展示框或编辑按钮进行修改信息重新发布，如果您不想卖了可以点击下架按钮进行下架。" />
         <view class="released-list">
-            <view class="list-item" v-for="item in productList" :key="item.detail" @tap="navigateToDetail(item.id as number)">
-                <view class="item-info">
+            <view class="list-item" v-for="(item,index) in productList" :key="item.detail">
+                <view class="item-info" @tap="navigateToDetail(item.id as number)">
                     <view class="item-info-left">
                         <view style="padding-bottom: 100%;position: relative;">
-                            <image
-                                :src="APP_BASE_URL + item.images.split(',')[0]"
-                                mode="scaleToFill"
-                            />
+                            <image :src="APP_BASE_URL + item.images.split(',')[0]" mode="scaleToFill" />
                         </view>
                     </view>
                     <view class="item-info-right">
-                        <view>
-                            <uni-icons
-                            type="gift-filled"
-                            color=""
-                            size="24"
-                        />
+                        <view class="item-right-wrapper">
+                            <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <text style="font-weight: bold;">{{ item.detail.slice(0, 6) }}...</text>
                         </view>
-                        <view>
-                            <uni-icons
-                            type="gift-filled"
-                            color=""
-                            size="24"
-                        />
+                        <view class="item-right-wrapper">
+                            <uv-icon name="tags" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <text>{{ sellModeMap[item.sellModeId] }}</text>
                         </view>
-                        <view>
-                            <uni-icons
-                            type="gift-filled"
-                            color=""
-                            size="24"
-                        />
+                        <view class="item-right-wrapper">
+                            <uv-icon name="map" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <text>{{ item.address }}</text>
                         </view>
-                        <view>
-                            <uni-icons
-                            type="gift-filled"
-                            color=""
-                            size="24"
-                        />
+                        <view class="item-right-wrapper">
+                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <text style="padding-right: 20px;">{{ item.createTime }}</text>
+                            <text style="font-weight: bold;color: red;">￥{{ item.currentPrice }}</text>
                         </view>
                     </view>
                 </view>
+                <uv-line style="margin: 5px 0;" color="#2979ff"></uv-line>
                 <view class="item-operation">
-                    <view class="operation-item">
-                        <uni-icons
-                            type="compose"
-                            color="white"
-                            size="24"
-                        />
-                        <text>编辑</text>
-                    </view>
-                    <view class="operation-item">
-                        <uni-icons
-                            type="pulldown"
-                            color="white"
-                            size="24"
-                        />
-                        <text>下架</text>
-                    </view>
+                    <uv-button type="success" :plain="true" size="small" shape="circle" :iconSize="18" icon="edit-pen"
+                        @tap="navigateToDetail" text="编辑"></uv-button>
+                    <uv-button type="error" :plain="true" size="small" shape="circle" :iconSize="18" icon="trash"
+                        @tap="deleteP(item.id as number,index)" text="下架"></uv-button>
                 </view>
             </view>
         </view>
@@ -79,50 +80,54 @@ const navigateToDetail = (productId:number)=>{
 </template>
 <style lang="scss" scoped>
 .released-list-container {
+    background-color: #ece1e1;
+    min-height: 100vh;
+
     .released-list {
         display: flex;
         flex-direction: column;
         padding: 0 5px;
+
         .list-item {
-            $item-height:150px;
+            $item-height: 160px;
             display: flex;
             flex-direction: column;
-            background-color: pink;
+            background-color: white;
+            border-radius: $xh-border-radius-base;
             height: $item-height;
             margin-bottom: 15px;
+            padding: 5px;
+
             .item-info {
                 display: flex;
                 flex: 0 0 80%;
+
                 .item-info-left {
                     width: calc($item-height * 0.8);
-                    background-color: $uni-color-primary;
-                    image{
+
+                    image {
                         position: absolute;
                         width: 100%;
                         height: 100%;
                     }
                 }
+
                 .item-info-right {
                     display: flex;
                     flex-direction: column;
 
-                }
-            }
-            .item-operation {
-                flex: 0 1 100%;
-                background-color: red;
-                display: flex;
-                justify-content: space-around;
-                .operation-item{
-                    display: flex;
-                    justify-content: center;
-                    background-color: green;
-                    padding: 2px 5px;
-                    border-radius: $xh-border-radius-sm;
-                    text{
-                        
+                    .item-right-wrapper {
+                        display: flex;
+                        align-items: center;
                     }
                 }
+            }
+
+            .item-operation {
+                flex: 0 1 100%;
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
             }
         }
     }
