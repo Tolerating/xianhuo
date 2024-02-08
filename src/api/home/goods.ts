@@ -4,7 +4,7 @@ import type { Category } from '@/types/Category';
 import type { DispatchMode } from '@/types/DispatchMode';
 import type { ProductRequire } from '@/types/ProductRequire';
 import type { SellMode } from '@/types/SellMode';
-import type { Product } from '@/types/Product';
+import type { Product, ProductStatus } from '@/types/Product';
 // 获得所有分类
 const allCategories = () => request<Category[]>('/categories', {}, "GET")
 
@@ -29,7 +29,7 @@ const releaseGoods = (data:Product)=>request("/product",data,"POST")
 const updateProduct = (data:Product)=>request("/product",data,"PUT")
 
 // 根据id删除商品
-const deleteProduct = (id:number)=>request(`/product/${id}`,{},"DELETE")
+const deleteProduct = (id:number,status:ProductStatus)=>request(`/product/${id}/${status}`,{},"DELETE")
 // 根据商品id获取商品详情
 const requestProductById = (productId:number)=>request<Product>(`/product/${productId}`,{},"GET")
 
@@ -38,6 +38,8 @@ const allDispatchMode = ()=>request<DispatchMode[]>("/dispatchMode",{},"GET")
 
 // 获取所有的商品要求
 const allProductRequire = ()=>request<ProductRequire[]>("/productRequire",{},"GET")
+// 根据用户id获取商品
+const productsByUserId = (id:number)=>request(`/product?id=${id}`,{},"GET")
 export {
     allCategories,
     allSellMode,
@@ -50,5 +52,6 @@ export {
     allProductRequire,
     allMode,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    productsByUserId
 }
