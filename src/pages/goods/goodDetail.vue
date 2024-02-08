@@ -12,7 +12,7 @@
       </view>
       <view>
         <!-- <text>信用：100</text> -->
-        <view class="store-button">进入TA的仓库</view>
+        <view class="store-button" @tap="naviagteToStoreHouse">进入TA的仓库</view>
       </view>
     </view>
     <!--  商品信息  -->
@@ -20,12 +20,12 @@
       <!--   价格、售卖模式   -->
       <view class="base-info">
         <view class="base-info-left">
-          <text>￥{{ product.currentPrice }}</text>
+          <!-- <text>￥{{ product.currentPrice }}</text> -->
+          <ProductPrice :mode="product.sellModeId" :origin-price="product.originPrice" :current-price="product.currentPrice" :time-unit="product.timeUnit"></ProductPrice>
         </view>
         <view class="base-info-right">
           <!--   售卖模式      -->
-          <SellModeIcon type="出售"></SellModeIcon>
-          <!-- <text>13浏览</text> -->
+          <SellModeIcon :mode="product.sellModeId"></SellModeIcon>
         </view>
       </view>
     </view>
@@ -55,10 +55,6 @@
         <image v-for="item in imgList" :key="item" :src="item" mode="widthFix"></image>
       </view>
     </uni-section>
-
-
-
-
     <!--  页脚操作栏  -->
     <view class="goods-detail-footer">
       <uni-goods-nav :options="[
@@ -78,24 +74,6 @@
     color: '#fff'
   }
 ]" :fill="true" @click="" @button-click="" />
-      <!-- <view class="footer-icon">
-        <uni-icons type="star" color="black" size="24" />
-        <text>
-          收藏
-        </text>
-      </view>
-      <view class="footer-icon">
-        <uni-icons type="chat" color="black" size="24" />
-        <text>
-          留言
-        </text>
-      </view>
-      <view class="footer-button">
-        <uni-icons type="chatboxes" color="black" size="24" />
-        <text>
-          我想要
-        </text>
-      </view> -->
 
     </view>
   </view>
@@ -104,6 +82,7 @@
 <script lang="ts" setup>
 import SellModeIcon from '@/components/goods/SellModeIcon.vue'
 import { requestProductById } from '@/api/home/goods'
+import ProductPrice from '@/components/goods/ProductPrice.vue'
 import { ref } from "vue";
 import { onMounted } from 'vue';
 import { reactive } from 'vue';
@@ -130,6 +109,7 @@ const product = reactive<Product>({
   productRequireId: "",
   status: 1,
   location: "",
+  address:""
 })
 const productStore = useProductStore()
 // 商品分类名字
@@ -148,8 +128,8 @@ const previewImg = () => {
     urls: imgList
   })
 }
-const init = async () => {
-  const result = await requestProductById(1)
+const init = async (pId:number) => {
+  const result = await requestProductById(pId)
   console.log(result);
   Object.assign(product, result.data)
   console.log(productStore.categoryList);
@@ -160,12 +140,14 @@ const init = async () => {
   dispatchName.value = productStore.dispatchModeNameById(product.dispatchModeId) || ""
   productRequireNameList.length = 0
   productRequireNameList.push(...productStore.productRequireNameById(product.productRequireId.split(",")))
-
-
-
+}
+const naviagteToStoreHouse = ()=>{
+  uni.navigateTo({
+    url:`/pages/home/mine/myStoresHouse?id=${product.userId}`
+  })
 }
 onLoad((options) => {
-  init()
+  init(options?.pId)
   requestPartUserInfo(options?.uId)
   console.log(options);
 

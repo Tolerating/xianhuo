@@ -116,6 +116,8 @@ const releaseProduct = async () => {
     } else {
         // 处理上传图片服务器路径为字符串，以逗号拼接
         result = await releaseGoods(releaseForm)
+        userStore.counts.released++
+
     }
     const { message } = result
     uni.showToast({
@@ -246,7 +248,7 @@ const initData = async () => {
         console.log("要编辑的数据：", data);
         Object.assign(releaseForm, data.data)
         // 设置售卖与发货模式
-        sellMode.value = Number(data.data.sellModeId)
+        sellMode.value = Number(releaseForm.sellModeId)
         // 商品要求选中
         selectedProductRequire.length = 0
         console.log(...releaseForm.productRequireId.split(",").map(item => Number(item)));
@@ -266,10 +268,7 @@ const initData = async () => {
             })
             selectImgs.set(item, item)
         })
-        dispatchMode.value = Number(data.data.dispatchModeId)
-        nextTick(() => {
-
-        })
+        dispatchMode.value = Number(releaseForm.dispatchModeId)
     } else {
         sellMode.value = sellModeList.value[0].id
         dispatchMode.value = dispatchModeList.value[0].id
@@ -376,12 +375,12 @@ onMounted(() => {
                     <input placeholder="￥0.00" @input="dealPrice" v-model="releaseForm.currentPrice"
                         @focus="isCurrentPrice = 0" type="digit">
                 </view>
-                <view v-if="releaseForm.sellModeId == 2" class="price-group">
+                <view v-if="sellMode == 2" class="price-group">
                     <text>单位</text>
                     <uni-data-select v-model="releaseForm.timeUnit" :localdata="timeUnitList"></uni-data-select>
                 </view>
                 <hr>
-                <view v-if="releaseForm.sellModeId != 2" class="price-group">
+                <view v-if="sellMode != 2" class="price-group">
                     <text style="font-size: 14px;">原价</text>
                     <input style="font-size: 14px;" @input="dealPrice" @focus="isCurrentPrice = 1"
                         v-model="releaseForm.originPrice" placeholder="￥0.00" type="digit">

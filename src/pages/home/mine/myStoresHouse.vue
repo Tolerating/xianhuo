@@ -1,9 +1,28 @@
 <script lang="ts" setup>
 import useUserStore from '@/stores/users/index'
+import useProductStore from '@/stores/product/index'
 import { storeToRefs } from 'pinia'
+import {productsByUserId} from '@/api/home/goods'
 import GoodCard from '@/components/goods/GoodCard.vue'
+import { onMounted } from 'vue';
+import { reactive } from 'vue';
+
+import type { Product } from '@/types/Product';
+import { onLoad } from '@dcloudio/uni-app'
+import { APP_BASE_URL } from '@/config'
 const userStore = useUserStore()
+const productStore = useProductStore()
+const products = reactive<Product[]>([])
 const { userInfo } = storeToRefs(userStore)
+onLoad((option:any)=>{
+    productsByUserId(option.id).then(res=>{
+        products.length = 0
+        products.push(...res.data)
+    })
+    
+})
+onMounted(()=>{
+})
 </script>
 <template>
     <view class="released-producted-container">
@@ -16,25 +35,14 @@ const { userInfo } = storeToRefs(userStore)
             </view>
         </view>
         <view class="products-list">
-            <view class="product-card" v-for="item in 3" :key="item">
-                <view style="background-color: aquamarine;">
-                    <image src="../../../static/yifu.jpg" class="good-image" mode=""></image>
-                    <text class="goods-title">
-                        <span>售卖</span>
-                        我是标题
-                    </text>
-                    <view class="goods-price">
-                        <text><span>￥</span>680</text>
-                    </view>
-                </view>
-            </view>
+            <GoodCard v-for="item in products" :key="item.createTime" :product="item"></GoodCard>
         </view>
     </view>
 </template>
 <style lang="scss" scoped>
 .released-producted-container {
-    background-color: rgba($color: $xh-theme-color-100, $alpha: .4);
-    height: 100vh;
+    background-color: $xh-color-primary;
+    min-height: 100vh;
 
     .profile_top {
         display: flex;
@@ -59,22 +67,6 @@ const { userInfo } = storeToRefs(userStore)
     .products-list {
         display: flex;
         flex-wrap: wrap;
-
-        .product-card {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            overflow: hidden;
-            box-sizing: border-box;
-            padding: 5px;
-            flex: 0 0 50%;
-
-            .good-image {
-                width: 100%;
-                border-radius: 15px;
-                overflow: hidden;
-            }
-        }
     }
 }
 </style>

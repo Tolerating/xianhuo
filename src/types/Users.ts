@@ -5,7 +5,9 @@ export type LoginUser = {
 	password: string;
 }
 
-export interface UserPart{
+export interface UserPart {
+	// 用户id
+	id: number;
 	//用户昵称
 	name: string;
 	//学校名字
@@ -17,9 +19,7 @@ export interface UserPart{
 }
 
 // 用户信息表
-export interface User extends LoginUser,UserPart {
-	// 用户id
-	id: number;
+export interface User extends LoginUser, UserPart {
 	//电话
 	phone: string;
 	//身份证

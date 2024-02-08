@@ -94,21 +94,25 @@ const dealItem = reactive([
 const countsNavigate = (flag: number) => {
     switch (flag) {
         case 1:
+            // 我的收藏
             uni.navigateTo({
                 url: "/pages/home/mine/myStoresHouse"
             })
             break;
         case 2:
+            // 我的发布
             uni.navigateTo({
                 url: "/pages/home/mine/releasedProductList"
             })
             break;
         case 3:
+            // 我的仓库
             uni.navigateTo({
-                url: "/pages/home/mine/myStoresHouse"
+                url: `/pages/home/mine/myStoresHouse?id=${userInfo.value.id}`
             })
             break;
         case 4:
+            // 我的帖子
             uni.navigateTo({
                 url: "/pages/home/mine/myStoresHouse"
             })

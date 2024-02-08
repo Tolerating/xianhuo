@@ -22,7 +22,7 @@ export type Product = {
     // 商品要求id,以逗号分隔
     productRequireId:string,
     // 商品状态，1表示在售，0表示售出，-1表示下架
-    status:number,
+    status:ProductStatus,
     // 商品所在学校定位
     location:string,
     // 运费
@@ -37,5 +37,5 @@ export type Product = {
     deleteTime?:string,
     [key: string]: unknown
 }
-
+export type ProductStatus = 1|0|-1
 export const timeUnit = ["时","天","周","月","年", "学期"]

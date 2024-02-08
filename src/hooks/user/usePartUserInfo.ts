@@ -5,9 +5,11 @@ import {APP_BASE_URL} from '@/config/index'
 
 export function usePartUserInfo(){
     const partUserInfo = reactive<UserPart>({
+        id:0,
         name:"",
         school:"",
-        avatar:""
+        avatar:"",
+        location:""
     })
 
     async function requestPartUserInfo(uId:number){

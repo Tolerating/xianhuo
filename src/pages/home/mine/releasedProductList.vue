@@ -2,6 +2,8 @@
 import useProductStore from '@/stores/product/index'
 import { storeToRefs } from 'pinia';
 import { APP_BASE_URL } from '@/config/index'
+import type {Product} from '@/types/Product'
+import ProductPrice from '@/components/goods/ProductPrice.vue'
 import { onMounted } from 'vue';
 import { reactive } from 'vue';
 import { deleteProduct } from '@/api/home/goods'
@@ -22,7 +24,7 @@ const deleteP = (id:number,index:number)=>{
         content: '确定下架',
         success: function (res) {
             if (res.confirm) {
-                deleteProduct(id).then(res=>{
+                deleteProduct(id,-1).then(res=>{
                     uni.showToast({
                         title:res.message
                     })
@@ -63,14 +65,14 @@ onMounted(() => {
                         <view class="item-right-wrapper">
                             <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
                             <text style="padding-right: 20px;">{{ item.createTime }}</text>
-                            <text style="font-weight: bold;color: red;">￥{{ item.currentPrice }}</text>
+                            <ProductPrice :mode="item.sellModeId" originPrice="0" :currentPrice="item.currentPrice" :timeUnit="item.timeUnit"></ProductPrice>
                         </view>
                     </view>
                 </view>
                 <uv-line style="margin: 5px 0;" color="#2979ff"></uv-line>
                 <view class="item-operation">
                     <uv-button type="success" :plain="true" size="small" shape="circle" :iconSize="18" icon="edit-pen"
-                        @tap="navigateToDetail" text="编辑"></uv-button>
+                        @tap="navigateToDetail(item.id as number)" text="编辑"></uv-button>
                     <uv-button type="error" :plain="true" size="small" shape="circle" :iconSize="18" icon="trash"
                         @tap="deleteP(item.id as number,index)" text="下架"></uv-button>
                 </view>
