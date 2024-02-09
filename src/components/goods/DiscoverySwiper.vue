@@ -25,9 +25,10 @@
 	const currentIndex = ref<number>(0);
 	const changeTab = (val : DiscoveryType) : void => {
 		currentIndex.value = val.id;
-		console.log(`设置storage--${"discovery" +currentTab.id}`,currentTab.title,store.currentScrollTop);
+		store.updateCurrentTab(val)
+		// console.log(`设置storage--${"discovery" +currentTab.id}`,currentTab.title,store.currentScrollTop);
 		uni.setStorageSync("discovery" +currentTab.id,store.currentScrollTop)
-		console.log("获取最新页面位置的缓存",uni.getStorageSync("discovery"+currentTab.id));
+		// console.log("获取最新页面位置的缓存",uni.getStorageSync("discovery"+currentTab.id));
 		emits("tabChange",val)
 	}
 </script>

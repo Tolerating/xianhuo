@@ -6,7 +6,7 @@
       </view>
       <view class="home-index-organization">
         <image src="../../static/tabbar/home.png" mode=""></image>
-        <text>浙江万里学院</text>
+        <text>{{ userInfo.school }}</text>
       </view>
       <view class="search-wrapper">
         <view class="search-input" @tap="jumpSearch">
@@ -20,7 +20,7 @@
       <DiscoverySwiper @tabChange="getTabSelectedGoods"></DiscoverySwiper>
     </view>
     <template v-for="(item) in tabList" :key="item.id">
-      <GoodsWaterFallFlow :disCoveryType="item" v-show="currentTab.id==item.id"></GoodsWaterFallFlow>
+      <GoodsWaterFallFlow :disCoveryType="item" v-if="currentTab.id==item.id"></GoodsWaterFallFlow>
     </template>
     <CategoryPopup ref="categoryPopup" type="bottom" @change="navigateToFilter" :category-id="-1"></CategoryPopup>
   </view>
@@ -35,21 +35,21 @@ import DiscoverySwiper from '@/components/goods/DiscoverySwiper.vue'
 import GoodsWaterFallFlow from '@/components/goods/GoodsWaterFallFlow.vue'
 import CategoryPopup from '@/components/goods/CategoryPopup.vue'
 import useCommonStore from "@/stores/common"
+import useUserStore from '@/stores/users'
 import {storeToRefs} from 'pinia'
 import type { Category } from '@/types/Category'
 const searchValue = ref<string>("")
 const store = useCommonStore()
+const userStore = useUserStore()
 const {reachBottom} = storeToRefs(store)
+const {userInfo} = storeToRefs(userStore)
 const {tabList, currentTab} = store
 const categoryPopup = ref()
 onReachBottom(() => {
   store.updateReachBottom(!reachBottom.value)
 })
 onPageScroll((e) => {
-  // console.log("页面滚动：",e.scrollTop);
-
   store.currentScrollTop = e.scrollTop
-  // console.log("页面位置：",store.currentScrollTop);
 })
 onLoad(() => {
   tabList.forEach((item) => {

@@ -40,19 +40,18 @@ const useCommonStore = defineStore("common", () => {
 	const updateReachBottom = (val : boolean) => {
 		reachBottom.value = val
 	}
-	const currentTab = ref<DiscoveryType>({ id: 0, title: "最新发布" })
+	const currentTab = reactive<DiscoveryType>({ id: 0, title: "最新发布",type:0 })
 	const updateCurrentTab = (val : DiscoveryType) => {
-		currentTab.value.id = val.id
-		currentTab.value.title = val.title
+		Object.assign(currentTab,val)
 	}
 
 	const tabList = reactive<DiscoveryType[]>([
-		{ id: 0, title: "最新发布" },
-		{ id: 1, title: "猜你喜欢" },
-		{ id: 2, title: "物品出租" },
-		{ id: 3, title: "物品出售" },
-		{ id: 4, title: "书籍资料" },
-		{ id: 5, title: "数码产品" }
+		{ id: 0, title: "最新发布",type:0 },
+		{ id: 1, title: "物品出租",type:1 },
+		{ id: 2, title: "物品出售",type:1 },
+		{ id: 3, title: "宿舍神器",type:2 },
+		{ id: 4, title: "书籍资料",type:2 },
+		{ id: 5, title: "数码产品",type:2 }
 	])
 	const updateTabList = (val : DiscoveryType) : void => {
 		tabList.push(val)

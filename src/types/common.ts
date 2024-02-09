@@ -17,7 +17,13 @@ type RequestParams = {
 // 咸货首页的商品分类（横向滑动块），例如：猜你喜欢、最近发布.....
 type DiscoveryType = {
 	id: number,
-	title: string
+	title: string,
+	/**
+	 * 0表示最新发布，1表示售卖模式，2表示商品类别
+	 *
+	 * @type {(0 | 1 | 2)}
+	 */
+	type:0 | 1 | 2
 }
 
 

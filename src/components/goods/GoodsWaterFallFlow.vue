@@ -10,12 +10,21 @@
 	import useCommonStore from "@/stores/common"
 	import type { DiscoveryType } from '@/types/common'
 	import { storeToRefs } from 'pinia';
-import { reactive } from 'vue';
-import type { Product } from '@/types/Product';
+	import { reactive } from 'vue';
+	import type { Product } from '@/types/Product';
+	import {produtsBySellMode} from '@/api/home/goods'
+	import useProductStore from '@/stores/product/index'
+	import useUserStore from '@/stores/users';
+import { onShow } from '@dcloudio/uni-app';
 	const store = useCommonStore()
+	const productStore = useProductStore()
+	const userStore = useUserStore()
+	const {userInfo} = storeToRefs(userStore)
+	const {sellModeList} = storeToRefs(productStore)
 	const { reachBottom,currentTab} = storeToRefs(store)
 	const productList = reactive<Product[]>([])
 	const goodsWrapper = ref<HTMLElement>()
+	const currentPage = ref<number>(1)
 	// 测试数据，模拟商品数据
 	const goodsNum = ref<number>(5)
 	const props = defineProps<{
@@ -29,7 +38,22 @@ import type { Product } from '@/types/Product';
 		}
 	})
 	onMounted(() => {
-		// console.log("挂载好了", props.disCoveryType.title);
+		console.log(props.disCoveryType);
+		
+		if(props.disCoveryType.type == 0){
+		}else if(props.disCoveryType.type == 1){
+			console.log("类别",1);
+			
+			let mode = sellModeList.value.filter(item=>item.name == props.disCoveryType.title)[0]
+			produtsBySellMode(mode.id,currentPage.value,10,userInfo.value.location).then(res=>{
+				console.log(res);
+				
+				productList.length = 0
+				productList.push(...res.data.records)
+			})
+		}
+
+		console.log("挂载好了", props.disCoveryType.title);
 	})
 </script>
 
