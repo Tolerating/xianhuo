@@ -20,7 +20,6 @@
       <!--   价格、售卖模式   -->
       <view class="base-info">
         <view class="base-info-left">
-          <!-- <text>￥{{ product.currentPrice }}</text> -->
           <ProductPrice :mode="product.sellModeId" :origin-price="product.originPrice" :current-price="product.currentPrice" :time-unit="product.timeUnit"></ProductPrice>
         </view>
         <view class="base-info-right">
@@ -42,7 +41,10 @@
     </uni-section>
     <uni-section type="line" padding="0 0 0 20px" class="sell-item" title="发货方式">
       <template v-slot:right>
-        <text style="color: red;">{{ dispatchName }}({{ product.freight?'￥'+product.freight:'包邮' }})</text>
+        <text style="color: red;">
+          {{dispatchNameComputed}}
+          <!-- {{ dispatchName }}{{ product.freight=='null'?'￥'+product.freight:'包邮' }} -->
+        </text>
       </template>
 
     </uni-section>
@@ -84,7 +86,6 @@ import SellModeIcon from '@/components/goods/SellModeIcon.vue'
 import { requestProductById } from '@/api/home/goods'
 import ProductPrice from '@/components/goods/ProductPrice.vue'
 import { ref } from "vue";
-import { onMounted } from 'vue';
 import { reactive } from 'vue';
 import type { Product } from '@/types/Product';
 import useProductStore from '@/stores/product';
@@ -92,6 +93,7 @@ import useUserStore from '@/stores/users';
 import { onLoad } from '@dcloudio/uni-app';
 import { APP_BASE_URL } from '@/config/index'
 import { usePartUserInfo } from '@/hooks/user/usePartUserInfo'
+import { computed } from 'vue';
 
 // 商品图片列表
 const imgList = reactive<string[]>([])
@@ -110,6 +112,13 @@ const product = reactive<Product>({
   status: 1,
   location: "",
   address:""
+})
+const dispatchNameComputed = computed(()=>{
+  if(dispatchName.value == "快递"){
+    return product.freight == "null"?dispatchName.value+"(包邮)":dispatchName.value + "(￥"+ product.freight+")"
+  }else{
+    return dispatchName.value
+  }
 })
 const productStore = useProductStore()
 // 商品分类名字
@@ -138,6 +147,8 @@ const init = async (pId:number) => {
   imgList.length = 0
   imgList.push(...product.images.split(",").map(value => APP_BASE_URL + value));
   dispatchName.value = productStore.dispatchModeNameById(product.dispatchModeId) || ""
+  // 获取最新的全部商品要求
+  productStore.requestAllProductRequire()
   productRequireNameList.length = 0
   productRequireNameList.push(...productStore.productRequireNameById(product.productRequireId.split(",")))
 }
