@@ -2,15 +2,17 @@
 	<view class="good-card-wrapper" @tap="toGoodsDetail">
 		<view class="good-card-content">
 			<image :src="APP_BASE_URL + product.images.split(',')[0]" class="good-image" mode=""></image>
-			<text class="goods-title">
-				{{ product.detail.slice(0, 6) }}...
-			</text>
-			<uv-tags :text="sellModeMap[product.sellModeId]" type="success" style="max-width: 85px;"></uv-tags>
-			<text>{{ product.address }}</text>
-			<!-- <view class="goods-price">
-				<text>￥{{ product.sellModeId==1? product.currentPrice:product.currentPrice+"/"+product.timeUnit }}</text>
-			</view> -->
-			<ProductPrice :mode="product.sellModeId" :origin-price="product.originPrice" :current-price="product.currentPrice" :time-unit="product.timeUnit"></ProductPrice>
+			<view style="padding: 5px;">
+				<text class="goods-title">
+					{{ product.detail.slice(0, 6) }}...
+				</text>
+				<uv-tags :text="sellModeMap[product.sellModeId]" type="success" style="max-width: 85px;"></uv-tags>
+				<text>{{ product.address }}</text>
+				<!-- <view class="goods-price">
+					<text>￥{{ product.sellModeId==1? product.currentPrice:product.currentPrice+"/"+product.timeUnit }}</text>
+				</view> -->
+				<ProductPrice :mode="product.sellModeId" :origin-price="product.originPrice" :current-price="product.currentPrice" :time-unit="product.timeUnit"></ProductPrice>
+			</view>
 		</view>
 	</view>
 </template>

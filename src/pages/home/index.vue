@@ -20,7 +20,7 @@
       <DiscoverySwiper @tabChange="getTabSelectedGoods"></DiscoverySwiper>
     </view>
     <template v-for="(item) in tabList" :key="item.id">
-      <GoodsWaterFallFlow :disCoveryType="item" v-if="currentTab.id==item.id"></GoodsWaterFallFlow>
+      <GoodsWaterFallFlow :disCoveryType="item" v-show="currentTab.id==item.id"></GoodsWaterFallFlow>
     </template>
     <CategoryPopup ref="categoryPopup" type="bottom" @change="navigateToFilter" :category-id="-1"></CategoryPopup>
   </view>
@@ -110,7 +110,8 @@ $icon-size: 25px;
   box-sizing: border-box;
   justify-content: flex-start;
   width: 100%;
-  background-color: white;
+  background-color: #dee5e3;
+  min-height: 100vh;
 
   .status_bar {
     background-color: #d4c9a7;
