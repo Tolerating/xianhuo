@@ -8,10 +8,8 @@
 				</text>
 				<uv-tags :text="sellModeMap[product.sellModeId]" type="success" style="max-width: 85px;"></uv-tags>
 				<text>{{ product.address }}</text>
-				<!-- <view class="goods-price">
-					<text>￥{{ product.sellModeId==1? product.currentPrice:product.currentPrice+"/"+product.timeUnit }}</text>
-				</view> -->
 				<ProductPrice :mode="product.sellModeId" :origin-price="product.originPrice" :current-price="product.currentPrice" :time-unit="product.timeUnit"></ProductPrice>
+				<uv-text :customStyle="{marginTop:'5px',marginLeft:'5px'}" type="sueecss" :text="product.createTime"></uv-text>
 			</view>
 		</view>
 	</view>

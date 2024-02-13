@@ -104,13 +104,33 @@ const productsByUserId = (id:number)=>request(`/product?id=${id}`,{},"GET")
 
 /**
  *
- *根据售卖模式获取对应的商品
+ *根据售卖模式分页获取对应的商品
  * @param {number} sellModeId
  * @param {number} current
  * @param {number} size
  * @param {string} location
  */
 const produtsBySellMode = (sellModeId:number,current:number,size:number,location:string)=>request(`/product/sellMode/${sellModeId}?current=${current}&size=${size}&location=${location}`,{},"GET")
+
+/**
+ *分页获取最新发布的商品
+ *
+ * @param {number} current
+ * @param {number} size
+ * @param {string} location
+ */
+const productByLatest = (current:number,size:number,location:string)=>request(`/product/latest?current=${current}&size=${size}&location=${location}`,{},"GET")
+
+
+/**
+ *根据分类分页获取商品
+ *
+ * @param {number} categoryId
+ * @param {number} current
+ * @param {number} size
+ * @param {string} location
+ */
+const productByCategory = (categoryId:number,current:number,size:number,location:string)=>request(`/product/category/${categoryId}?current=${current}&size=${size}&location=${location}`,{},"GET")
 export {
     allCategories,
     allSellMode,
@@ -125,5 +145,7 @@ export {
     updateProduct,
     deleteProduct,
     productsByUserId,
-    produtsBySellMode
+    produtsBySellMode,
+    productByLatest,
+    productByCategory
 }

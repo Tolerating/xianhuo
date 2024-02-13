@@ -43,7 +43,6 @@
       <template v-slot:right>
         <text style="color: red;">
           {{dispatchNameComputed}}
-          <!-- {{ dispatchName }}{{ product.freight=='null'?'￥'+product.freight:'包邮' }} -->
         </text>
       </template>
 
@@ -148,8 +147,7 @@ const init = async (pId:number) => {
   imgList.push(...product.images.split(",").map(value => APP_BASE_URL + value));
   dispatchName.value = productStore.dispatchModeNameById(product.dispatchModeId) || ""
   // 获取最新的全部商品要求
-  productStore.requestAllProductRequire()
-  productRequireNameList.length = 0
+  productStore.requestAllProductRequire() 
   productRequireNameList.push(...productStore.productRequireNameById(product.productRequireId.split(",")))
 }
 const naviagteToStoreHouse = ()=>{

@@ -45,8 +45,10 @@ const {reachBottom} = storeToRefs(store)
 const {userInfo} = storeToRefs(userStore)
 const {tabList, currentTab} = store
 const categoryPopup = ref()
+
 onReachBottom(() => {
   store.updateReachBottom(!reachBottom.value)
+
 })
 onPageScroll((e) => {
   store.currentScrollTop = e.scrollTop
