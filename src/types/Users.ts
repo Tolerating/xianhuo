@@ -7,7 +7,7 @@ export type LoginUser = {
 
 export interface UserPart {
 	// 用户id
-	id: number;
+	id?: number;
 	//用户昵称
 	name: string;
 	//学校名字

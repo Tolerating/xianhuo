@@ -5,6 +5,7 @@ import { onLaunch } from '@dcloudio/uni-app';
 const productStore = useProductStore()
 const userStore = useUserStore()
 
+
 onLaunch(() => {
 	productStore.requestSellMode()
 	productStore.requestCategory()
@@ -12,9 +13,9 @@ onLaunch(() => {
 	// productStore.requestAllProductRequire()
 	userStore.getUserInfo()
 	// 用户第一次登录后没有完善用户信息就退出应用，再次打开应用后的判断
-	if(userStore.userInfo.name == ""){
+	if (userStore.userInfo.name == "") {
 		uni.redirectTo({
-			url:"/pages/login/setPersonalInfo"
+			url: "/pages/login/setPersonalInfo"
 		})
 	}
 	uni.getSystemInfo({
@@ -24,6 +25,7 @@ onLaunch(() => {
 
 		}
 	})
+	
 })
 
 </script>

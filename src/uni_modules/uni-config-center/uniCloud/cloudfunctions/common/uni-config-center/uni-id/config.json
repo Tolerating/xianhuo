@@ -1,0 +1,21 @@
+{
+  "passwordSecret": [
+    {
+      "type": "hmac-sha256",
+      "version": 1
+    }
+  ], 
+  "passwordStrength": "medium", 
+  "tokenSecret": "lk@354378485hellowroldhahahaha", 
+  "requestAuthSecret": "xianhuoapphenhahoyong", 
+  "tokenExpiresIn": 2678400000, 
+  "tokenExpiresThreshold": 3600, 
+  "maxTokenLength": 10, 
+  "passwordErrorLimit": 6,
+  "passwordErrorRetryTime": 3600, 
+  "userRegisterDefaultRole": [],
+   "web": {
+      "tokenExpiresIn": 2678400000,
+      "tokenExpiresThreshold": 3600
+    }
+}

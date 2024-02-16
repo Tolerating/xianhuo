@@ -6,8 +6,9 @@ import type { AMAPLocation, FileSelect } from '@/types/common';
 import { onHide, onReady, onShow } from '@dcloudio/uni-app';
 import { reactive } from 'vue';
 import { ref } from 'vue';
-import {DEFAULT_AVATAR,APP_BASE_URL} from '@/config/index'
+import { DEFAULT_AVATAR, APP_BASE_URL } from '@/config/index'
 import { improveInfo } from '@/api/user/user'
+import { getSignature, registerUniId } from '@/api/user/login'
 import useUserStore from '@/stores/users/index'
 const userStore = useUserStore()
 const formData = reactive<{
@@ -23,14 +24,14 @@ const formData = reactive<{
 })
 // 存储地址选择界面传回的地址信息
 const selectedLocation = reactive<AMAPLocation>({} as AMAPLocation)
-onShow(()=>{
+onShow(() => {
     console.log("设置用户信息---显示");
-    
+
     uni.$once("school-location", (data) => {
         Object.assign(selectedLocation, data)
         // 处理发布商品定位，格式为 "经度,维度"
-        const { name,location:{longitude,latitude} } = data
-        formData.school = name.replace(/\\/g,"")
+        const { name, location: { longitude, latitude } } = data
+        formData.school = name.replace(/\\/g, "")
         formData.location = `${longitude},${latitude}`
     })
 })
@@ -48,7 +49,7 @@ const avatarPreview = reactive([
         "url": APP_BASE_URL + DEFAULT_AVATAR,
     }
 ])
-const setAvatar = async (e:any) => {
+const setAvatar = async (e: any) => {
     const result = await uploadImg({ name: "file", file: e.tempFiles[0].file, uri: e.tempFilePaths[0] })
     console.log(result);
     formData.avatar = result.data
@@ -84,27 +85,55 @@ const form = ref()
 // 提交更新信息
 const submit = () => {
     // 表单校验
-    form.value.validate().then(async (res: any) => {
-        // 校验成功
-        if(formData.avatar == APP_BASE_URL + DEFAULT_AVATAR){
-            formData.avatar = DEFAULT_AVATAR
-        }
-        const result = await improveInfo(formData)
-        userStore.getUserInfo()
-        uni.showToast({
-            title:result.message,
-            success(){
-                uni.switchTab({
-                    url:"/pages/home/index"
-                })
+    // form.value.validate().then(async (res: any) => {
+    // 校验成功
+    if (formData.avatar == APP_BASE_URL + DEFAULT_AVATAR) {
+        formData.avatar = DEFAULT_AVATAR
+    }
+    userStore.getUserInfo()
+    getSignature(formData).then(res => {
+        console.log(res);
+        uni.request({
+            url: 'https://fc-mp-cb2eb9b5-3cbb-47a7-aa08-383cdf5374d2.next.bspapp.com/uni-id-co/externalRegister',
+            method: 'POST',
+            data: {
+                clientInfo: uni.getSystemInfoSync(),
+                uniIdToken: '',
+                params: {
+                    externalUid: String(userStore.userInfo.id),
+                    nickname: formData.name,
+                    avatar: formData.avatar
+                }
+            },
+            header: {
+                'Content-Type': 'application/json',
+                "uni-id-nonce": res.data.nonce,
+                "uni-id-timestamp": res.data.timestamp,
+                "uni-id-signature": res.data.signature
+            },
+            success: (res) => {
+                console.log(res);
+                
             }
         })
-        
-    }).catch((res: any) => {
-        // 校验失败
-        console.log(res);
-
+        // registerUniId({ externalUid: String(userStore.userInfo.id), nickname: formData.name, avatar: formData.avatar }, { uniIdNonce: res.data.})
     })
+    // const result = await improveInfo(formData)
+    // userStore.getUserInfo()
+    // uni.showToast({
+    //     title:result.message,
+    //     success(){
+    //         uni.switchTab({
+    //             url:"/pages/home/index"
+    //         })
+    //     }
+    // })
+
+    // }).catch((res: any) => {
+    //     // 校验失败
+    //     console.log(res);
+
+    // })
 }
 </script>
 <template>
@@ -126,16 +155,9 @@ const submit = () => {
             <uni-section type="line" class="property-item" title="选择学校">
                 <uni-forms-item required name="school">
                     <navigator url="/pages/home/release/locationSelect" open-type="navigate" hover-class="navigator-hover">
-                    <uni-easyinput
-                        v-model="formData.school"
-                        prefixIcon="location-filled"
-                        type="text"
-                        placeholder="选择你的学校"
-                        :disabled="true"
-                        :clearable="false"
-                        :readonly="true"
-                    />
-                </navigator>
+                        <uni-easyinput v-model="formData.school" prefixIcon="location-filled" type="text"
+                            placeholder="选择你的学校" :disabled="true" :clearable="false" :readonly="true" />
+                    </navigator>
                 </uni-forms-item>
             </uni-section>
             <button @click="submit" class="submit-btn">提交</button>
@@ -158,9 +180,10 @@ const submit = () => {
     .property-item {
         padding: 20px 0;
     }
-    .submit-btn{
+
+    .submit-btn {
         background-color: $xh-color-primary;
-        color:$xh-text-color-main;
+        color: $xh-text-color-main;
     }
 }
 </style>

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import WaterFullLayoutVue from '@/components/WaterFullLayout.vue';
+import { markRaw } from 'vue';
 import { watch } from 'vue';
 import { reactive } from 'vue';
 import { nextTick, ref, onMounted } from 'vue';
@@ -18,6 +19,8 @@ const messageList = reactive<any>([
     { id: 6, message: "回消息" },
 ])
 const scrollIntoView = ref<string>("msg"+(messageList.length-1))
+
+let socketOpen:boolean = false
 
 const emojiOperation = () => {
     if (isShowEmoji.value) {
@@ -60,6 +63,9 @@ const sendMessage = () => {
         scrollIntoView.value = 'msg'+(messageList.length-1)
     })
     scrollIntoView.value = ''
+    uni.sendSocketMessage({
+        data:"测试"
+    })
     
 }
 
@@ -68,6 +74,12 @@ onMounted(() => {
     //     selector: "#modal",
     //     duration: 0
     // })
+    uni.connectSocket({
+        url:"ws://localhost:8080/websocket"
+    })
+    uni.onSocketOpen(res=>{
+        socketOpen = true
+    })
 })
 </script>
 <template>
