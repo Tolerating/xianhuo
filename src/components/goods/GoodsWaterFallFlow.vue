@@ -17,6 +17,7 @@ import { produtsBySellMode,productByLatest,productByCategory } from '@/api/home/
 import useProductStore from '@/stores/product/index'
 import useUserStore from '@/stores/users';
 import { onShow } from '@dcloudio/uni-app';
+import { nextTick } from 'vue';
 const store = useCommonStore()
 const productStore = useProductStore()
 const userStore = useUserStore()
@@ -99,9 +100,11 @@ const pageSellMode = () => {
 	})
 }
 onMounted(() => {
-	console.log(props.disCoveryType);
+	console.log(props.disCoveryType,currentTab.value.id);
 	if(currentTab.value.id == props.disCoveryType.id){
-		typeRequest(false)
+		nextTick(()=>{
+			typeRequest(false)
+		})
 	}
 
 

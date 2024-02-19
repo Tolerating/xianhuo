@@ -25,11 +25,15 @@ const registerUniId = (data: { externalUid: String, nickname: string, avatar: st
 	"uni-id-timestamp": header.uniIdTimestamp,
 	"uni-id-signature": header.uniIdSignature
 })
+
+// 设置session
+const setSession = ()=>request("/user/session",{},"GET")
 export {
 	login,
 	getCheckCode,
 	registerXH,
 	updatePassword,
 	getSignature,
-	registerUniId
+	registerUniId,
+	setSession
 }

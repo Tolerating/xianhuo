@@ -15,6 +15,9 @@ const productStore = useProductStore()
 const products = reactive<Product[]>([])
 const { userInfo } = storeToRefs(userStore)
 onLoad((option:any)=>{
+    uni.setNavigationBarTitle({
+        title:"商品仓库"
+    })
     productsByUserId(option.id).then(res=>{
         products.length = 0
         products.push(...res.data)

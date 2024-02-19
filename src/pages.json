@@ -183,6 +183,9 @@
 		},
 		{
 			"path": "pages/home/mine/releasedProductList"
+		},
+		{
+			"path": "pages/home/mine/favouriteList"
 		}
 ],
 	

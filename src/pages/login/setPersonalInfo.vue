@@ -85,55 +85,55 @@ const form = ref()
 // 提交更新信息
 const submit = () => {
     // 表单校验
-    // form.value.validate().then(async (res: any) => {
+    form.value.validate().then(async (res: any) => {
     // 校验成功
     if (formData.avatar == APP_BASE_URL + DEFAULT_AVATAR) {
         formData.avatar = DEFAULT_AVATAR
     }
-    userStore.getUserInfo()
-    getSignature(formData).then(res => {
-        console.log(res);
-        uni.request({
-            url: 'https://fc-mp-cb2eb9b5-3cbb-47a7-aa08-383cdf5374d2.next.bspapp.com/uni-id-co/externalRegister',
-            method: 'POST',
-            data: {
-                clientInfo: uni.getSystemInfoSync(),
-                uniIdToken: '',
-                params: {
-                    externalUid: String(userStore.userInfo.id),
-                    nickname: formData.name,
-                    avatar: formData.avatar
-                }
-            },
-            header: {
-                'Content-Type': 'application/json',
-                "uni-id-nonce": res.data.nonce,
-                "uni-id-timestamp": res.data.timestamp,
-                "uni-id-signature": res.data.signature
-            },
-            success: (res) => {
-                console.log(res);
-                
-            }
-        })
-        // registerUniId({ externalUid: String(userStore.userInfo.id), nickname: formData.name, avatar: formData.avatar }, { uniIdNonce: res.data.})
-    })
-    // const result = await improveInfo(formData)
     // userStore.getUserInfo()
-    // uni.showToast({
-    //     title:result.message,
-    //     success(){
-    //         uni.switchTab({
-    //             url:"/pages/home/index"
-    //         })
-    //     }
-    // })
-
-    // }).catch((res: any) => {
-    //     // 校验失败
+    // getSignature(formData).then(res => {
     //     console.log(res);
-
+    //     uni.request({
+    //         url: 'https://fc-mp-cb2eb9b5-3cbb-47a7-aa08-383cdf5374d2.next.bspapp.com/uni-id-co/externalRegister',
+    //         method: 'POST',
+    //         data: {
+    //             clientInfo: uni.getSystemInfoSync(),
+    //             uniIdToken: '',
+    //             params: {
+    //                 externalUid: String(userStore.userInfo.id),
+    //                 nickname: formData.name,
+    //                 avatar: formData.avatar
+    //             }
+    //         },
+    //         header: {
+    //             'Content-Type': 'application/json',
+    //             "uni-id-nonce": res.data.nonce,
+    //             "uni-id-timestamp": res.data.timestamp,
+    //             "uni-id-signature": res.data.signature
+    //         },
+    //         success: (res) => {
+    //             console.log(res);
+                
+    //         }
+    //     })
+        // registerUniId({ externalUid: String(userStore.userInfo.id), nickname: formData.name, avatar: formData.avatar }, { uniIdNonce: res.data.})
     // })
+    const result = await improveInfo(formData)
+    userStore.getUserInfo()
+    uni.showToast({
+        title:result.message,
+        success(){
+            uni.switchTab({
+                url:"/pages/home/index"
+            })
+        }
+    })
+
+    }).catch((res: any) => {
+        // 校验失败
+        console.log(res);
+
+    })
 }
 </script>
 <template>

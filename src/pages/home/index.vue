@@ -36,9 +36,14 @@ import GoodsWaterFallFlow from '@/components/goods/GoodsWaterFallFlow.vue'
 import CategoryPopup from '@/components/goods/CategoryPopup.vue'
 import useCommonStore from "@/stores/common"
 import useUserStore from '@/stores/users'
+import {useWebsocket} from '@/hooks/product/useWebSocket'
 import {storeToRefs} from 'pinia'
 import type { Category } from '@/types/Category'
+import {setSession} from '@/api/user/login'
+import { onMounted } from 'vue'
+import useProductStore from '@/stores/product'
 const searchValue = ref<string>("")
+  const productStore = useProductStore()
 const store = useCommonStore()
 const userStore = useUserStore()
 const {reachBottom} = storeToRefs(store)
@@ -102,6 +107,15 @@ const navigateToFilter = (e:Category)=>{
 
 		})
 }
+
+onMounted(()=>{
+  productStore.requestSellMode()
+		productStore.requestCategory()
+		productStore.requestAllDispatchMode()
+    productStore.requestAllProductRequire()
+		userStore.getUserInfo()
+    userStore.initCounts()
+})
 </script>
 
 <style lang="scss" scoped>

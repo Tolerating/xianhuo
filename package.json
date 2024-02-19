@@ -55,6 +55,7 @@
     "@dcloudio/uni-mp-xhs": "3.0.0-3090820231124001",
     "@dcloudio/uni-quickapp-webview": "3.0.0-3090820231124001",
     "@dcloudio/uni-ui": "^1.4.28",
+    "@vueuse/core": "^10.7.2",
     "pinia": "2.0.35",
     "pinia-plugin-persistedstate": "^3.2.0",
     "validator": "^13.11.0",

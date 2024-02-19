@@ -20,7 +20,8 @@
       <!--   价格、售卖模式   -->
       <view class="base-info">
         <view class="base-info-left">
-          <ProductPrice :mode="product.sellModeId" :origin-price="product.originPrice" :current-price="product.currentPrice" :time-unit="product.timeUnit"></ProductPrice>
+          <ProductPrice :mode="product.sellModeId" :origin-price="product.originPrice"
+            :current-price="product.currentPrice" :time-unit="product.timeUnit"></ProductPrice>
         </view>
         <view class="base-info-right">
           <!--   售卖模式      -->
@@ -42,7 +43,7 @@
     <uni-section type="line" padding="0 0 0 20px" class="sell-item" title="发货方式">
       <template v-slot:right>
         <text style="color: red;">
-          {{dispatchNameComputed}}
+          {{ dispatchNameComputed }}
         </text>
       </template>
 
@@ -58,23 +59,18 @@
     </uni-section>
     <!--  页脚操作栏  -->
     <view class="goods-detail-footer">
-      <uni-goods-nav :options="[
+      <uni-goods-nav :options="goodsNavOption" :button-group="[
         {
-          icon: 'star',
-          text: '收藏'
+          text: '咨询卖家',
+          backgroundColor: '#fd8464',
+          color: '#fff'
+        },
+        {
+          text: '立即购买',
+          backgroundColor: '#bf3916',
+          color: '#fff'
         }
-      ]" :button-group="[
-  {
-    text: '咨询卖家',
-    backgroundColor: '#fd8464',
-    color: '#fff'
-  },
-  {
-    text: '立即购买',
-    backgroundColor: '#bf3916',
-    color: '#fff'
-  }
-]" :fill="true" @click="" @button-click="" />
+      ]" :fill="true" @click="starProduct" @button-click="footerBtn" />
 
     </view>
   </view>
@@ -82,17 +78,20 @@
 
 <script lang="ts" setup>
 import SellModeIcon from '@/components/goods/SellModeIcon.vue'
-import { requestProductById } from '@/api/home/goods'
+import { requestProductById, addFavourite, queryFavourite,cancelFavourite } from '@/api/home/goods'
 import ProductPrice from '@/components/goods/ProductPrice.vue'
 import { ref } from "vue";
 import { reactive } from 'vue';
 import type { Product } from '@/types/Product';
 import useProductStore from '@/stores/product';
+import { queryLink } from '@/api/chat/index'
 import useUserStore from '@/stores/users';
 import { onLoad } from '@dcloudio/uni-app';
 import { APP_BASE_URL } from '@/config/index'
 import { usePartUserInfo } from '@/hooks/user/usePartUserInfo'
 import { computed } from 'vue';
+import { nextTick } from 'vue';
+import { onMounted } from 'vue';
 
 // 商品图片列表
 const imgList = reactive<string[]>([])
@@ -110,56 +109,120 @@ const product = reactive<Product>({
   productRequireId: "",
   status: 1,
   location: "",
-  address:""
+  address: ""
 })
-const dispatchNameComputed = computed(()=>{
-  if(dispatchName.value == "快递"){
-    return product.freight == "null"?dispatchName.value+"(包邮)":dispatchName.value + "(￥"+ product.freight+")"
-  }else{
+const dispatchNameComputed = computed(() => {
+  if (dispatchName.value == "快递") {
+    return product.freight == "null" ? dispatchName.value + "(包邮)" : dispatchName.value + "(￥" + product.freight + ")"
+  } else {
     return dispatchName.value
   }
 })
 const productStore = useProductStore()
+const userStore = useUserStore()
 // 商品分类名字
 const categoryName = ref<string>("")
 // 商品发货方式名字
 const dispatchName = ref<string>("")
 // 商品要求列表
 const productRequireNameList: string[] = []
-
+const pageParams = reactive<{pId:string,uId:string}>({
+  pId:"",
+  uId:""
+})
 // 获取商品发布者部分信息
 const { partUserInfo, requestPartUserInfo } = usePartUserInfo()
-
+const goodsNavOption = reactive([
+  {
+    icon: 'star',
+    text: '收藏'
+  }
+])
 //预览图片
 const previewImg = () => {
   uni.previewImage({
     urls: imgList
   })
 }
-const init = async (pId:number) => {
-  const result = await requestProductById(pId)
-  console.log(result);
+// 添加收藏
+const starProduct = async (e: any) => {
+  
+  if (userStore.userInfo.id != product.id) {
+    if(goodsNavOption[0].icon == "star"){
+      // 添加收藏
+      let result = await addFavourite({ userId: String(userStore.userInfo.id), productId: String(product.id) })
+      uni.showToast({
+        title: result.message
+      })
+      goodsNavOption.length = 0
+      goodsNavOption.push({icon:"star-filled",text:"收藏"})
+
+    }else{
+      // 取消收藏
+      let result = await cancelFavourite(String(userStore.userInfo.id),String(product.id))
+      uni.showToast({
+        title:result.message
+      })
+      goodsNavOption.length = 0
+      goodsNavOption.push({icon:"star",text:"收藏"})
+    }
+  }
+}
+
+// 页脚按钮
+const footerBtn = async (e: any) => {
+  console.log(e);
+  if (e.content.text == "咨询卖家") {
+    if (product.userId != userStore.userInfo.id) {
+      // 1.查询是否有聊天关系,没有服务端会直接创建
+      let result = await queryLink(String(product.userId), String(userStore.userInfo.id))
+      let { linkId } = result.data
+      uni.navigateTo({
+        url: `/pages/home/chat/chatView?toUser=${product.userId}&toUserName=${partUserInfo.name}&toUserPicture=${partUserInfo.avatar}&linkId=${linkId}&unread=0`,
+      })
+    }
+  }
+
+}
+// 页面初始化
+const init = async (pId: string) => {
+  const result = await requestProductById(Number(pId))
+  // console.log(result);
   Object.assign(product, result.data)
-  console.log(productStore.categoryList);
+  // console.log(productStore.categoryList);
   categoryName.value = productStore.categoryNameById(product.categoryId) || ""
-  console.log(categoryName.value);
+  // console.log(categoryName.value);
   imgList.length = 0
   imgList.push(...product.images.split(",").map(value => APP_BASE_URL + value));
   dispatchName.value = productStore.dispatchModeNameById(product.dispatchModeId) || ""
-  // 获取最新的全部商品要求
-  productStore.requestAllProductRequire() 
   productRequireNameList.push(...productStore.productRequireNameById(product.productRequireId.split(",")))
+  // 查询商品是否被收藏了
+  let isFav = await queryFavourite(String(userStore.userInfo.id), String(product.id))
+    if (isFav.data == 1) {
+      goodsNavOption.length = 0
+      goodsNavOption.push({icon:"star-filled",text:"收藏"})
+    } else {
+      goodsNavOption.length = 0
+      goodsNavOption.push({icon:"star",text:"收藏"})
+    }
+  
 }
-const naviagteToStoreHouse = ()=>{
+const naviagteToStoreHouse = () => {
   uni.navigateTo({
-    url:`/pages/home/mine/myStoresHouse?id=${product.userId}`
+    url: `/pages/home/mine/myStoresHouse?id=${product.userId}`
   })
 }
 onLoad((options) => {
-  init(options?.pId)
+  pageParams.pId = options?.pId
+  pageParams.uId = options?.uId
+  // init(options?.pId)
   requestPartUserInfo(options?.uId)
   console.log(options);
 
+})
+onMounted(async ()=>{
+  init(pageParams.pId)
+  
 })
 </script>
 
@@ -252,8 +315,6 @@ $footer-height: 50px;
     font-size: 15px;
     font-weight: bold;
   }
-
-  .type-list {}
 
 }
 

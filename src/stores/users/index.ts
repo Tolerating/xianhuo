@@ -3,6 +3,7 @@ import {defineStore} from 'pinia'
 import {ref,reactive} from 'vue'
 import {releasedCount, requestUserInfo} from '@/api/user/user'
 import {APP_BASE_URL} from '@/config/index'
+import {favouriteCount} from '@/api/home/goods'
 
 const useUserStore = defineStore("user",()=>{
 	// 用户个人信息
@@ -31,7 +32,9 @@ const useUserStore = defineStore("user",()=>{
 	}
 	async function initCounts() {
 		const released = await releasedCount()
+		const star = await favouriteCount()
 		counts.released = released.data
+		counts.star = star.data
 		
 	}
 	return{
@@ -46,7 +49,7 @@ const useUserStore = defineStore("user",()=>{
 },{
 	persist:{
 		key:"xh_user",
-		paths:['authorization',"userInfo"],
+		paths:['authorization',"userInfo","counts"],
 		storage:{
 			setItem(key,value) {
 				console.log("setitem",value)

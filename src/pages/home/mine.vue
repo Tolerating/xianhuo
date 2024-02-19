@@ -47,15 +47,12 @@
             </view>
         </view>
         <uni-list>
-            <uni-list-item showArrow title="我的收货地址" />
             <uni-list-item showArrow title="修改学校" />
-            <uni-list-item showArrow title="修改主题" />
-            <uni-list-item showArrow title="建议意见反馈" />
-            <uni-list-item showArrow title="在线客服" />
+            <!-- <uni-list-item showArrow title="修改主题" /> -->
+            <!-- <uni-list-item showArrow title="建议意见反馈" /> -->
             <uni-list-item showArrow title="退出登录" clickable @click="logoutXH" />
             <uni-list-item showArrow title="用户服务协议" />
         </uni-list>
-        <!-- <button type="primary" @tap="logoutXH">页面主操作 Normal</button> -->
     </view>
 </template>
 
@@ -96,7 +93,7 @@ const countsNavigate = (flag: number) => {
         case 1:
             // 我的收藏
             uni.navigateTo({
-                url: "/pages/home/mine/myStoresHouse"
+                url: "/pages/home/mine/favouriteList"
             })
             break;
         case 2:
@@ -141,9 +138,8 @@ const logoutXH = () => {
 }
 onMounted(() => {
     console.log("登录页挂载");
-    
-    userStore.initCounts()
     productStore.requestProductList()
+    
 })
 </script>
 
