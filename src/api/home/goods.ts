@@ -5,6 +5,7 @@ import type { DispatchMode } from '@/types/DispatchMode';
 import type { ProductRequire } from '@/types/ProductRequire';
 import type { SellMode } from '@/types/SellMode';
 import type { Product, ProductStatus } from '@/types/Product';
+import type { Favourite } from '@/types/Favourite';
 /**
  *获得所有分类
  *
@@ -131,6 +132,43 @@ const productByLatest = (current:number,size:number,location:string)=>request(`/
  * @param {string} location
  */
 const productByCategory = (categoryId:number,current:number,size:number,location:string)=>request(`/product/category/${categoryId}?current=${current}&size=${size}&location=${location}`,{},"GET")
+
+/**
+ * 添加收藏
+ *
+ * @param {Favourite} data
+ */
+const addFavourite = (data:Favourite)=>request("/favourite",data,"POST")
+
+/**
+ * 查询当前商品是否已经被收藏了
+ *
+ * @param {string} userId
+ * @param {string} productId
+ */
+const queryFavourite = (userId:string,productId:string)=>request(`/favourite?userId=${userId}&productId=${productId}`,{},"GET")
+
+
+/**
+ * 取消收藏
+ *
+ * @param {string} userId
+ * @param {string} productId
+ */
+const cancelFavourite = (userId:string,productId:string)=>request(`/favourite?userId=${userId}&productId=${productId}`,{},"DELETE")
+
+/**
+ * 根据userId获取所有收藏
+ *
+ * @param {string} userId
+ */
+const allFavouriteByUserId = (userId:string)=>request(`/favourite/all/${userId}`,{},"GET")
+
+/**
+ * 获取收藏数量
+ *
+ */
+const favouriteCount = ()=>request("/favourite/count",{},"GET")
 export {
     allCategories,
     allSellMode,
@@ -147,5 +185,10 @@ export {
     productsByUserId,
     produtsBySellMode,
     productByLatest,
-    productByCategory
+    productByCategory,
+    addFavourite,
+    queryFavourite,
+    cancelFavourite,
+    allFavouriteByUserId,
+    favouriteCount
 }
