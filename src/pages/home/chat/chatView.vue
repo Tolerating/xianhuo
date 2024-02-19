@@ -1,172 +1,179 @@
 <script lang="ts" setup>
-import WaterFullLayoutVue from '@/components/WaterFullLayout.vue';
-import { markRaw } from 'vue';
-import { watch } from 'vue';
 import { reactive } from 'vue';
 import { nextTick, ref, onMounted } from 'vue';
-const emoji = ["😂", "😀", "😃", "😄", "😁", "😆", "😅", "🤣", "😂", "🙂", "🙃", "😉", "😊", "😇", "😕", "😟", "🙁", "😮", "😯", "😲", "😳", "🥺", "😦", "😧", "😨", "😰", "😥", "😢", "😭", "😱", "😖", "😣", "😞", "😓", "😩", "😫", "🥱", "😤", "😡", "😠", "🥰", "😍", "🤩", "😘", "😗", "😚", "😙", "😋", "😛", "😜", "🤪", "😝", "🤑", "🤗", "🤭", "🤫", "🤔", "🤐", "🤨", "😐", "😑", "😶", "😏", "😒", "🙄", "😬", "😌", "😔", "😪", "🤤", "😴", "😷", "🤒", "🤕", "🤢", "🤮", "🤧", "🥵", "🥶", "🥴", "😵", "🤯", "🤠", "🥳", "😎", "🤓", "🧐"]
+import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
+import { useNow, useDateFormat } from '@vueuse/core'
+import useUserStore from '@/stores/users';
+import { storeToRefs } from 'pinia';
+import type { SocketTask } from '@/types/SocketTask';
+import { pageChatMessage, clearUnRead } from '@/api/chat/index'
+import type { ChatMessage } from '@/types/ChatMessage';
+import { APP_BASE_URL } from '@/config/index'
+const userStore = useUserStore()
+const { userInfo } = storeToRefs(userStore)
+const toUser = reactive<{ toUserId: string, toUserName: string, toUserPicture: string }>({
+    toUserId: "",
+    toUserName: "",
+    toUserPicture: ""
+})
+// 聊天关系id
+const linkId = ref<string>("")
+// 未读消息数量
+const unread = ref<number>(0)
 const inputValue = ref<string>("")
-const isShowEmoji = ref<boolean>(false);
+let heartInterval: any = null
+const socket = ref<SocketTask | null>(null)
 const isFocus = ref<boolean>(false)
-const chatListEle = ref<any>()
-const messageList = reactive<any>([
-    { id: 0, message: "你好" },
-    { id: 1, message: "回消息" },
-    { id: 2, message: "回消息" },
-    { id: 3, message: "回消息" },
-    { id: 4, message: "回消息" },
-    { id: 5, message: "回消息" },
-    { id: 6, message: "回消息" },
-])
-const scrollIntoView = ref<string>("msg"+(messageList.length-1))
+const messageList = reactive<ChatMessage[]>([])
+const scrollIntoView = ref<string>("msg" + (messageList.length - 1))
 
-let socketOpen:boolean = false
+let socketOpen: boolean = false
 
-const emojiOperation = () => {
-    if (isShowEmoji.value) {
-        isShowEmoji.value = false
-        isFocus.value = true
-        // chatListEle.value.style='height:calc(100vh - 44px - 55px);'
+const initWebsocket = () => {
 
-    } else {
-        isShowEmoji.value = true
-        isFocus.value = false
-        console.log(chatListEle.value);
-        
-        // chatListEle.value.style='height:calc(100vh - 44px - 315px);'
-        nextTick(() => {
-            // uni.pageScrollTo({
-            //     selector: "#modal",
-            //     duration: 300
-            // })
-            scrollIntoView.value = 'msg'+(messageList.length-1)
-        })
-        scrollIntoView.value = ''
-    }
+    socket.value = uni.connectSocket({
+        url: `ws://localhost:8080/websocket/${userStore.userInfo.id}`,
+        success() { }
+    })
+    socket.value.onOpen(() => {
+        console.log("socket连接成功");
+        heartInterval = setInterval(() => {
+            uni.sendSocketMessage({
+                data: "heart keep"
+            })
+        }, 1000 * 30)
+    })
+    socket.value.onMessage((res: any) => {
+        console.log("服务端消息", res.data);
+        let receive = JSON.parse(res.data)
+        if (receive.sendUser == toUser.toUserId) {
+            messageList.push({
+                scrollId: messageList.length,
+                content: receive.content,
+                toUser: String(userInfo.value.id),
+                fromUser: toUser.toUserId,
+                linkId: linkId.value,
+                sendTime: useDateFormat(useNow(), "YYYY-MM-DD HH:mm").value
+            })
+            nextTick(() => {
+                scrollIntoView.value = 'msg' + (messageList.length - 1)
+            })
+            scrollIntoView.value = ''
+        }
 
+    })
+    socket.value.onError(() => {
+        console.log('WebSocket连接打开失败，请检查！');
+    })
 }
-const hideEmoji = () => {
-    if (isShowEmoji.value) {
-        uni.hideKeyboard();
-        isShowEmoji.value = false;
-        isFocus.value = true
-    }
-
-}
-const sendMessage = () => {
-    messageList.push({
-        id: messageList.length,
-        message: inputValue.value
-    })
-    inputValue.value = ""
-    nextTick(()=>{
-        scrollIntoView.value = 'msg'+(messageList.length-1)
-    })
-    scrollIntoView.value = ''
-    uni.sendSocketMessage({
-        data:"测试"
-    })
-    
-}
-
-onMounted(() => {
-    // uni.pageScrollTo({
-    //     selector: "#modal",
-    //     duration: 0
-    // })
-    uni.connectSocket({
-        url:"ws://localhost:8080/websocket"
-    })
-    uni.onSocketOpen(res=>{
-        socketOpen = true
+onLoad(option => {
+    console.log("聊天页面加载");
+    toUser.toUserId = option?.toUser
+    toUser.toUserName = option?.toUserName
+    toUser.toUserPicture = option?.toUserPicture
+    linkId.value = option?.linkId
+    unread.value = option?.unread
+    uni.setNavigationBarTitle({
+        title: option?.toUserName
     })
 })
+onUnload(() => {
+    console.log("页面卸载");
+    // 将聊天内容缓存到本地
+    uni.setStorageSync(`chat${toUser.toUserId}`, messageList)
+    socket.value?.close()
+    socket.value?.onClose(() => {
+        clearInterval(heartInterval)
+        console.log("关闭连接");
+
+    })
+})
+const sendMessage = () => {
+    socket.value?.send({
+        data: JSON.stringify(
+            {
+                linkId: linkId.value,
+                content: inputValue.value,
+                toUser: toUser.toUserId,
+                fromUser: userInfo.value.id
+            }
+        )
+    })
+    messageList.push({
+        scrollId: messageList.length,
+        content: inputValue.value,
+        toUser: toUser.toUserId,
+        fromUser: String(userInfo.value.id),
+        linkId: linkId.value,
+        sendTime: useDateFormat(useNow(), "YYYY-MM-DD HH:mm").value
+    })
+    inputValue.value = ""
+    nextTick(() => {
+        scrollIntoView.value = 'msg' + (messageList.length - 1)
+    })
+    scrollIntoView.value = ''
+
+}
+
+onMounted(async () => {
+    console.log("挂载");
+    if (socket.value == null) {
+        initWebsocket()
+    }
+    // 读取缓存的聊天内容
+    console.log(unread.value);
+    let chatHistory = uni.getStorageSync(`chat${toUser.toUserId}`)
+    if (chatHistory) {
+        messageList.length = 0
+        messageList.push(...uni.getStorageSync(`chat${toUser.toUserId}`))
+    }
+    if (unread.value > 0) {
+        await clearUnRead(String(userInfo.value.id), linkId.value)
+        // 获取最新的消息
+        const result = await pageChatMessage(1, unread.value, linkId.value)
+        messageList.push(...result.data.records)
+
+    }
+    nextTick(()=>{
+        scrollIntoView.value = "modal"
+    })
+    scrollIntoView.value = ''
+})
+
 </script>
 <template>
     <view class="chat-view-container">
-        <scroll-view ref="chatListEle" scroll-y="true" :style="isShowEmoji?'height:calc(100vh - 44px - 315px);':'height:calc(100vh - 44px - 55px);'" :scroll-into-view="scrollIntoView" :enable-flex="true" class="chat-view-list" @tap="isShowEmoji = false">
-            <view class="chat-other-message">
-                <view class="message-avatar">
-                    <image src="../../../static/logo.png" style="height: 100%;width: 100%;" mode="scaleToFill" />
+        <scroll-view scroll-y="true" style="height:calc(100vh - 44px - 55px);" :scroll-into-view="scrollIntoView"
+            :enable-flex="true" class="chat-view-list">
+            <template v-for="item in messageList" :key="item.content" >
+
+                <view v-if="item.fromUser != String(userInfo.id)" :id="'msg' + item.scrollId" class="chat-other-message">
+                    <view class="message-avatar">
+                        <image :src="toUser.toUserPicture" style="height: 100%;width: 100%;" mode="scaleToFill" />
+                    </view>
+                    <view class="other-message-content">
+                        <text>{{ item.content }}</text>
+                    </view>
                 </view>
-                <view class="other-message-content">
-                    <text>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Impedit ex exercitationem inventore
-                        repudiandae laboriosam totam similique explicabo esse quasi nobis. Vitae dolor ex voluptas!
-                        Doloribus corporis libero assumenda, soluta aperiam omnis cupiditate quaerat cumque. Aliquam tempora
-                        magnam, labore expedita recusandae nobis autem eos quisquam doloribus ad excepturi deserunt sed.
-                        Qui.</text>
+                <view v-else class="chat-mine-message" :id="'msg' + item.scrollId">
+                    <view class="mine-message-content">
+                        <text>{{ item.content }}</text>
+                    </view>
+                    <view class="message-avatar">
+                        <image :src="userInfo.avatar" style="height: 100%;width: 100%;" mode="scaleToFill" />
+                    </view>
                 </view>
-            </view>
-            <view class="chat-mine-message" v-for="item in messageList" :key="item" :id="'msg'+item.id">
-                <view class="mine-message-content">
-                    <text>{{ item.message }}</text>
-                </view>
-                <view class="message-avatar">
-                    <image src="../../../static/logo.png" style="height: 100%;width: 100%;" mode="scaleToFill" />
-                </view>
-            </view>
+            </template>
             <view id="modal"></view>
         </scroll-view>
         <view class="chat-input-container" style="display: flex;flex-direction: column;">
             <view style="display: flex;width: 100%;">
-                <uni-icons type="mic-filled" color="black" size="25" class="chat-input-icon" />
                 <uni-easyinput v-model="inputValue" :focus="isFocus" maxlength="-1" type="textarea" confrimType="send"
-                    @confirm="" @focus="hideEmoji" style="height:35px;"
-                    :styles="{ backgroundColor: 'rgba(143, 147, 156, 0.2);' }" :inputBorder="false" class="chat-input" />
-                <image :src="isShowEmoji ? '../../../static/icon/keyboard.png' : '../../../static/icon/biaoqing.png'"
-                    mode="scaleToFill" class="chat-input-icon" @tap="emojiOperation" />
-                <image v-if="inputValue == ''" src="../../../static/icon/add.png" mode="scaleToFill"
-                    class="chat-input-icon" />
-                <button v-else class="chat-send-btn" @tap.stop="sendMessage">发送</button>
+                    @confirm="" style="height:35px;" :styles="{ backgroundColor: 'rgba(143, 147, 156, 0.2);' }"
+                    :inputBorder="false" class="chat-input" />
+                <button class="chat-send-btn" @tap.stop="sendMessage">发送</button>
             </view>
-            <scroll-view :enable-flex="true" :scroll-y="true" class="emoji-list-container" v-show="isShowEmoji">
-                <text v-for="item in emoji" :key="item" @tap="inputValue = inputValue + item">
-                    {{ item }}
-                </text>
-            </scroll-view>
         </view>
-        <!-- <view class="chat-view-list" @tap="isShowEmoji = false">
-            <view class="chat-other-message">
-                <view class="message-avatar">
-                    <image src="../../../static/logo.png" style="height: 100%;width: 100%;" mode="scaleToFill" />
-                </view>
-                <view class="other-message-content">
-                    <text>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Impedit ex exercitationem inventore
-                        repudiandae laboriosam totam similique explicabo esse quasi nobis. Vitae dolor ex voluptas!
-                        Doloribus corporis libero assumenda, soluta aperiam omnis cupiditate quaerat cumque. Aliquam tempora
-                        magnam, labore expedita recusandae nobis autem eos quisquam doloribus ad excepturi deserunt sed.
-                        Qui.</text>
-                </view>
-            </view>
-            
-            <view class="chat-mine-message" v-for="item in messageList" :key="item">
-                <view class="mine-message-content">
-                    <text>{{ item.message }}</text>
-                </view>
-                <view class="message-avatar">
-                    <image src="../../../static/logo.png" style="height: 100%;width: 100%;" mode="scaleToFill" />
-                </view>
-            </view>
-            <view id="modal"></view>
-        </view>
-        <view class="chat-input-container" style="display: flex;flex-direction: column;">
-            <view style="display: flex;width: 100%;">
-                <uni-icons type="mic-filled" color="black" size="25" class="chat-input-icon" />
-                <uni-easyinput v-model="inputValue" :focus="isFocus" maxlength="-1" type="textarea" confrimType="send"
-                    @confirm="" @focus="hideEmoji" style="height:35px;"
-                    :styles="{ backgroundColor: 'rgba(143, 147, 156, 0.2);' }" :inputBorder="false" class="chat-input" />
-                <image :src="isShowEmoji ? '../../../static/icon/keyboard.png' : '../../../static/icon/biaoqing.png'"
-                    mode="scaleToFill" class="chat-input-icon" @tap="emojiOperation" />
-                <image v-if="inputValue == ''" src="../../../static/icon/add.png" mode="scaleToFill"
-                    class="chat-input-icon" />
-                <button v-else class="chat-send-btn" @tap.stop="sendMessage">发送</button>
-            </view>
-            <scroll-view :enable-flex="true" :scroll-y="true" class="emoji-list-container" v-show="isShowEmoji">
-                <text v-for="item in emoji" :key="item" @tap="inputValue = inputValue + item">
-                    {{ item }}
-                </text>
-            </scroll-view>
-        </view> -->
     </view>
 </template>
 <style lang="scss" scoped>
@@ -186,17 +193,20 @@ onMounted(() => {
     padding: 0 10px;
     width: 100%;
     background-color: white;
-    .navigator-header{
+
+    .navigator-header {
         height: 44px;
         background-color: white;
         display: flex;
     }
+
     .chat-view-list {
         display: flex;
         flex-direction: column;
         padding: 20px 0 15px 0;
         box-sizing: border-box;
         height: calc(100vh - 44px - 55px);
+
         .chat-mine-message {
             display: flex;
             margin-bottom: 10px;
@@ -289,11 +299,11 @@ onMounted(() => {
         }
 
         .chat-send-btn {
-            height: 35px;
+            height: 25px;
             background-color: $xh-color-primary;
-            line-height: 30px;
+            line-height: 25px;
             font-size: $xh-font-size-base;
-            padding: 5px;
+            // padding: 5px;
 
         }
 
