@@ -6,8 +6,12 @@
 				<text class="goods-title">
 					{{ product.detail.slice(0, 6) }}...
 				</text>
-				<uv-tags :text="sellModeMap[product.sellModeId]" type="success" style="max-width: 85px;"></uv-tags>
-				<text>{{ product.address }}</text>
+				<view style="display: flex;justify-content: space-between;">
+					<uv-tags :text="sellModeMap[product.sellModeId]" type="success" style="max-width: 85px;"></uv-tags>
+					<uv-tags :text="categoryName" style="max-width: 85px;"></uv-tags>
+
+				</view>
+				<text style="font-size: 14px;">{{ product.address }}</text>
 				<ProductPrice :mode="product.sellModeId" :origin-price="product.originPrice" :current-price="product.currentPrice" :time-unit="product.timeUnit"></ProductPrice>
 				<uv-text :customStyle="{marginTop:'5px',marginLeft:'5px'}" type="sueecss" :text="product.createTime"></uv-text>
 			</view>
@@ -23,11 +27,11 @@ import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
 import { reactive } from 'vue';
 import ProductPrice from '@/components/goods/ProductPrice.vue'
+const props = defineProps<{ product: Product }>()
 const productStore = useProductStore()
 const {sellModeList} = storeToRefs(productStore)
 const sellModeMap = reactive<string[]>([])
-
-const props = defineProps<{ product: Product }>()
+const categoryName = productStore.categoryNameById(props.product.categoryId) || ""
 
 const toGoodsDetail = () => {
 	uni.navigateTo({
