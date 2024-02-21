@@ -19,6 +19,13 @@ const chatLists = ()=>request<ChatList>("/chatlists",{},"GET")
 const pageChatMessage = (current:number,size:number,linkId:string)=>request(`/chatMessage?current=${current}&size=${size}&linkId=${linkId}`,{},"GET")
 
 /**
+ * 获取全部聊天内容
+ *
+ * @param {string} linkId
+ */
+const allMessages = (linkId:string)=>request<ChatMessage[]>(`/chatMessage/${linkId}`,{},"GET")
+
+/**
  * 清除未读消息
  *
  * @param {string} fromUser
@@ -45,5 +52,6 @@ export {
     pageChatMessage,
     clearUnRead,
     queryLink,
-    deleteList
+    deleteList,
+    allMessages
 }

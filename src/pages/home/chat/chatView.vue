@@ -6,9 +6,9 @@ import { useNow, useDateFormat } from '@vueuse/core'
 import useUserStore from '@/stores/users';
 import { storeToRefs } from 'pinia';
 import type { SocketTask } from '@/types/SocketTask';
-import { pageChatMessage, clearUnRead } from '@/api/chat/index'
+import { pageChatMessage, clearUnRead,allMessages } from '@/api/chat/index'
 import type { ChatMessage } from '@/types/ChatMessage';
-import { APP_BASE_URL } from '@/config/index'
+import { APP_BASE_URL, APP_URL_PORT } from '@/config/index'
 const userStore = useUserStore()
 const { userInfo } = storeToRefs(userStore)
 const toUser = reactive<{ toUserId: string, toUserName: string, toUserPicture: string }>({
@@ -24,6 +24,7 @@ const inputValue = ref<string>("")
 let heartInterval: any = null
 const socket = ref<SocketTask | null>(null)
 const isFocus = ref<boolean>(false)
+const isSend = ref<boolean>(false)
 const messageList = reactive<ChatMessage[]>([])
 const scrollIntoView = ref<string>("msg" + (messageList.length - 1))
 
@@ -32,7 +33,7 @@ let socketOpen: boolean = false
 const initWebsocket = () => {
 
     socket.value = uni.connectSocket({
-        url: `ws://localhost:8080/websocket/${userStore.userInfo.id}`,
+        url: `ws://${APP_BASE_URL.replace("http://","")}:${APP_URL_PORT}/websocket/${userStore.userInfo.id}`,
         success() { }
     })
     socket.value.onOpen(() => {
@@ -63,7 +64,10 @@ const initWebsocket = () => {
 
     })
     socket.value.onError(() => {
-        console.log('WebSocket连接打开失败，请检查！');
+        isSend.value = true
+        uni.showToast({
+            title:"连接打开失败，请检查网络！"
+        })
     })
 }
 onLoad(option => {
@@ -80,7 +84,9 @@ onLoad(option => {
 onUnload(() => {
     console.log("页面卸载");
     // 将聊天内容缓存到本地
-    uni.setStorageSync(`chat${toUser.toUserId}`, messageList)
+    if(messageList.length > 0){
+        uni.setStorageSync(`chat${toUser.toUserId}`, messageList)
+    }
     socket.value?.close()
     socket.value?.onClose(() => {
         clearInterval(heartInterval)
@@ -123,6 +129,8 @@ onMounted(async () => {
     // 读取缓存的聊天内容
     console.log(unread.value);
     let chatHistory = uni.getStorageSync(`chat${toUser.toUserId}`)
+    console.log("chatHistory",chatHistory=='');
+    
     if (chatHistory) {
         messageList.length = 0
         messageList.push(...uni.getStorageSync(`chat${toUser.toUserId}`))
@@ -132,7 +140,13 @@ onMounted(async () => {
         // 获取最新的消息
         const result = await pageChatMessage(1, unread.value, linkId.value)
         messageList.push(...result.data.records)
-
+        
+    }
+    if(chatHistory == ""){
+        const result = await allMessages(linkId.value)
+        console.log(result);
+        
+        messageList.push(...result.data)
     }
     nextTick(()=>{
         scrollIntoView.value = "modal"
@@ -171,7 +185,7 @@ onMounted(async () => {
                 <uni-easyinput v-model="inputValue" :focus="isFocus" maxlength="-1" type="textarea" confrimType="send"
                     @confirm="" style="height:35px;" :styles="{ backgroundColor: 'rgba(143, 147, 156, 0.2);' }"
                     :inputBorder="false" class="chat-input" />
-                <button class="chat-send-btn" @tap.stop="sendMessage">发送</button>
+                <button class="chat-send-btn" :disabled="isSend" @tap.stop="sendMessage">发送</button>
             </view>
         </view>
     </view>
@@ -205,7 +219,7 @@ onMounted(async () => {
         flex-direction: column;
         padding: 20px 0 15px 0;
         box-sizing: border-box;
-        height: calc(100vh - 44px - 55px);
+        // height: calc(100vh - 44px - 55px);
 
         .chat-mine-message {
             display: flex;
