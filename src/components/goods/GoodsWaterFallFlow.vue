@@ -99,16 +99,13 @@ const pageSellMode = () => {
 		productList.push(...res.data.records)
 	})
 }
-onMounted(() => {
+onMounted(async () => {
 	console.log(props.disCoveryType,currentTab.value.id);
 	if(currentTab.value.id == props.disCoveryType.id){
-		nextTick(()=>{
-			typeRequest(false)
-		})
+		// nextTick(()=>{
+			await typeRequest(false)
+		// })
 	}
-
-
-	console.log("挂载好了", props.disCoveryType.title);
 })
 </script>
 
