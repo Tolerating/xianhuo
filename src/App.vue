@@ -7,8 +7,8 @@ const userStore = useUserStore()
 
 
 onLaunch(() => {
-	console.log("launch",uni.getStorageSync("xh_user")=='');
-	if(uni.getStorageSync("xh_user")!=''){
+	console.log("launch", uni.getStorageSync("xh_user"));
+	if (uni.getStorageSync("xh_user") != '') {
 
 		productStore.requestSellMode()
 		productStore.requestCategory()
@@ -19,18 +19,40 @@ onLaunch(() => {
 		// 用户第一次登录后没有完善用户信息就退出应用，再次打开应用后的判断
 		if (userStore.userInfo.name == "") {
 			uni.redirectTo({
-				url: "/pages/login/setPersonalInfo"
+				url: "/pages/login/setPersonalInfo",
+				success() {
+					// #ifdef APP-PLUS
+					plus.navigator.closeSplashscreen()
+					// #endif
+				}
 			})
 		}
+		uni.switchTab({
+			url: "/pages/home/index",
+			success() {
+				// #ifdef APP-PLUS
+				plus.navigator.closeSplashscreen()
+				// #endif
+			}
+		})
+
+	} else {
+		uni.redirectTo({
+			url: "/pages/login/index",
+			success() {
+				// #ifdef APP-PLUS
+				plus.navigator.closeSplashscreen()
+				// #endif
+			}
+		})
 	}
 	uni.getSystemInfo({
 		success(res) {
-			console.log(res.windowWidth);
 			uni.setStorageSync("windowWidth", res.windowWidth / 2 - 38 + 19)
 
 		}
 	})
-	
+
 })
 
 </script>

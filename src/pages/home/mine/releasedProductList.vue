@@ -71,15 +71,15 @@ onMounted(() => {
                         </view>
                         <view class="item-right-wrapper">
                             <uv-icon name="tags" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text>{{ sellModeMap[item.sellModeId] }}</text>
+                            <text class="item-right-text">{{ sellModeMap[item.sellModeId] }}</text>
                         </view>
                         <view class="item-right-wrapper">
                             <uv-icon name="map" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text>{{ item.address }}</text>
+                            <text class="item-right-text">{{ item.address }}</text>
                         </view>
                         <view class="item-right-wrapper">
                             <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text style="padding-right: 20px;">{{ item.createTime }}</text>
+                            <text class="item-right-text" style="padding-right: 20px;">{{ item.createTime }}</text>
                         </view>
                         <ProductPrice style="display: flex;justify-content: flex-end;margin-top: 15px;"
                             :mode="item.sellModeId" originPrice="0" :currentPrice="item.currentPrice"
@@ -137,6 +137,9 @@ onMounted(() => {
                     .item-right-wrapper {
                         display: flex;
                         align-items: center;
+                    }
+                    .item-right-text{
+                        font-size: $xh-font-size-base;
                     }
                 }
             }

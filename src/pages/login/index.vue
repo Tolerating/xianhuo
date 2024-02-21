@@ -40,36 +40,43 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { login } from '@/api/user/login'
-import useUserStore from '@/stores/users'
+import useUserStore from '@/stores/users/index'
 import validator from 'validator'
 import { computed } from 'vue';
 import { onBackPress } from '@dcloudio/uni-app';
+import useProductStore from '@/stores/product/index';
 const email = ref<string>("")
 const password = ref<string>("")
 const store = useUserStore()
+const productStore = useProductStore()
 const { updateAuthorization } = store
 const loginXH = async () => {
-	console.log(validator.isEmail(email.value), validator.isEmpty(password.value));
 	let result = await login({ email: email.value, password: password.value });
 	let arr = result.data.split(",")
-	console.log(arr);
-	
 	updateAuthorization(arr[1] as string)
-	console.log("返回的token：",arr[1]);
-	
-	console.log("userStore中的token",store.authorization);
-	
-	if(arr[0] == 'null'){
+	// console.log("返回的token：",arr[1]);
+
+	// console.log("userStore中的token",store.authorization);
+
+	if (arr[0] == 'null') {
 		uni.navigateTo({
-			url:"/pages/login/setPersonalInfo"
+			url: "/pages/login/setPersonalInfo"
 		})
-	}else{
+	} else {
 		uni.switchTab({
-			url: "/pages/home/index"
+			url: "/pages/home/index",
+			success() {
+				productStore.requestSellMode()
+				productStore.requestCategory()
+				productStore.requestAllDispatchMode()
+				productStore.requestAllProductRequire()
+				store.getUserInfo()
+				store.initCounts()
+			}
 		})
 	}
 }
-onBackPress(()=>{
+onBackPress(() => {
 	return true
 })
 const isLogin = computed(() => {
@@ -186,4 +193,5 @@ const isLogin = computed(() => {
 		background-color: $input-bgColor;
 
 	}
-}</style>
+}
+</style>
