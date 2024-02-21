@@ -169,6 +169,19 @@ const allFavouriteByUserId = (userId:string)=>request(`/favourite/all/${userId}`
  *
  */
 const favouriteCount = ()=>request("/favourite/count",{},"GET")
+
+/**
+ * 分页获取筛选数据
+ *
+ * @param {number} current
+ * @param {number} size
+ * @param {string} productName
+ * @param {string} location
+ * @param {string} sellMode
+ * @param {string} categoryId
+ */
+const pageFilterProduct = (current:number,size:number,productName:string,location:string,sellMode:number,categoryId:number)=>request(`/product/search?current=${current}&size=${size}&productName=${productName}&location=${location}&sellMode=${sellMode}&categoryId=${categoryId}`,{},"GET")
+
 export {
     allCategories,
     allSellMode,
@@ -190,5 +203,6 @@ export {
     queryFavourite,
     cancelFavourite,
     allFavouriteByUserId,
-    favouriteCount
+    favouriteCount,
+    pageFilterProduct
 }
