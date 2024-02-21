@@ -2,6 +2,7 @@ import type { User } from '@/types/Users'
 import {defineStore} from 'pinia'
 import {ref,reactive} from 'vue'
 import {releasedCount, requestUserInfo} from '@/api/user/user'
+import {getInfoCount} from "@/api/home/require"
 import {APP_BASE_URL} from '@/config/index'
 import {favouriteCount} from '@/api/home/goods'
 
@@ -33,8 +34,10 @@ const useUserStore = defineStore("user",()=>{
 	async function initCounts() {
 		const released = await releasedCount()
 		const star = await favouriteCount()
+		const article = await getInfoCount()
 		counts.released = released.data
 		counts.star = star.data
+		counts.article = article.data
 		
 	}
 	return{
@@ -52,7 +55,6 @@ const useUserStore = defineStore("user",()=>{
 		paths:['authorization',"userInfo","counts"],
 		storage:{
 			setItem(key,value) {
-				console.log("setitem",value)
 				uni.setStorageSync(key,value)
 			},
 			getItem(key) {

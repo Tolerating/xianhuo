@@ -26,7 +26,7 @@
                 </view>
                 <view class="bottom_operation" @tap="countsNavigate(4)">
                     <text style="font-size: 20px;">{{ counts.article }}</text>
-                    <text style="font-size: 12px;">我的帖子</text>
+                    <text style="font-size: 12px;">我的需求</text>
                 </view>
             </view>
         </view>
@@ -48,8 +48,6 @@
         </view>
         <uni-list>
             <uni-list-item showArrow title="修改学校" />
-            <!-- <uni-list-item showArrow title="修改主题" /> -->
-            <!-- <uni-list-item showArrow title="建议意见反馈" /> -->
             <uni-list-item showArrow title="退出登录" clickable @click="logoutXH" />
             <uni-list-item showArrow title="用户服务协议" />
         </uni-list>
@@ -63,7 +61,6 @@ import useUserStore from '@/stores/users/index'
 import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
 import useProductStore from '@/stores/product/index'
-import { releasedCount } from '@/api/user/user'
 const statusBarHeight = ref<number>(Number(uni.getSystemInfoSync().statusBarHeight));
 const userStore = useUserStore()
 const productStore = useProductStore()
@@ -111,7 +108,7 @@ const countsNavigate = (flag: number) => {
         case 4:
             // 我的帖子
             uni.navigateTo({
-                url: "/pages/home/mine/myStoresHouse"
+                url: "/pages/home/mine/requireList"
             })
             break;
         default:
