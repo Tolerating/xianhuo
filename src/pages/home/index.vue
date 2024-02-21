@@ -35,15 +35,15 @@ import DiscoverySwiper from '@/components/goods/DiscoverySwiper.vue'
 import GoodsWaterFallFlow from '@/components/goods/GoodsWaterFallFlow.vue'
 import CategoryPopup from '@/components/goods/CategoryPopup.vue'
 import useCommonStore from "@/stores/common"
-import useUserStore from '@/stores/users'
-import {useWebsocket} from '@/hooks/product/useWebSocket'
+import useUserStore from '@/stores/users/index'
 import {storeToRefs} from 'pinia'
 import type { Category } from '@/types/Category'
 import {setSession} from '@/api/user/login'
 import { onMounted } from 'vue'
 import useProductStore from '@/stores/product'
+import { nextTick } from 'vue'
 const searchValue = ref<string>("")
-  const productStore = useProductStore()
+const productStore = useProductStore()
 const store = useCommonStore()
 const userStore = useUserStore()
 const {reachBottom} = storeToRefs(store)
@@ -66,13 +66,8 @@ onLoad(() => {
 })
 const toGoodsType = ()=>{
   categoryPopup.value.show()
-  // uni.navigateTo({
-  //   url:"/pages/goods/goodsType",
-  //   animationDuration:0
-  // })
 }
 const jumpSearch = () => {
-  console.log("search");
   uni.navigateTo({
     url: "/pages/goods/search",
     animationType: "slide-in-bottom",
@@ -80,21 +75,22 @@ const jumpSearch = () => {
   })
 }
 const getTabSelectedGoods = (val: DiscoveryType) => {
-  console.log("discovery0", uni.getStorageSync("discovery0"));
 
-  let timer = setTimeout(() => {
-    uni.pageScrollTo({
-      scrollTop: uni.getStorageSync("discovery" + val.id) || 0,
-      duration: 0,
-      fail() {
-        console.log("失败了");
-      },
-      success() {
-        console.log("成功了");
-      }
+  // let timer = setTimeout(() => {
+    nextTick(()=>{
+      uni.pageScrollTo({
+        scrollTop: uni.getStorageSync("discovery" + val.id) || 0,
+        duration: 0,
+        fail() {
+          console.log("失败了");
+        },
+        success() {
+          console.log("成功了");
+        }
+      })
     })
-    clearTimeout(timer)
-  }, 10)
+    // clearTimeout(timer)
+  // }, 10)
 
   store.updateCurrentTab(val)
 }
@@ -109,12 +105,8 @@ const navigateToFilter = (e:Category)=>{
 }
 
 onMounted(()=>{
-  productStore.requestSellMode()
-		productStore.requestCategory()
-		productStore.requestAllDispatchMode()
-    productStore.requestAllProductRequire()
-		userStore.getUserInfo()
-    userStore.initCounts()
+
+    // setSession()
 })
 </script>
 

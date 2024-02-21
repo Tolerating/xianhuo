@@ -59,11 +59,11 @@ const request = <T = any>(url = '', data = {}, type: method = 'GET', header: hea
 			resolve(response.data as ResponseResult<T>)
 		}).catch(error => {
 			console.log(error);
-			uni.showToast({
-				title: "网络错误",
-				icon:"error",
-				duration: 2000
-			});
+			// uni.showToast({
+			// 	title: "网络错误",
+			// 	icon:"error",
+			// 	duration: 2000
+			// });
 			reject(error);
 		});
 	});

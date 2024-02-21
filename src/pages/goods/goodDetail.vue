@@ -147,7 +147,7 @@ const previewImg = () => {
 // 添加收藏
 const starProduct = async (e: any) => {
   
-  if (userStore.userInfo.id != product.id) {
+  if (userStore.userInfo.id != product.userId) {
     if(goodsNavOption[0].icon == "star"){
       // 添加收藏
       let result = await addFavourite({ userId: String(userStore.userInfo.id), productId: String(product.id) })
@@ -156,6 +156,7 @@ const starProduct = async (e: any) => {
       })
       goodsNavOption.length = 0
       goodsNavOption.push({icon:"star-filled",text:"收藏"})
+      userStore.counts.star++
 
     }else{
       // 取消收藏
@@ -165,6 +166,7 @@ const starProduct = async (e: any) => {
       })
       goodsNavOption.length = 0
       goodsNavOption.push({icon:"star",text:"收藏"})
+      userStore.counts.star--
     }
   }
 }

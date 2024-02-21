@@ -9,7 +9,7 @@ import { timeUnit, type Product } from '@/types/Product'
 import type { AMAPLocation, FileSelect } from '@/types/common'
 import { computed } from 'vue';
 import CategoryPopup from '@/components/goods/CategoryPopup.vue'
-import { onHide, onLoad, onShow } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import type { Category } from '@/types/Category';
 import { requestProductById, allMode } from '@/api/home/goods'
 import useUserStore from '@/stores/users/index'
@@ -106,7 +106,7 @@ const releaseProduct = async () => {
     })
     releaseForm.images = imgArr.join()
     // 设置发布者id
-    releaseForm.userId = userStore.userInfo.id
+    releaseForm.userId = Number(userStore.userInfo.id)
     // 设置售卖模式，发货模式
     releaseForm.sellModeId = sellMode.value
     releaseForm.dispatchModeId = dispatchMode.value
@@ -130,7 +130,7 @@ const releaseProduct = async () => {
 
 // 计算发布按钮是否可用
 const isRelease = computed((): boolean => {
-    return !(Boolean(releaseForm.detail) && Boolean(selectImgs.size) && Boolean(releaseForm.currentPrice)) && Boolean(releaseForm.location)
+    return !(Boolean(releaseForm.detail) && Boolean(selectImgs.size) && Boolean(releaseForm.currentPrice) && Boolean(releaseForm.location))
 })
 
 // 处理价钱输入
@@ -259,7 +259,6 @@ const initData = async () => {
         if (releaseForm.freight as string == "0") {
             freightSelect.value = 1
         }
-        // 设置完整地址计算的值
         releaseForm.images.split(",").forEach(item => {
             preImage.push({
                 status: "success",

@@ -7,6 +7,7 @@ export function useSellMode(){
 
     async function requestSellMode(){
         const sellmodes = await allSellMode();
+        sellModeList.length = 0
         sellModeList.push(...sellmodes.data)
         return sellmodes.data
     }

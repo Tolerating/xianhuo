@@ -11,7 +11,7 @@ export interface UserPart {
 	//用户昵称
 	name: string;
 	//学校名字
-	school: String;
+	school: string;
 	//用户头像
 	avatar: string;
 	// 学校定位
@@ -37,7 +37,7 @@ export interface User extends LoginUser, UserPart {
 	//信誉分
 	score: number;
 	//创建时间
-	createdAt: string;
+	createdAt?: string;
 	//删除时间
-	deletedAt: string;
+	deletedAt?: string;
 }
