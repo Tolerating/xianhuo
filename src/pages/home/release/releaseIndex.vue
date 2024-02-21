@@ -71,9 +71,9 @@ const goRelease = (path:number)=>{
 			break;
 	
 		case 1:
-			// uni.navigateTo({
-			// 	url:"pages/home/release/releaseGoods"
-			// })
+			uni.navigateTo({
+				url:"/pages/home/release/releaseRequire"
+			})
 			break;
 	}
 }
