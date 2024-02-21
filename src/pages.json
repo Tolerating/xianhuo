@@ -8,13 +8,13 @@
 	},
 	"pages": [
 		{
-			"path": "pages/home/index",
+			"path": "pages/login/index",
 			"style": {
 				"navigationStyle": "custom"
 			}
 		},
 		{
-			"path": "pages/login/index",
+			"path": "pages/home/index",
 			"style": {
 				"navigationStyle": "custom"
 			}
@@ -41,7 +41,18 @@
 		{
 			"path": "pages/home/campus",
 			"style": {
-				"navigationStyle": "custom"
+				"app-plus": {
+					"titleNView":{
+						"buttons": [
+							{
+								"text": "筛选",
+								"color": "#000",
+								"fontSize": "14px",
+								"width":"48px"
+							}
+						]
+					}
+				}
 			}
 		},
 		{
@@ -64,6 +75,12 @@
 		},
 		{
 			"path": "pages/home/release/releaseGoods",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/home/release/releaseRequire",
 			"style": {
 				"navigationStyle": "custom"
 			}
@@ -164,6 +181,21 @@
 			}
 		},
 		{
+			"path": "pages/goods/infoDetail",
+			"style": {
+				"h5": {
+					"titleNView": {
+						"titleText":"需求详情"
+					}
+				},
+				"app-plus": {
+					"titleNView": {
+						"navigationBarTitleText":"需求详情"
+					}
+				}
+			}
+		},
+		{
 			"path": "pages/goods/goodsType",
 			"style": {
 				"app-plus": {
@@ -186,6 +218,9 @@
 		},
 		{
 			"path": "pages/home/mine/favouriteList"
+		},
+		{
+			"path": "pages/home/mine/requireList"
 		}
 ],
 	
