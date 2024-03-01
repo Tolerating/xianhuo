@@ -221,6 +221,16 @@
 		},
 		{
 			"path": "pages/home/mine/requireList"
+		},
+		{
+			"path": "pages/goods/goodsPay",
+			"style": {
+				"app-plus": {
+					"titleNView":{
+						"navigationBarTitleText":"确认购买"
+					}
+				}
+			}
 		}
 ],
 	

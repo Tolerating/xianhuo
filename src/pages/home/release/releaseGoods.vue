@@ -93,9 +93,9 @@ const showuPricePopup = () => {
 // 图片预览数据源
 const preImage = reactive<any>([])
 
-// 
+// 商品要求多选框变化事件
 const productRequireChange = (e: any) => {
-    releaseForm.productRequireId = e.detail.value.join()
+    releaseForm.productRequireId = e.detail.value.join()   
 }
 
 // 发布商品
@@ -251,7 +251,7 @@ const initData = async () => {
         sellMode.value = Number(releaseForm.sellModeId)
         // 商品要求选中
         selectedProductRequire.length = 0
-        console.log(...releaseForm.productRequireId.split(",").map(item => Number(item)));
+        // console.log(...releaseForm.productRequireId.split(",").map(item => Number(item)));
 
         selectedProductRequire.push(...releaseForm.productRequireId.split(",").map(item => Number(item)))
 
@@ -353,7 +353,7 @@ onMounted(() => {
             </uni-section>
             <uni-section type="line" class="sell-item" title="商品要求">
                 <uni-data-checkbox style="padding-left: 10px;" :localdata="requireComputed" v-model="selectedProductRequire"
-                    :map="{ text: 'name', value: 'id' }" multiple @change="productRequireChange" mode="button" />
+                    :map="{ text: 'name', value: 'id' }" multiple @change="productRequireChange"/>
             </uni-section>
             <hr>
             <view class="property-item" @tap="showuPricePopup">

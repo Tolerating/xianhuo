@@ -183,6 +183,13 @@ const footerBtn = async (e: any) => {
         url: `/pages/home/chat/chatView?toUser=${product.userId}&toUserName=${partUserInfo.name}&toUserPicture=${partUserInfo.avatar}&linkId=${linkId}&unread=0`,
       })
     }
+  }else{
+    if (product.userId != userStore.userInfo.id) {
+      let data = encodeURIComponent(JSON.stringify(product))
+      uni.navigateTo({
+        url:`/pages/goods/goodsPay?product=${data}`
+      })
+    }
   }
 
 }
