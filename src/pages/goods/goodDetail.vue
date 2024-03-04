@@ -90,7 +90,6 @@ import { onLoad } from '@dcloudio/uni-app';
 import { APP_BASE_URL } from '@/config/index'
 import { usePartUserInfo } from '@/hooks/user/usePartUserInfo'
 import { computed } from 'vue';
-import { nextTick } from 'vue';
 import { onMounted } from 'vue';
 
 // 商品图片列表

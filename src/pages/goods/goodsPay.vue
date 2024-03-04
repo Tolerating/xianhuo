@@ -2,10 +2,40 @@
 import ProductPrice from '@/components/goods/ProductPrice.vue'
 import { APP_BASE_URL } from '@/config';
 import type { Product } from '@/types/Product';
+import { addOrderInfo,payProduct } from '@/api/home/goods'
 import { onLoad } from '@dcloudio/uni-app';
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
+import useUserStore from '@/stores/users'
+const userStore = useUserStore()
 let product: Product = {} as Product
+const isBuy = ref<Boolean>(false)
+const buyProduct = () => {
+    isBuy.value = true
+    let orderId = new Date().getTime().toString()
+    addOrderInfo({ orderId, buyId: userStore.userInfo.id?.toString() as string, productId: product.id?.toString() as string }).then(res => {
+        payProduct(orderId).then(res=>{
+            uni.requestPayment({
+                "provider": "alipay", //固定值为"alipay"
+                "orderInfo": res.data, //此处为服务器返回的订单信息字符串
+                success: function (res) {
+                    var rawdata = JSON.parse(res.rawdata);
+                    uni.navigateTo({
+                        url:"/pages/home/index"
+                    })
+                    console.log("支付成功",rawdata);
+                },
+                fail: function (err) {
+                    console.log('支付失败:' + JSON.stringify(err));
+                }
+            });
+        })
+    })
+
+}
 onLoad((option: any) => {
+    let EnvUtils = plus.android.importClass("com.alipay.sdk.app.EnvUtils");
+    //@ts-ignore
+    EnvUtils.setEnv(EnvUtils.EnvEnum.SANDBOX);
     console.log(decodeURIComponent(option.product));
     product = JSON.parse(decodeURIComponent(option.product)) as Product
     uni.setNavigationBarTitle({
@@ -46,7 +76,7 @@ onLoad((option: any) => {
         </view>
         <view class="price-footer">
             <text>实付款: <text style="font-weight: bold;color: red;">￥{{ product.currentPrice }}</text></text>
-            <uv-button type="primary" shape="circle" text="确认购买"></uv-button>
+            <uv-button type="primary" shape="circle" text="确认购买" :disabled="isBuy" @tap="buyProduct"></uv-button>
         </view>
     </view>
 </template>
@@ -57,6 +87,7 @@ onLoad((option: any) => {
     height: calc(100vh - var(--status-bar-height));
     padding: 0 $xianhuo-padding-LR;
     flex-direction: column;
+
     .list-item {
         $item-height: 160px;
         display: flex;
@@ -69,8 +100,10 @@ onLoad((option: any) => {
 
         .item-info {
             display: flex;
+
             .item-info-left {
                 flex: 0 0 $item-height;
+
                 image {
                     position: absolute;
                     width: 100%;
@@ -104,7 +137,8 @@ onLoad((option: any) => {
         border-radius: $xh-border-radius-base;
         margin-top: 15px;
         padding: 15px;
-        text:nth-child(1){
+
+        text:nth-child(1) {
             font-size: $xh-font-size-xl;
             padding-left: 10px;
             margin-bottom: 20px;
@@ -112,7 +146,7 @@ onLoad((option: any) => {
 
     }
 
-    .price-footer{
+    .price-footer {
         display: flex;
         justify-content: flex-end;
         align-items: center;
@@ -123,10 +157,10 @@ onLoad((option: any) => {
         background-color: white;
         height: 50px;
         padding-right: 10px;
-        text:nth-child(1){
+
+        text:nth-child(1) {
             padding-right: 10px;
         }
 
     }
-}
-</style>
+}</style>
