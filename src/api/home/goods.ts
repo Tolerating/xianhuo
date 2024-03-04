@@ -6,6 +6,7 @@ import type { ProductRequire } from '@/types/ProductRequire';
 import type { SellMode } from '@/types/SellMode';
 import type { Product, ProductStatus } from '@/types/Product';
 import type { Favourite } from '@/types/Favourite';
+import type { OrderInfo } from '@/types/OrderInfo';
 /**
  *获得所有分类
  *
@@ -182,6 +183,20 @@ const favouriteCount = ()=>request("/favourite/count",{},"GET")
  */
 const pageFilterProduct = (current:number,size:number,productName:string,location:string,sellMode:number,categoryId:number)=>request(`/product/search?current=${current}&size=${size}&productName=${productName}&location=${location}&sellMode=${sellMode}&categoryId=${categoryId}`,{},"GET")
 
+
+/**
+ * 新增订单
+ *
+ * @param {OrderInfo} data
+ */
+const addOrderInfo = (data:OrderInfo)=>request("/order",data,"POST")
+
+/**
+ * 商品支付
+ *
+ * @param {string} orderId
+ */
+const payProduct = (orderId:string)=>request<string>(`/pay?orderNo=${orderId}`,{},"GET")
 export {
     allCategories,
     allSellMode,
@@ -204,5 +219,7 @@ export {
     cancelFavourite,
     allFavouriteByUserId,
     favouriteCount,
-    pageFilterProduct
+    pageFilterProduct,
+    addOrderInfo,
+    payProduct
 }
