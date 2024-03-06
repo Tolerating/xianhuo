@@ -1,4 +1,4 @@
-import {request,uploadFile} from '@/plugin/request'
+import { request, uploadFile } from '@/plugin/request'
 import type { Files } from '@/types/common';
 import type { Category } from '@/types/Category';
 import type { DispatchMode } from '@/types/DispatchMode';
@@ -18,21 +18,21 @@ const allCategories = () => request<Category[]>('/categories', {}, "GET")
  *获得售卖模式
  *
  */
-const allSellMode = ()=>request<SellMode[]>('/sellMode/1',{},"GET")
+const allSellMode = () => request<SellMode[]>('/sellMode/1', {}, "GET")
 
- 
+
 /**
  *根据售卖模式获取发货方式
  *
  * @param {number} sellModeId
  */
-const dispatchModeBySell = (sellModeId:number)=>request<DispatchMode[]>(`/dispatchMode/${sellModeId}`,{},"GET")
+const dispatchModeBySell = (sellModeId: number) => request<DispatchMode[]>(`/dispatchMode/${sellModeId}`, {}, "GET")
 
 /**
  *获取所有售卖规则对应关系
  *
  */
-const allMode = ()=>request("/modes",{},"GET")
+const allMode = () => request("/modes", {}, "GET")
 
 
 /**
@@ -41,7 +41,7 @@ const allMode = ()=>request("/modes",{},"GET")
  * @param {number} sellModeId
  * @param {number} dispatchModeId
  */
-const productRequireByDispatch = (sellModeId:number,dispatchModeId:number)=>request<ProductRequire[]>(`/productRequire/${sellModeId}/${dispatchModeId}`,{},"GET")
+const productRequireByDispatch = (sellModeId: number, dispatchModeId: number) => request<ProductRequire[]>(`/productRequire/${sellModeId}/${dispatchModeId}`, {}, "GET")
 
 
 /**
@@ -49,15 +49,15 @@ const productRequireByDispatch = (sellModeId:number,dispatchModeId:number)=>requ
  *
  * @param {Files} data
  */
-const uploadImg = (data:Files)=>uploadFile<string>("/upload",data)
+const uploadImg = (data: Files) => uploadFile<string>("/upload", data)
 
- 
+
 /**
  *发布
  *
  * @param {Product} data
  */
-const releaseGoods = (data:Product)=>request("/product",data,"POST")
+const releaseGoods = (data: Product) => request("/product", data, "POST")
 
 
 /**
@@ -65,7 +65,7 @@ const releaseGoods = (data:Product)=>request("/product",data,"POST")
  *更新商品
  * @param {Product} data
  */
-const updateProduct = (data:Product)=>request("/product",data,"PUT")
+const updateProduct = (data: Product) => request("/product", data, "PUT")
 
 
 /**
@@ -74,34 +74,34 @@ const updateProduct = (data:Product)=>request("/product",data,"PUT")
  * @param {number} id
  * @param {ProductStatus} status
  */
-const deleteProduct = (id:number,status:ProductStatus)=>request(`/product/${id}/${status}`,{},"DELETE")
+const deleteProduct = (id: number, status: ProductStatus) => request(`/product/${id}/${status}`, {}, "DELETE")
 
 /**
  *根据商品id获取商品详情
  *
  * @param {number} productId
  */
-const requestProductById = (productId:number)=>request<Product>(`/product/${productId}`,{},"GET")
+const requestProductById = (productId: number) => request<Product>(`/product/${productId}`, {}, "GET")
 
 /**
  *获取全部的分类
  *
  */
-const allDispatchMode = ()=>request<DispatchMode[]>("/dispatchMode",{},"GET")
+const allDispatchMode = () => request<DispatchMode[]>("/dispatchMode", {}, "GET")
 
 
 /**
  *获取所有的商品要求
  *
  */
-const allProductRequire = ()=>request<ProductRequire[]>("/productRequire",{},"GET")
+const allProductRequire = () => request<ProductRequire[]>("/productRequire", {}, "GET")
 
 /**
  *
  *根据用户id获取商品
  * @param {number} id
  */
-const productsByUserId = (id:number)=>request(`/product?id=${id}`,{},"GET")
+const productsByUserId = (id: number) => request(`/product?id=${id}`, {}, "GET")
 
 
 /**
@@ -112,7 +112,7 @@ const productsByUserId = (id:number)=>request(`/product?id=${id}`,{},"GET")
  * @param {number} size
  * @param {string} location
  */
-const produtsBySellMode = (sellModeId:number,current:number,size:number,location:string)=>request(`/product/sellMode/${sellModeId}?current=${current}&size=${size}&location=${location}`,{},"GET")
+const produtsBySellMode = (sellModeId: number, current: number, size: number, location: string) => request(`/product/sellMode/${sellModeId}?current=${current}&size=${size}&location=${location}`, {}, "GET")
 
 /**
  *分页获取最新发布的商品
@@ -121,7 +121,7 @@ const produtsBySellMode = (sellModeId:number,current:number,size:number,location
  * @param {number} size
  * @param {string} location
  */
-const productByLatest = (current:number,size:number,location:string)=>request(`/product/latest?current=${current}&size=${size}&location=${location}`,{},"GET")
+const productByLatest = (current: number, size: number, location: string) => request(`/product/latest?current=${current}&size=${size}&location=${location}`, {}, "GET")
 
 
 /**
@@ -132,14 +132,14 @@ const productByLatest = (current:number,size:number,location:string)=>request(`/
  * @param {number} size
  * @param {string} location
  */
-const productByCategory = (categoryId:number,current:number,size:number,location:string)=>request(`/product/category/${categoryId}?current=${current}&size=${size}&location=${location}`,{},"GET")
+const productByCategory = (categoryId: number, current: number, size: number, location: string) => request(`/product/category/${categoryId}?current=${current}&size=${size}&location=${location}`, {}, "GET")
 
 /**
  * 添加收藏
  *
  * @param {Favourite} data
  */
-const addFavourite = (data:Favourite)=>request("/favourite",data,"POST")
+const addFavourite = (data: Favourite) => request("/favourite", data, "POST")
 
 /**
  * 查询当前商品是否已经被收藏了
@@ -147,7 +147,7 @@ const addFavourite = (data:Favourite)=>request("/favourite",data,"POST")
  * @param {string} userId
  * @param {string} productId
  */
-const queryFavourite = (userId:string,productId:string)=>request(`/favourite?userId=${userId}&productId=${productId}`,{},"GET")
+const queryFavourite = (userId: string, productId: string) => request(`/favourite?userId=${userId}&productId=${productId}`, {}, "GET")
 
 
 /**
@@ -156,20 +156,20 @@ const queryFavourite = (userId:string,productId:string)=>request(`/favourite?use
  * @param {string} userId
  * @param {string} productId
  */
-const cancelFavourite = (userId:string,productId:string)=>request(`/favourite?userId=${userId}&productId=${productId}`,{},"DELETE")
+const cancelFavourite = (userId: string, productId: string) => request(`/favourite?userId=${userId}&productId=${productId}`, {}, "DELETE")
 
 /**
  * 根据userId获取所有收藏
  *
  * @param {string} userId
  */
-const allFavouriteByUserId = (userId:string)=>request(`/favourite/all/${userId}`,{},"GET")
+const allFavouriteByUserId = (userId: string) => request(`/favourite/all/${userId}`, {}, "GET")
 
 /**
  * 获取收藏数量
  *
  */
-const favouriteCount = ()=>request("/favourite/count",{},"GET")
+const favouriteCount = () => request("/favourite/count", {}, "GET")
 
 /**
  * 分页获取筛选数据
@@ -181,7 +181,7 @@ const favouriteCount = ()=>request("/favourite/count",{},"GET")
  * @param {string} sellMode
  * @param {string} categoryId
  */
-const pageFilterProduct = (current:number,size:number,productName:string,location:string,sellMode:number,categoryId:number)=>request(`/product/search?current=${current}&size=${size}&productName=${productName}&location=${location}&sellMode=${sellMode}&categoryId=${categoryId}`,{},"GET")
+const pageFilterProduct = (current: number, size: number, productName: string, location: string, sellMode: number, categoryId: number) => request(`/product/search?current=${current}&size=${size}&productName=${productName}&location=${location}&sellMode=${sellMode}&categoryId=${categoryId}`, {}, "GET")
 
 
 /**
@@ -189,14 +189,64 @@ const pageFilterProduct = (current:number,size:number,productName:string,locatio
  *
  * @param {OrderInfo} data
  */
-const addOrderInfo = (data:OrderInfo)=>request("/order",data,"POST")
+const addOrderInfo = (data: OrderInfo) => request("/order", data, "POST")
 
 /**
  * 商品支付
  *
  * @param {string} orderId
  */
-const payProduct = (orderId:string)=>request<string>(`/pay?orderNo=${orderId}`,{},"GET")
+const payProduct = (orderId: string) => request<string>(`/pay?orderNo=${orderId}`, {}, "GET")
+
+
+/**
+ * 获取待发货订单，卖家显示
+ *
+ */
+const dispatchProductList = () => request<OrderInfo[]>("/orders/dispatch", {}, "GET")
+/**
+ * 获取待收货订单，买家显示
+ *
+ */
+const receiveProductList = () => request<OrderInfo[]>("/orders/receive", {}, "GET")
+
+/**
+ * 确认发货
+ *
+ * @param {string} id 订单表id
+ */
+const dispatchedProduct = (id: string) => request(`/order/dispatched?id=${id}`, {}, "GET")
+
+/**
+ * 确认收货
+ *
+ * @param {string} id 订单表id
+ */
+const receivedProduct = (id: string) => request(`/order/received?id=${id}`, {}, "GET")
+
+/**
+ * 出售记录
+ *
+ */
+const sellHistory = () => request<OrderInfo[]>(`/orders/sell`, {}, "GET")
+
+/**
+ * 购买记录
+ *
+ */
+const buyHistory = () => request<OrderInfo[]>(`/orders/buy`, {}, "GET")
+
+/**
+ * 获取待发货，待收货，交易记录数量
+ *
+ */
+const orderTypeCount = () => request<{
+    dispatch: string,
+    receive: string,
+    buy: string,
+    sell: string,
+    profit:string
+}>(`/orders/count`, {}, "GET")
 export {
     allCategories,
     allSellMode,
@@ -221,5 +271,12 @@ export {
     favouriteCount,
     pageFilterProduct,
     addOrderInfo,
-    payProduct
+    payProduct,
+    dispatchProductList,
+    receiveProductList,
+    dispatchedProduct,
+    receivedProduct,
+    sellHistory,
+    buyHistory,
+    orderTypeCount
 }
