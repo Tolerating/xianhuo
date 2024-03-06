@@ -35,7 +35,7 @@
 import WaterFullLayout from "@/components/WaterFullLayout.vue";
 import RequireInfoCard from "@/components/RequireInfoCard.vue";
 import { getCurrentInstance, ref } from "vue";
-import { onReachBottom, onNavigationBarButtonTap, onLoad } from "@dcloudio/uni-app";
+import { onReachBottom, onNavigationBarButtonTap, onLoad,onShow } from "@dcloudio/uni-app";
 import { pageRequireInfo } from '@/api/home/require'
 import { reactive } from "vue";
 import useProductStore from '@/stores/product';
@@ -99,7 +99,7 @@ const getFilterProducts = () => {
 		infoList.push(...res.data.records)
 	})
 }
-onMounted(() => {
+onShow(() => {
 	console.log("挂载之后");
 	pageRequireInfo(categorySelected.value, currentPage.value, 10).then(res => {
 		infoList.length = 0

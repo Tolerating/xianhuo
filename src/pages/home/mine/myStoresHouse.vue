@@ -14,11 +14,18 @@ const userStore = useUserStore()
 const productStore = useProductStore()
 const products = reactive<Product[]>([])
 const { userInfo } = storeToRefs(userStore)
+const storeMasterInfo = reactive(Object.assign({},userInfo.value))
 onLoad((option:any)=>{
     uni.setNavigationBarTitle({
         title:"商品仓库"
     })
-    productsByUserId(option.id).then(res=>{
+	const {userInfo,self} = option
+	if(self==0){
+		let data = JSON.parse(decodeURIComponent(option.userInfo))
+		Object.assign(storeMasterInfo,data)
+	}
+	
+    productsByUserId(storeMasterInfo.id as number).then(res=>{
         products.length = 0
         products.push(...res.data)
     })
@@ -30,10 +37,10 @@ onMounted(()=>{
 <template>
     <view class="released-producted-container">
         <view class="profile_top">
-            <image :src="userInfo.avatar" mode="aspectFill"></image>
+            <image :src="storeMasterInfo.avatar" mode="aspectFill"></image>
             <view class="profile_top_right">
-                <text style="font-size: 20px;font-weight: bold;margin-bottom: 5px;">{{ userInfo.name.length >
-                    5 ? userInfo.name.slice(0, 5) + "..." : userInfo.name }}的仓库</text>
+                <text style="font-size: 20px;font-weight: bold;margin-bottom: 5px;">{{ storeMasterInfo.name.length >
+                    5 ? storeMasterInfo.name.slice(0, 5) + "..." : storeMasterInfo.name }}的仓库</text>
                 <text>欢迎关顾仓库，喜欢就拿下吧！</text>
             </view>
         </view>

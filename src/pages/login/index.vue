@@ -23,17 +23,17 @@
 				<navigator style="display: inline-block;" url="/pages/login/register" hover-class="navigator-hover">
 					<text>注册</text>
 				</navigator>
-				<navigator style="display: inline-block;" url="/pages/home/index" open-type="switchTab"
+				<!-- <navigator style="display: inline-block;" url="/pages/home/index" open-type="switchTab"
 					hover-class="navigator-hover">
 					<text>主页</text>
-				</navigator>
+				</navigator> -->
 			</view>
 
 		</view>
-		<view class="login_page_others">
+		<!-- <view class="login_page_others">
 			<text>其它登录方式</text>
 			<image src="../../static/icon/weixin.png" mode=""></image>
-		</view>
+		</view> -->
 	</view>
 </template>
 
@@ -63,7 +63,7 @@ const loginXH = async () => {
 			url: "/pages/login/setPersonalInfo"
 		})
 	} else {
-		uni.switchTab({
+		uni.reLaunch({
 			url: "/pages/home/index",
 			success() {
 				productStore.requestSellMode()

@@ -28,7 +28,7 @@ const cancelStar = (product: Product, index: number) => {
 
     uni.showModal({
         title: '提示',
-        content: '确定下架',
+        content: '确定取消？',
         success: function (res) {
             if (res.confirm) {
                 cancelFavourite(String(userStore.userInfo.id), String(product.id)).then(res => {

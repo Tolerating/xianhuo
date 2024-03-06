@@ -99,7 +99,7 @@ const searchPoi = (value) => {
         key: value,
         types: "高等院校",
     }, ret => {
-        // console.log(ret);
+        console.log(ret);
         poiList.length = 0
         poiList.push(...ret.poiList)
     })

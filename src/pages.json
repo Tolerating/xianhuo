@@ -231,6 +231,12 @@
 					}
 				}
 			}
+		},
+		{
+			"path": "pages/home/mine/dispatchProduct"
+		},
+		{
+			"path": "pages/home/mine/receiveProduct"
 		}
 ],
 	
@@ -256,7 +262,10 @@
 				"pagePath": "pages/home/index",
 				"iconPath": "static/tabbar/home.png",
 				"selectedIconPath": "static/tabbar/home_sel.png",
-				"text": "咸货"
+				"text": "咸货",
+				"style":{
+					"enablePullDownRefresh": true
+				}
 			},
 			{
 				"pagePath": "pages/home/campus",

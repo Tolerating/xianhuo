@@ -119,12 +119,17 @@ const releaseProduct = async () => {
         userStore.counts.released++
 
     }
-    const { message } = result
+    let { message,data } = result
     uni.showToast({
         title: message,
         duration: 2000
     });
-    uni.navigateBack()
+	if(isEdit.value){
+		data = releaseForm.id
+	}
+    uni.navigateTo({
+    	url: `/pages/goods/goodDetail?uId=${releaseForm.userId}&pId=${data}`
+    })
 
 }
 

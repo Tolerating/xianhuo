@@ -29,7 +29,7 @@
 
 <script lang="ts" setup>
 import {reactive, ref} from 'vue'
-import {onReachBottom, onPageScroll, onLoad} from '@dcloudio/uni-app'
+import {onReachBottom, onPageScroll, onLoad,onPullDownRefresh, onShow} from '@dcloudio/uni-app'
 import type {DiscoveryType} from '@/types/common'
 import DiscoverySwiper from '@/components/goods/DiscoverySwiper.vue'
 import GoodsWaterFallFlow from '@/components/goods/GoodsWaterFallFlow.vue'
@@ -46,7 +46,7 @@ const searchValue = ref<string>("")
 const productStore = useProductStore()
 const store = useCommonStore()
 const userStore = useUserStore()
-const {reachBottom} = storeToRefs(store)
+const {reachBottom,homeRefesh} = storeToRefs(store)
 const {userInfo} = storeToRefs(userStore)
 const {tabList, currentTab} = store
 const categoryPopup = ref()
@@ -54,6 +54,9 @@ const categoryPopup = ref()
 onReachBottom(() => {
   store.updateReachBottom(!reachBottom.value)
 
+})
+onPullDownRefresh(()=>{
+	console.log(1231231313123131);
 })
 onPageScroll((e) => {
   store.currentScrollTop = e.scrollTop
@@ -104,8 +107,8 @@ const navigateToFilter = (e:Category)=>{
 		})
 }
 
-onMounted(()=>{
-
+onShow(()=>{
+	homeRefesh.value = !homeRefesh.value
     // setSession()
 })
 </script>

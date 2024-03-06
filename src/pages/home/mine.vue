@@ -36,18 +36,36 @@
                     <text>我的交易</text>
                 </view>
                 <view class="deal_card_body">
-                    <view class='deal_option' v-for="(item, index) in dealItem" :key="index">
+                    <view class='deal_option' @tap="orderNavigate(1)">
                         <view class="icon_group">
-                            <text :class="'cuIcon-' + item.icon" style="font-size: 30px;"></text>
-                            <view class="cu-tag badge" style="right: 0px;">9</view>
+                            <view class="cu-tag badge" style="right: 0px;">{{ orderCount.dispatch }}</view>
                         </view>
-                        <text style="font-size: 13px;color: #999898;">{{ item.name }}</text>
+                        <text style="font-size: 13px;color: #999898;">待发货</text>
+                    </view>
+                    <view class='deal_option'  @tap="orderNavigate(2)">
+                        <view class="icon_group">
+                            <view class="cu-tag badge" style="right: 0px;">{{ orderCount.receive }}</view>
+                        </view>
+                        <text style="font-size: 13px;color: #999898;">待收货</text>
+                    </view>
+                    <view class='deal_option'>
+                        <view class="icon_group">
+                            <view class="cu-tag badge" style="right: 0px;">{{ orderCount.sell }}</view>
+                        </view>
+                        <text style="font-size: 13px;color: #999898;">出售记录</text>
+                    </view>
+                    <view class='deal_option'>
+                        <view class="icon_group">
+                            <view class="cu-tag badge" style="right: 0px;">{{ orderCount.buy }}</view>
+                        </view>
+                        <text style="font-size: 13px;color: #999898;">购买记录</text>
                     </view>
                 </view>
             </view>
         </view>
         <uni-list>
-            <uni-list-item showArrow title="修改学校" />
+            <uni-list-item title="我的收益" :rightText="'￥ '+ orderCount.profit" />
+            <uni-list-item showArrow title="修改个人信息" />
             <uni-list-item showArrow title="退出登录" clickable @click="logoutXH" />
             <uni-list-item showArrow title="用户服务协议" />
         </uni-list>
@@ -58,18 +76,29 @@
 import { reactive } from 'vue';
 import { ref } from 'vue';
 import useUserStore from '@/stores/users/index'
+import {onShow} from '@dcloudio/uni-app'
 import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
+import {orderTypeCount} from '@/api/home/goods'
 import useProductStore from '@/stores/product/index'
 const statusBarHeight = ref<number>(Number(uni.getSystemInfoSync().statusBarHeight));
 const userStore = useUserStore()
 const productStore = useProductStore()
+const orderCount = reactive<{
+    dispatch: string,
+    receive: string,
+    buy: string,
+    sell: string,
+    profit:string
+}>({
+    dispatch: "",
+    receive: "",
+    buy: "",
+    sell: "",
+    profit:"0.0"
+})
 const { userInfo, counts } = storeToRefs(userStore)
 const dealItem = reactive([
-    {
-        name: "待付款",
-        icon: 'pay'
-    },
     {
         name: "待发货",
         icon: 'send'
@@ -79,9 +108,9 @@ const dealItem = reactive([
         icon: 'deliver'
     },
     {
-        name: "退款/售后",
-        icon: 'refund'
-    },
+        name: "交易记录",
+        icon: 'deliver'
+    }
 
 ])
 // 我的收藏，我的帖子，我的发布页面跳转函数
@@ -102,7 +131,7 @@ const countsNavigate = (flag: number) => {
         case 3:
             // 我的仓库
             uni.navigateTo({
-                url: `/pages/home/mine/myStoresHouse?id=${userInfo.value.id}`
+                url: `/pages/home/mine/myStoresHouse?id=$userInfo=${userInfo.value.id}&self=1`
             })
             break;
         case 4:
@@ -115,6 +144,39 @@ const countsNavigate = (flag: number) => {
             break;
     }
 }
+
+// 我的收藏，我的帖子，我的发布页面跳转函数
+const orderNavigate = (flag: number) => {
+    switch (flag) {
+        case 1:
+            // 待发货
+            uni.navigateTo({
+                url: "/pages/home/mine/dispatchProduct"
+            })
+            break;
+        case 2:
+            // 待收货
+            uni.navigateTo({
+                url: "/pages/home/mine/receiveProduct"
+            })
+            break;
+        case 3:
+            // 我的仓库
+            // uni.navigateTo({
+            //     url: `/pages/home/mine/myStoresHouse?id=${userInfo.value.id}`
+            // })
+            break;
+        case 4:
+            // 我的帖子
+            // uni.navigateTo({
+            //     url: "/pages/home/mine/requireList"
+            // })
+            break;
+        default:
+            break;
+    }
+}
+
 const logoutXH = () => {
     uni.showModal({
         title: '提示',
@@ -133,6 +195,11 @@ const logoutXH = () => {
     });
 
 }
+onShow(()=>{
+    orderTypeCount().then(res=>{
+        Object.assign(orderCount,res.data)
+    })
+})
 onMounted(() => {
     console.log("登录页挂载");
     productStore.requestProductList()

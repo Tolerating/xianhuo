@@ -1,6 +1,8 @@
 <!-- 商品检索页 -->
 <template>
   <water-full-layout class="goods-filter-container">
+    <uv-empty v-if="productList.length == 0" mode="list"
+            style="position: fixed;top: 0;bottom: 0;left: 0;right: 0;"></uv-empty>
     <view ref="goodsWrapper" class="goods-wrapper">
       <GoodCard v-for="item in productList" :key="item.detail" :product="item" class="goods-item"></GoodCard>
     </view>

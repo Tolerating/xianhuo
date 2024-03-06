@@ -6,20 +6,33 @@ import { addOrderInfo,payProduct } from '@/api/home/goods'
 import { onLoad } from '@dcloudio/uni-app';
 import { reactive, ref } from 'vue';
 import useUserStore from '@/stores/users'
+import type { OrderInfo } from '@/types/OrderInfo';
 const userStore = useUserStore()
 let product: Product = {} as Product
 const isBuy = ref<Boolean>(false)
 const buyProduct = () => {
     isBuy.value = true
     let orderId = new Date().getTime().toString()
-    addOrderInfo({ orderId, buyId: userStore.userInfo.id?.toString() as string, productId: product.id?.toString() as string }).then(res => {
+    let data:OrderInfo = {
+        orderId, 
+        buyId: userStore.userInfo.id?.toString() as string,
+        sellId:product.userId.toString(), 
+        productId: product.id?.toString() as string,
+        productAddress:product.address,
+		total:product.currentPrice,
+        productCategory:String(product.categoryId),
+        productDetail:product.detail,
+        productImages:product.images 
+    }
+    addOrderInfo(data).then(res => {
+		console.log(data);
         payProduct(orderId).then(res=>{
             uni.requestPayment({
                 "provider": "alipay", //固定值为"alipay"
                 "orderInfo": res.data, //此处为服务器返回的订单信息字符串
                 success: function (res) {
                     var rawdata = JSON.parse(res.rawdata);
-                    uni.navigateTo({
+                    uni.reLaunch({
                         url:"/pages/home/index"
                     })
                     console.log("支付成功",rawdata);

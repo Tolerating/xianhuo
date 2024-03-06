@@ -39,7 +39,9 @@ const releaseProduct = async () => {
         title: result.message,
         duration: 2000
     });
-    uni.navigateBack()
+    uni.redirectTo({
+        url: `/pages/goods/infoDetail?uId=${releaseForm.userId}&pId=${result.data}`
+    })
 
 }
 
