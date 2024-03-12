@@ -60,6 +60,12 @@
                         </view>
                         <text style="font-size: 13px;color: #999898;">购买记录</text>
                     </view>
+                    <view class='deal_option'>
+                        <view class="icon_group">
+                            <view class="cu-tag badge" style="right: 0px;">{{ 0 }}</view>
+                        </view>
+                        <text style="font-size: 13px;color: #999898;">售后</text>
+                    </view>
                 </view>
             </view>
         </view>
@@ -98,21 +104,6 @@ const orderCount = reactive<{
     profit:"0.0"
 })
 const { userInfo, counts } = storeToRefs(userStore)
-const dealItem = reactive([
-    {
-        name: "待发货",
-        icon: 'send'
-    },
-    {
-        name: "待收货",
-        icon: 'deliver'
-    },
-    {
-        name: "交易记录",
-        icon: 'deliver'
-    }
-
-])
 // 我的收藏，我的帖子，我的发布页面跳转函数
 const countsNavigate = (flag: number) => {
     switch (flag) {
