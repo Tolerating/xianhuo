@@ -7,6 +7,7 @@ import type { SellMode } from '@/types/SellMode';
 import type { Product, ProductStatus } from '@/types/Product';
 import type { Favourite } from '@/types/Favourite';
 import type { OrderInfo } from '@/types/OrderInfo';
+import type { Complain } from '@/types/Complain';
 /**
  *获得所有分类
  *
@@ -247,6 +248,13 @@ const orderTypeCount = () => request<{
     sell: string,
     profit:string
 }>(`/orders/count`, {}, "GET")
+
+/**
+ * 新增商品投诉
+ *
+ * @param {Complain} data
+ */
+const complainProduct = (data:Complain)=>request("/complain",data,"POST")
 export {
     allCategories,
     allSellMode,
@@ -278,5 +286,6 @@ export {
     receivedProduct,
     sellHistory,
     buyHistory,
-    orderTypeCount
+    orderTypeCount,
+    complainProduct
 }

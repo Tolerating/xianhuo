@@ -31,18 +31,21 @@
         </uni-section>
         <!--  页脚操作栏  -->
         <view class="goods-detail-footer">
-            <uni-goods-nav :options="[]" :button-group="[
-                {
-                    text: '联系TA',
-                    backgroundColor: '#fd8464',
-                    color: '#fff'
-                }
-            ]" :fill="true" @button-click="footerBtn" />
+            <uni-goods-nav :options="[{
+                    icon: 'compose',
+                    text: '投诉'
+                }]" :button-group="[
+                    {
+                        text: '联系TA',
+                        backgroundColor: '#fd8464',
+                        color: '#fff'
+                    }
+                ]" :fill="true" @click="complainPost" @button-click="footerBtn" />
 
         </view>
     </view>
 </template>
-  
+
 <script lang="ts" setup>
 import { getInfoById } from '@/api/home/require'
 import { ref } from "vue";
@@ -51,12 +54,11 @@ import useProductStore from '@/stores/product';
 import { queryLink } from '@/api/chat/index'
 import useUserStore from '@/stores/users';
 import { onLoad } from '@dcloudio/uni-app';
-import { APP_BASE_URL } from '@/config/index'
 import { usePartUserInfo } from '@/hooks/user/usePartUserInfo'
-import { computed } from 'vue';
-import { nextTick } from 'vue';
+import { complainProduct } from '@/api/home/goods'
 import { onMounted } from 'vue';
 import type { RequireInfo } from '@/types/RequireInfo';
+import type { Complain } from '@/types/Complain';
 const productStore = useProductStore()
 const userStore = useUserStore()
 // 商品图片列表
@@ -68,9 +70,9 @@ const categoryName = ref<string>("")
 // 获取商品发布者部分信息
 const { partUserInfo, requestPartUserInfo } = usePartUserInfo()
 
-const pageParams = reactive<{pId:string,uId:string}>({
-  pId:"",
-  uId:""
+const pageParams = reactive<{ pId: string, uId: string }>({
+    pId: "",
+    uId: ""
 })
 // 页脚按钮
 const footerBtn = async (e: any) => {
@@ -85,6 +87,33 @@ const footerBtn = async (e: any) => {
         }
     }
 
+}
+const complainPost = () => {
+    if (userStore.userInfo.id != Number(info.userId)) {
+        uni.showModal({
+            title: "投诉帖子",
+            editable: true,
+            placeholderText: "违规原因",
+            success(res) {
+                if (res.confirm) {
+                    console.log(res.content);
+                    let data: Complain = {
+                        complainantCause: res.content || "帖子违规",
+                        complainantId: String(userStore.userInfo.id),
+                        complainantSubject: String(info.id),
+                        sellerId: String(partUserInfo.id),
+                        type: 0
+                    }
+                    complainProduct(data).then(res => {
+                        uni.showToast({
+                            title: res.message,
+                            icon: "success"
+                        })
+                    })
+                }
+            }
+        })
+    }
 }
 // 页面初始化
 const init = async (pId: string) => {
@@ -108,7 +137,7 @@ onMounted(() => {
 
 })
 </script>
-  
+
 <style lang="scss" scoped>
 $footer-height: 50px;
 
