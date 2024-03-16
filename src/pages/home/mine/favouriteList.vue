@@ -47,11 +47,6 @@ onMounted(async () => {
     favouriteList.length = 0
     favouriteList.push(...result.data)
 })
-onLoad(() => {
-    uni.setNavigationBarTitle({
-        title: "我的收藏"
-    })
-})
 </script>
 <template>
     <view class="favourite-list-container">

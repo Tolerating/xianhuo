@@ -95,6 +95,9 @@ onShow(() => {
 			chatlists.push(...res.data)
 		}
 	})
+	uni.removeTabBarBadge({
+		index:2
+	})
 })
 </script>
 

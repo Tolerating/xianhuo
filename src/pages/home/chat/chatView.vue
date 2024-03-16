@@ -3,14 +3,16 @@ import { reactive } from 'vue';
 import { nextTick, ref, onMounted } from 'vue';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
 import { useNow, useDateFormat } from '@vueuse/core'
+import {updateInChat} from '@/api/user/user'
 import useUserStore from '@/stores/users';
 import { storeToRefs } from 'pinia';
-import type { SocketTask } from '@/types/SocketTask';
 import { pageChatMessage, clearUnRead,allMessages } from '@/api/chat/index'
 import type { ChatMessage } from '@/types/ChatMessage';
-import { APP_BASE_URL, APP_URL_PORT } from '@/config/index'
+import useCommonStore from '@/stores/common'
 const userStore = useUserStore()
+const commonStore = useCommonStore()
 const { userInfo } = storeToRefs(userStore)
+const {socketOpen} = storeToRefs(commonStore)
 const toUser = reactive<{ toUserId: string, toUserName: string, toUserPicture: string }>({
     toUserId: "",
     toUserName: "",
@@ -21,30 +23,13 @@ const linkId = ref<string>("")
 // 未读消息数量
 const unread = ref<number>(0)
 const inputValue = ref<string>("")
-let heartInterval: any = null
-const socket = ref<SocketTask | null>(null)
 const isFocus = ref<boolean>(false)
-const isSend = ref<boolean>(false)
 const messageList = reactive<ChatMessage[]>([])
 const scrollIntoView = ref<string>("msg" + (messageList.length - 1))
 
-let socketOpen: boolean = false
 
 const initWebsocket = () => {
-
-    socket.value = uni.connectSocket({
-        url: `ws://${APP_BASE_URL.replace("http://","")}:${APP_URL_PORT}/websocket/${userStore.userInfo.id}`,
-        success() { }
-    })
-    socket.value.onOpen(() => {
-        console.log("socket连接成功");
-        heartInterval = setInterval(() => {
-            uni.sendSocketMessage({
-                data: "heart keep"
-            })
-        }, 1000 * 30)
-    })
-    socket.value.onMessage((res: any) => {
+    commonStore.socket?.onMessage((res: any) => {
         console.log("服务端消息", res.data);
         let receive = JSON.parse(res.data)
         if (receive.sendUser == toUser.toUserId) {
@@ -62,12 +47,6 @@ const initWebsocket = () => {
             scrollIntoView.value = ''
         }
 
-    })
-    socket.value.onError(() => {
-        isSend.value = true
-        uni.showToast({
-            title:"连接打开失败，请检查网络！"
-        })
     })
 }
 onLoad(option => {
@@ -87,21 +66,19 @@ onUnload(() => {
     if(messageList.length > 0){
         uni.setStorageSync(`chat${toUser.toUserId}`, messageList)
     }
-    socket.value?.close()
-    socket.value?.onClose(() => {
-        clearInterval(heartInterval)
-        console.log("关闭连接");
-
-    })
+    updateInChat(0)
 })
 const sendMessage = () => {
-    socket.value?.send({
+    commonStore.socket?.send({
         data: JSON.stringify(
             {
                 linkId: linkId.value,
                 content: inputValue.value,
                 toUser: toUser.toUserId,
-                fromUser: userInfo.value.id
+                fromUser: userInfo.value.id,
+                senderName:userInfo.value.name,
+                senderAvatar:userInfo.value.avatar,
+                showType:"chat"
             }
         )
     })
@@ -123,9 +100,9 @@ const sendMessage = () => {
 
 onMounted(async () => {
     console.log("挂载");
-    if (socket.value == null) {
+    
         initWebsocket()
-    }
+    
     // 读取缓存的聊天内容
     console.log(unread.value);
     let chatHistory = uni.getStorageSync(`chat${toUser.toUserId}`)
@@ -152,6 +129,8 @@ onMounted(async () => {
         scrollIntoView.value = "modal"
     })
     scrollIntoView.value = ''
+    updateInChat(1)
+
 })
 
 </script>
@@ -185,7 +164,7 @@ onMounted(async () => {
                 <uni-easyinput v-model="inputValue" :focus="isFocus" maxlength="-1" type="textarea" confrimType="send"
                     @confirm="" style="height:35px;" :styles="{ backgroundColor: 'rgba(143, 147, 156, 0.2);' }"
                     :inputBorder="false" class="chat-input" />
-                <button class="chat-send-btn" :disabled="isSend" @tap.stop="sendMessage">发送</button>
+                <button class="chat-send-btn" :disabled="!socketOpen" @tap.stop="sendMessage">发送</button>
             </view>
         </view>
     </view>

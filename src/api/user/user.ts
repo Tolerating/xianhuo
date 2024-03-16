@@ -15,10 +15,18 @@ const releasedProducts  = ()=>request("/product/released",{},"GET")
 
 // 获取用户已发布商品的数量
 const releasedCount = ()=>request("/product/count",{},"GET")
+
+/**
+ * 更新是否在聊天页
+ *
+ * @param {number} status
+ */
+const updateInChat = (status:number)=>request(`/inChat?status=${status}`,{},"GET")
 export {
     userInfoById,
     requestUserInfo,
     improveInfo,
     releasedProducts,
-    releasedCount
+    releasedCount,
+    updateInChat
 }

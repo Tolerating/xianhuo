@@ -21,23 +21,25 @@ export interface UserPart {
 // 用户信息表
 export interface User extends LoginUser, UserPart {
 	//电话
-	phone: string;
+	phone: string,
 	//身份证
-	identityCard: string;
+	identityCard: string,
 	//学生学号
-	stuNumber: number;
+	stuNumber: number,
 	//班级
-	grade: string;
+	grade: string,
 	//学院
-	faculty: string;
+	faculty: string,
 	//专业
-	major: string;
+	major: string,
 	//生日
-	birthday: string;
+	birthday: string,
 	//信誉分
-	score: number;
+	score: number,
+	// 是否在聊天页
+	isChat: number,
 	//创建时间
-	createdAt?: string;
+	createdAt?: string,
 	//删除时间
-	deletedAt?: string;
+	deletedAt?: string
 }

@@ -12,7 +12,7 @@
 
 				</view>
 				<text style="font-size: 14px;">{{ product.address }}</text>
-				<ProductPrice :mode="product.sellModeId" :origin-price="product.originPrice" :current-price="product.currentPrice" :time-unit="product.timeUnit"></ProductPrice>
+				<ProductPrice :mode="product.sellModeId" :origin-price="String(product.originPrice)" :current-price="String(product.currentPrice)" :time-unit="product.timeUnit"></ProductPrice>
 				<uv-text :customStyle="{marginTop:'5px',marginLeft:'5px'}" type="sueecss" :text="product.createTime"></uv-text>
 			</view>
 		</view>

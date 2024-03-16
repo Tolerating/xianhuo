@@ -48,21 +48,21 @@
                         </view>
                         <text style="font-size: 13px;color: #999898;">待收货</text>
                     </view>
-                    <view class='deal_option'>
+                    <view class='deal_option' @tap="orderNavigate(3)"> 
                         <view class="icon_group">
                             <view class="cu-tag badge" style="right: 0px;">{{ orderCount.sell }}</view>
                         </view>
                         <text style="font-size: 13px;color: #999898;">出售记录</text>
                     </view>
-                    <view class='deal_option'>
+                    <view class='deal_option' @tap="orderNavigate(4)">
                         <view class="icon_group">
                             <view class="cu-tag badge" style="right: 0px;">{{ orderCount.buy }}</view>
                         </view>
                         <text style="font-size: 13px;color: #999898;">购买记录</text>
                     </view>
-                    <view class='deal_option'>
+                    <view class='deal_option' @tap="orderNavigate(5)">
                         <view class="icon_group">
-                            <view class="cu-tag badge" style="right: 0px;">{{ 0 }}</view>
+                            <view class="cu-tag badge" style="right: 0px;">{{ orderCount.after }}</view>
                         </view>
                         <text style="font-size: 13px;color: #999898;">售后</text>
                     </view>
@@ -71,6 +71,7 @@
         </view>
         <uni-list>
             <uni-list-item title="我的收益" :rightText="'￥ '+ orderCount.profit" />
+            <uni-list-item title="卖家待处理售后" rightText="0" />
             <uni-list-item showArrow title="修改个人信息" />
             <uni-list-item showArrow title="退出登录" clickable @click="logoutXH" />
             <uni-list-item showArrow title="用户服务协议" />
@@ -95,12 +96,14 @@ const orderCount = reactive<{
     receive: string,
     buy: string,
     sell: string,
-    profit:string
+    profit:string,
+    after:string
 }>({
     dispatch: "",
     receive: "",
     buy: "",
     sell: "",
+    after:"",
     profit:"0.0"
 })
 const { userInfo, counts } = storeToRefs(userStore)
@@ -152,16 +155,22 @@ const orderNavigate = (flag: number) => {
             })
             break;
         case 3:
-            // 我的仓库
-            // uni.navigateTo({
-            //     url: `/pages/home/mine/myStoresHouse?id=${userInfo.value.id}`
-            // })
+            // 出售记录
+            uni.navigateTo({
+                url: `/pages/home/mine/saleRecord`
+            })
             break;
         case 4:
-            // 我的帖子
-            // uni.navigateTo({
-            //     url: "/pages/home/mine/requireList"
-            // })
+            // 购买记录
+            uni.navigateTo({
+                url: "/pages/home/mine/buyRecord"
+            })
+            break;
+        case 5:
+            // 售后
+            uni.navigateTo({
+                url: "/pages/home/mine/afterService"
+            })
             break;
         default:
             break;

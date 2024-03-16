@@ -2,100 +2,78 @@
 import useProductStore from '@/stores/product/index'
 import { storeToRefs } from 'pinia';
 import { APP_BASE_URL } from '@/config/index'
+import type { Product } from '@/types/Product'
 import ProductPrice from '@/components/goods/ProductPrice.vue'
 import { onMounted } from 'vue';
 import { reactive } from 'vue';
-import { dispatchProductList,dispatchedProduct } from '@/api/home/goods'
+import { deleteProduct, sellHistory } from '@/api/home/goods'
+import { onLoad } from '@dcloudio/uni-app';
 import useUserStore from '@/stores/users';
-import { receivedProduct } from '@/api/home/goods'
 import type { OrderInfo } from '@/types/OrderInfo';
 const productStore = useProductStore()
 const userStore = useUserStore()
-const { counts } = storeToRefs(userStore)
-const { sellModeList } = storeToRefs(productStore)
-const favouriteList = reactive<OrderInfo[]>([])
+const sellHistoryList = reactive<OrderInfo[]>([])
 const sellModeMap = reactive<string[]>([])
-sellModeList.value.forEach(item => {
-    sellModeMap[item.id] = item.name
-})
 const navigateToDetail = (product: OrderInfo) => {
     uni.navigateTo({
-        url: `/pages/goods/goodDetail?uId=${product.sellId}&pId=${product.productId}`
+        url: `/pages/goods/goodDetail?uId=${userStore.userInfo.id}&pId=${product.productId}`
     })
 }
-const cancelStar = (product: OrderInfo, index: number) => {
-
-    uni.showModal({
-        title: '提示',
-        content: '确定发货？',
-        success: function (res) {
-            if (res.confirm) {
-                dispatchedProduct(product.id as string).then(res => {
-                    favouriteList.splice(index, 1)
-                })
-            }
-        }
-    });
-}
-onMounted(async () => {
-    let result = await dispatchProductList()
-    favouriteList.length = 0
-    favouriteList.push(...result.data)
+onMounted(() => {
+    sellHistory().then(res => {
+        console.log(res, userStore.userInfo);
+        sellHistoryList.length = 0
+        sellHistoryList.push(...res.data)
+    })
 })
 </script>
-
 <template>
-    <view class="favourite-list-container">
-        <uv-empty v-if="favouriteList.length == 0" mode="list"
-            style="position: fixed;top: 0;bottom: 0;left: 0;right: 0;"></uv-empty>
-        <view class="favourite-list">
-            <view class="list-item" v-for="(item, index) in favouriteList" :key="item.buyId">
-                <view class="item-info" style="position: relative;">
-                    <uv-button style="position: absolute;right: 0;top: 0;" type="success" :plain="true" size="small"
-                        shape="circle" :iconSize="18" icon="star" @tap="cancelStar(item, index)"
-                        text="确认发货"></uv-button>
+    <view class="released-list-container">
+        <uni-notice-bar text="温馨提示：如果填写信息有误可以点击商品展示框或编辑按钮进行修改信息重新发布，如果您不想卖了可以点击下架按钮进行下架。" />
+        <view class="released-list">
+            <view class="list-item" @tap="navigateToDetail(item)" style="position: relative;" v-for="(item, index) in sellHistoryList" :key="item.createTime">
+                <view class="item-info">
                     <view class="item-info-left">
                         <view style="padding-bottom: 100%;position: relative;">
                             <image :src="APP_BASE_URL + item.productImages.split(',')[0]" mode="scaleToFill" />
                         </view>
                     </view>
-                    <view class="item-info-right" @tap="navigateToDetail(item)">
-                        <view style="display: flex;justify-content: space-between;">
-                            <view style="display: flex;">
-                                <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                                <text style="font-weight: bold;">{{ item.productDetail.slice(0, 6) }}...</text>
-                            </view>
-
+                    <view class="item-info-right">
+                        <view class="item-right-wrapper">
+                            <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <text style="font-weight: bold;">{{ item.productDetail.slice(0, 6) }}...</text>
                         </view>
                         <view class="item-right-wrapper">
                             <uv-icon name="map" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text>{{ item.productAddress }}</text>
+                            <text class="item-right-text">{{ item.productAddress }}</text>
                         </view>
                         <view class="item-right-wrapper">
                             <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text style="padding-right: 20px;">创建时间：{{ item.createTime }}</text>
+                            <text class="item-right-text" style="padding-right: 20px;">{{ item.createTime }} 下单</text>
                         </view>
                         <view class="item-right-wrapper">
                             <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text style="padding-right: 20px;">支付时间：{{ item.payTime }}</text>
+                            <text class="item-right-text" style="padding-right: 20px;">{{ item?.payTime }} 支付</text>
                         </view>
-                        <ProductPrice style="display: flex;justify-content: flex-end;margin-top: 25px;" :mode="1"
-                            originPrice="0" :currentPrice="item.total as string" timeUnit="周" />
+                        <ProductPrice style="display: flex;justify-content: flex-end;margin-top: 15px;" :mode="1"
+                            originPrice='0' :currentPrice="item.total as string" timeUnit="周" />
                     </view>
+                    <image v-if="item.status == 0" style="width: 30%;height: 50%;position: absolute;right: 10px;top: 5px;" src="../../../static/returnMoney.png"></image>
+                </view>
+                <uv-line style="margin: 5px 0;" color="#2979ff"></uv-line>
+                <view class="item-operation">
+                    <uv-alert v-if="item.status == 2" type="warning" description="商品处于售后状态，请尽快处理"></uv-alert>
                 </view>
             </view>
         </view>
     </view>
 </template>
-
 <style lang="scss" scoped>
-.favourite-list-container {
+.released-list-container {
     background-color: #ece1e1;
-    box-sizing: border-box;
-    padding-bottom: 15px;
     min-height: 100vh;
 
-    .favourite-list {
+    .released-list {
         display: flex;
         flex-direction: column;
         padding: 0 5px;
@@ -106,8 +84,8 @@ onMounted(async () => {
             flex-direction: column;
             background-color: white;
             border-radius: $xh-border-radius-base;
-            height: $item-height;
-            margin-top: 15px;
+            height: 200px;
+            margin-bottom: 15px;
             padding: 5px;
 
             .item-info {
@@ -126,14 +104,14 @@ onMounted(async () => {
                 .item-info-right {
                     display: flex;
                     flex-direction: column;
-
                     .item-right-wrapper {
                         display: flex;
                         align-items: center;
+                        margin-bottom: 5px;
+                    }
 
-                        text {
-                            font-size: $xh-font-size-base;
-                        }
+                    .item-right-text {
+                        font-size: $xh-font-size-base;
                     }
                 }
             }

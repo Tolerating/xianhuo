@@ -58,6 +58,13 @@ export interface ChatMessage {
    */
   type?:number,
   /**
+   * 消息显示类型，chat表示聊天消息，notice表示系统通知
+   *
+   * @type {("chat" | "notice")}
+   * @memberof ChatMessage
+   */
+  showTypes?: "chat" | "notice",
+  /**
    *是否为最后一条消息，1表示是，0表示不是
    *
    * @type {number}

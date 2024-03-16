@@ -8,6 +8,7 @@ import type { Product, ProductStatus } from '@/types/Product';
 import type { Favourite } from '@/types/Favourite';
 import type { OrderInfo } from '@/types/OrderInfo';
 import type { Complain } from '@/types/Complain';
+import type { AfterService } from '@/types/AfterService';
 /**
  *获得所有分类
  *
@@ -246,7 +247,8 @@ const orderTypeCount = () => request<{
     receive: string,
     buy: string,
     sell: string,
-    profit:string
+    profit:string,
+    after:string
 }>(`/orders/count`, {}, "GET")
 
 /**
@@ -255,6 +257,52 @@ const orderTypeCount = () => request<{
  * @param {Complain} data
  */
 const complainProduct = (data:Complain)=>request("/complain",data,"POST")
+
+/**
+ * 更新商品状态
+ *
+ * @param {number} orderId
+ * @param {OrderInfo['status']} status
+ */
+const updateOrderStatus = (orderId:number,status:OrderInfo['status']) => request(`/orderInfo/status?id=${orderId}&status=${status}`, {}, "GET")
+
+
+/**
+ * 申请售后
+ *
+ * @param {AfterService} data
+ */
+const askAfterService = (data:AfterService)=>request('/afterService',data,"POST")
+
+/**
+ * 根据购买者id和订单号获取售后信息
+ *
+ * @param {string} buyerId
+ * @param {string} orderId
+ */
+const getAfterService = (buyerId:string,orderId:string)=>request<AfterService>(`/afterService?buyerId=${buyerId}&orderId=${orderId}`,{},"GET")
+
+/**
+ * 根据购买者id获取所有售后信息
+ *
+ * @param {string} buyerId
+ */
+const allAfterService = (buyerId:string)=>request(`/afterServices?buyerId=${buyerId}`,{},"GET")
+
+
+/**
+ * 申请平台介入
+ *
+ * @param {string} afterId
+ */
+const askPlatform = (afterId:string)=>request(`/askPlatform?afterId=${afterId}`,{},"GET")
+
+/**
+ * 获取售后记录
+ *
+ */
+const afterHistory = () => request<AfterService[]>(`/afterHistory`, {}, "GET")
+
 export {
     allCategories,
     allSellMode,
@@ -287,5 +335,11 @@ export {
     sellHistory,
     buyHistory,
     orderTypeCount,
-    complainProduct
+    complainProduct,
+    updateOrderStatus,
+    askAfterService,
+    getAfterService,
+    allAfterService,
+    askPlatform,
+    afterHistory
 }

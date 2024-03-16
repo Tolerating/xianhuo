@@ -160,6 +160,7 @@
 		{
 			"path": "pages/goods/goodDetail",
 			"style": {
+				"navigationBarTitleText": "商品详情",
 				"h5": {
 					"titleNView": {
 						"titleText":""
@@ -211,13 +212,22 @@
 			}
 		},
 		{
-			"path": "pages/home/mine/myStoresHouse"
+			"path": "pages/home/mine/myStoresHouse",
+			"style": {
+				"navigationBarTitleText": "我的仓库"
+			}
 		},
 		{
-			"path": "pages/home/mine/releasedProductList"
+			"path": "pages/home/mine/releasedProductList",
+			"style": {
+				"navigationBarTitleText": "我的发布"
+			}
 		},
 		{
-			"path": "pages/home/mine/favouriteList"
+			"path": "pages/home/mine/favouriteList",
+			"style": {
+				"navigationBarTitleText": "我的收藏"
+			}
 		},
 		{
 			"path": "pages/home/mine/requireList"
@@ -233,10 +243,34 @@
 			}
 		},
 		{
-			"path": "pages/home/mine/dispatchProduct"
+			"path": "pages/home/mine/dispatchProduct",
+			"style": {
+				"navigationBarTitleText": "待发货"
+			}
 		},
 		{
-			"path": "pages/home/mine/receiveProduct"
+			"path": "pages/home/mine/receiveProduct",
+			"style": {
+				"navigationBarTitleText": "待收货"
+			}
+		},
+		{
+			"path": "pages/home/mine/saleRecord",
+			"style": {
+				"navigationBarTitleText": "出售记录"
+			}
+		},
+		{
+			"path": "pages/home/mine/buyRecord",
+			"style": {
+				"navigationBarTitleText": "购买记录"
+			}
+		},
+		{
+			"path": "pages/home/mine/afterService",
+			"style": {
+				"navigationBarTitleText": "售后"
+			}
 		}
 ],
 	
