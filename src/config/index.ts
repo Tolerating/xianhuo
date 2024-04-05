@@ -1,4 +1,4 @@
-const APP_BASE_URL = "http://192.168.1.16"
+const APP_BASE_URL = "http://192.168.3.10"
 const APP_URL_PORT = "40001"
 const DEFAULT_AVATAR = `/img/avatar.png`
 export{

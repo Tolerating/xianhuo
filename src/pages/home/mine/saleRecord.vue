@@ -1,38 +1,57 @@
 <script lang="ts" setup>
-import useProductStore from '@/stores/product/index'
-import { storeToRefs } from 'pinia';
 import { APP_BASE_URL } from '@/config/index'
-import type { Product } from '@/types/Product'
 import ProductPrice from '@/components/goods/ProductPrice.vue'
 import { onMounted } from 'vue';
 import { reactive } from 'vue';
-import { deleteProduct, sellHistory } from '@/api/home/goods'
-import { onLoad } from '@dcloudio/uni-app';
+import { afterReceive, sellHistory } from '@/api/home/goods'
 import useUserStore from '@/stores/users';
 import type { OrderInfo } from '@/types/OrderInfo';
-const productStore = useProductStore()
 const userStore = useUserStore()
 const sellHistoryList = reactive<OrderInfo[]>([])
-const sellModeMap = reactive<string[]>([])
 const navigateToDetail = (product: OrderInfo) => {
     uni.navigateTo({
         url: `/pages/goods/goodDetail?uId=${userStore.userInfo.id}&pId=${product.productId}`
     })
 }
+const init = ()=>{
+	sellHistory().then(res => {
+	    console.log(res, userStore.userInfo);
+	    sellHistoryList.length = 0
+	    sellHistoryList.push(...res.data)
+	})
+}
+const checkReceive = (item:OrderInfo)=>{
+	uni.showModal({
+		title:"提示",
+		content:"确定收货？",
+		success(res) {
+			if(res.confirm){
+				uni.showLoading({
+					title:"请求中，切勿操作！"
+				})
+				afterReceive(item.afterServiceId as string,item.orderId).then(res =>{
+					uni.hideLoading()
+					uni.showToast({
+						title:res.message,
+						icon:"success"
+					})
+					init()
+				})
+			}
+		}
+	})
+	
+}
 onMounted(() => {
-    sellHistory().then(res => {
-        console.log(res, userStore.userInfo);
-        sellHistoryList.length = 0
-        sellHistoryList.push(...res.data)
-    })
+    init()
 })
 </script>
 <template>
     <view class="released-list-container">
         <uni-notice-bar text="温馨提示：如果填写信息有误可以点击商品展示框或编辑按钮进行修改信息重新发布，如果您不想卖了可以点击下架按钮进行下架。" />
         <view class="released-list">
-            <view class="list-item" @tap="navigateToDetail(item)" style="position: relative;" v-for="(item, index) in sellHistoryList" :key="item.createTime">
-                <view class="item-info">
+            <view class="list-item" style="position: relative;" v-for="(item, index) in sellHistoryList" :key="item.createTime">
+                <view class="item-info" @tap="navigateToDetail(item)">
                     <view class="item-info-left">
                         <view style="padding-bottom: 100%;position: relative;">
                             <image :src="APP_BASE_URL + item.productImages.split(',')[0]" mode="scaleToFill" />
@@ -40,29 +59,34 @@ onMounted(() => {
                     </view>
                     <view class="item-info-right">
                         <view class="item-right-wrapper">
-                            <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
                             <text style="font-weight: bold;">{{ item.productDetail.slice(0, 6) }}...</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="map" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <uv-icon name="map" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
                             <text class="item-right-text">{{ item.productAddress }}</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text class="item-right-text" style="padding-right: 20px;">{{ item.createTime }} 下单</text>
+                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
+                            <text class="item-right-text">{{ item.createTime }} 下单</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text class="item-right-text" style="padding-right: 20px;">{{ item?.payTime }} 支付</text>
+                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
+                            <text class="item-right-text">{{ item?.payTime }} 支付</text>
                         </view>
-                        <ProductPrice style="display: flex;justify-content: flex-end;margin-top: 15px;" :mode="1"
-                            originPrice='0' :currentPrice="item.total as string" timeUnit="周" />
+                        <ProductPrice style="display: flex;justify-content: flex-end;" :mode="1"
+                            originPrice="0" :currentPrice="String(item.total)" timeUnit="周" />
                     </view>
                     <image v-if="item.status == 0" style="width: 30%;height: 50%;position: absolute;right: 10px;top: 5px;" src="../../../static/returnMoney.png"></image>
                 </view>
                 <uv-line style="margin: 5px 0;" color="#2979ff"></uv-line>
                 <view class="item-operation">
-                    <uv-alert v-if="item.status == 2" type="warning" description="商品处于售后状态，请尽快处理"></uv-alert>
+                    <uv-alert v-if="item.status == 2 && item.afterStatus == 0" type="warning" description="商品处于售后状态，请尽快处理"></uv-alert>
+					<uv-alert v-if="item.status == 2 && item.afterStatus == 11" type="warning" description="商品售后成功，等待买家发货。。。"></uv-alert>
+					<uv-button type="success"
+					    v-if="item.status == 2 && item.afterStatus == 12"
+					    :plain="true" size="small" shape="circle" :iconSize="18" icon="edit-pen"
+					    @tap="checkReceive(item)" text="确认收货"></uv-button>
                 </view>
             </view>
         </view>
@@ -79,14 +103,14 @@ onMounted(() => {
         padding: 0 5px;
 
         .list-item {
-            $item-height: 160px;
+            $item-height: 150px;
             display: flex;
             flex-direction: column;
             background-color: white;
             border-radius: $xh-border-radius-base;
             height: 200px;
             margin-bottom: 15px;
-            padding: 5px;
+           overflow: hidden;
 
             .item-info {
                 display: flex;
@@ -111,7 +135,7 @@ onMounted(() => {
                     }
 
                     .item-right-text {
-                        font-size: $xh-font-size-base;
+                        font-size: $xh-font-size-sm;
                     }
                 }
             }

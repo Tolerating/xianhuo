@@ -60,7 +60,7 @@ const loginXH = async () => {
 
 	if (arr[0] == 'null') {
 		uni.navigateTo({
-			url: "/pages/login/setPersonalInfo"
+			url: "/pages/login/setPersonalInfo?flag=0"
 		})
 	} else {
 		uni.reLaunch({

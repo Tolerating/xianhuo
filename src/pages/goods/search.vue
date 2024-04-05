@@ -11,8 +11,8 @@
 </template>
 
 <script lang="ts" setup>
-import { onNavigationBarButtonTap, onNavigationBarSearchInputConfirmed, onNavigationBarSearchInputChanged, onShow, onHide } from '@dcloudio/uni-app'
-import { ref, getCurrentInstance, reactive } from 'vue';
+import { onNavigationBarButtonTap, onNavigationBarSearchInputConfirmed, onNavigationBarSearchInputChanged, onShow, onHide, onUnload } from '@dcloudio/uni-app'
+import { ref, getCurrentInstance, reactive, onMounted } from 'vue';
 const historyList = reactive<string[]>([])
 const deleteHistory = () => {
 	uni.removeStorageSync("history_search")
@@ -39,7 +39,8 @@ onNavigationBarSearchInputConfirmed((e) => {
 
 const navigateToFilter = () => {
 	if (searchValue.value) {
-		if(historyList.indexOf(searchValue.value) != -1){
+		if(historyList.indexOf(searchValue.value) == -1){
+			console.log("meiyou");
 			historyList.push(searchValue.value)
 		}
 		uni.navigateTo({

@@ -107,12 +107,40 @@ export interface AfterService {
       */
      platformDealTime?:string,
      /**
-      * 售后表状态，0表示售后处理中，-1表示售后失败，1表示售后成功
+      * 售后表状态，0表示售后处理中，-1表示售后失败，1表示售后成功，11表示待发货，12表示待收货
       *
       * @type {string}
       * @memberof AfterService
       */
-     status?: 0|1|-1,
+     status?: 0|1|-1|11|12,
+	 /**
+       *买家发货状态，0表示未发货，1表示已发货
+       *
+       * @type {(0|1)}
+       * @memberof AfterService
+       */
+      buyerSend?:0|1,
+	 /**
+       *买家发货时间
+       *
+       * @type {string}
+       * @memberof AfterService
+       */
+      buyerSendTime?:string,
+	 /**
+       *卖家收货状态，0表示未收货，1表示已收货
+       *
+       * @type {(0|1)}
+       * @memberof AfterService
+       */
+      sellerReceive?:0|1,
+	 /**
+       *卖家收货时间
+       *
+       * @type {string}
+       * @memberof AfterService
+       */
+      sellerReceiveTime?:string,
      /**
       * 创建时间
       *

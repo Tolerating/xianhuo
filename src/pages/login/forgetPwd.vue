@@ -15,6 +15,7 @@ const countDownFlag = ref<boolean>(false)
 const emailCode = ref<string>("")
 const pwd = ref<string>("")
 const rePwd = ref<string>("")
+const {requestEmailCode} = useEmailCode()
 const showInputPwd = ref<Boolean>(false)
 watch(code, (newValue, oldValue) => {
 	if (newValue == emailCode.value) {
@@ -27,8 +28,7 @@ const isRegister = computed(() => {
 })
 const getCode = async () => {
 	if (!countDownFlag.value) {
-		// emailCode.value = await requestEmailCode(email.value)
-		emailCode.value = "123123"
+		emailCode.value = await requestEmailCode(email.value)
 		countDown.value = 60
 		countDownFlag.value = true
 		setInterval(() => {

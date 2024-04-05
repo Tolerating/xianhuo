@@ -271,6 +271,18 @@
 			"style": {
 				"navigationBarTitleText": "售后"
 			}
+		},
+		{
+			"path": "pages/home/chat/officalNotice",
+			"style": {
+				"navigationBarTitleText": "官方通知"
+			}
+		},
+		{
+			"path": "pages/home/mine/waitDealAfterService",
+			"style": {
+				"navigationBarTitleText": "待处理售后"
+			}
 		}
 ],
 	

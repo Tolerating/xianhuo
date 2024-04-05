@@ -9,6 +9,7 @@ import type { Favourite } from '@/types/Favourite';
 import type { OrderInfo } from '@/types/OrderInfo';
 import type { Complain } from '@/types/Complain';
 import type { AfterService } from '@/types/AfterService';
+import type { Notice } from '@/types/Notice';
 /**
  *获得所有分类
  *
@@ -239,7 +240,7 @@ const sellHistory = () => request<OrderInfo[]>(`/orders/sell`, {}, "GET")
 const buyHistory = () => request<OrderInfo[]>(`/orders/buy`, {}, "GET")
 
 /**
- * 获取待发货，待收货，交易记录数量
+ * 获取待发货，待收货，交易记录数量,售后数量
  *
  */
 const orderTypeCount = () => request<{
@@ -248,7 +249,8 @@ const orderTypeCount = () => request<{
     buy: string,
     sell: string,
     profit:string,
-    after:string
+    after:string,
+	waitDeal:string
 }>(`/orders/count`, {}, "GET")
 
 /**
@@ -294,8 +296,9 @@ const allAfterService = (buyerId:string)=>request(`/afterServices?buyerId=${buye
  * 申请平台介入
  *
  * @param {string} afterId
+ * @param {string} orderId
  */
-const askPlatform = (afterId:string)=>request(`/askPlatform?afterId=${afterId}`,{},"GET")
+const askPlatform = (afterId:string,orderId:string)=>request(`/askPlatform?afterId=${afterId}&orderId=${orderId}`,{},"GET")
 
 /**
  * 获取售后记录
@@ -303,6 +306,55 @@ const askPlatform = (afterId:string)=>request(`/askPlatform?afterId=${afterId}`,
  */
 const afterHistory = () => request<AfterService[]>(`/afterHistory`, {}, "GET")
 
+/**
+ * 获取用户的官方通知
+ *
+ */
+const allNotices = () => request<Notice[]>(`/notices`, {}, "GET")
+
+/**
+ * 删除通知
+ *
+ */
+const delNotice = (id:string)=>request<string>(`/notice/del?id=${id}`,{},"GET")
+
+/**
+ * 获取待处理的售后
+ *
+ */
+const afterServiceToDeal = ()=> request<AfterService[]>(`/afterService/toDeal`, {}, "GET")
+
+/**
+ * 卖家处理售后
+ *
+ * @param {string} afterId
+ * @param {string} productId
+ * @param {string} orderId
+ * @param {string} buyerId
+ * @param {string} refuse
+ * @param {(0|1)} type
+ */
+const dealAfterService = (afterId:string, productId:string, orderId:string, buyerId:string, refuse:string, type:0|1)=>request<string>(`/afterService/sellerDeal?afterId=${afterId}&productId=${productId}&orderId=${orderId}&buyerId=${buyerId}&refuse=${refuse}&type=${type}`, {}, "GET")
+
+/**
+ * 买家售后发货
+ *
+ */
+const afterDispatch = (id:string)=> request<string>(`/afterService/dispatch?id=${id}`, {}, "GET")
+
+/**
+ * 买家售后发货
+ *@param {string} id
+ *@param {string} orderId
+ */
+const afterReceive = (id:string,orderId:string)=> request<string>(`/afterService/receive?id=${id}&orderId=${orderId}`, {}, "GET")
+
+/**
+ * 商家未发货退款
+ *
+ * @param {string} orderId
+ */
+const productRefund = (orderId:string)=>request(`/refund?id=${orderId}`,{},"GET")
 export {
     allCategories,
     allSellMode,
@@ -341,5 +393,12 @@ export {
     getAfterService,
     allAfterService,
     askPlatform,
-    afterHistory
+    afterHistory,
+    allNotices,
+    afterServiceToDeal,
+    dealAfterService,
+	delNotice,
+	afterDispatch,
+	afterReceive,
+	productRefund
 }

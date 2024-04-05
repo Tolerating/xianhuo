@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import useUserStore from '@/stores/users/index'
-import useProductStore from '@/stores/product/index'
 import { storeToRefs } from 'pinia'
 import {productsByUserId} from '@/api/home/goods'
 import GoodCard from '@/components/goods/GoodCard.vue'
@@ -9,9 +8,7 @@ import { reactive } from 'vue';
 
 import type { Product } from '@/types/Product';
 import { onLoad } from '@dcloudio/uni-app'
-import { APP_BASE_URL } from '@/config'
 const userStore = useUserStore()
-const productStore = useProductStore()
 const products = reactive<Product[]>([])
 const { userInfo } = storeToRefs(userStore)
 const storeMasterInfo = reactive(Object.assign({},userInfo.value))
@@ -19,7 +16,7 @@ onLoad((option:any)=>{
     uni.setNavigationBarTitle({
         title:"商品仓库"
     })
-	const {userInfo,self} = option
+	const {self} = option
 	if(self==0){
 		let data = JSON.parse(decodeURIComponent(option.userInfo))
 		Object.assign(storeMasterInfo,data)

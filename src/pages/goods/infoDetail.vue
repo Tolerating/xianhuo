@@ -27,10 +27,13 @@
         </uni-section>
         <uni-section type="line" padding="0 0 0 20px" class="sell-item" title="学校名称">
             <text style="color: rgb(15, 105, 241);text-decoration: underline solid rgb(15, 105, 241);">
-                {{ userStore.userInfo.school }}</text>
+                {{ partUserInfo.school }}</text>
         </uni-section>
+        <view class="selled-container">
+			<image v-if="info.status == '-1'" src="../../static/product_off.png" mode="scaleToFill" />
+		</view>
         <!--  页脚操作栏  -->
-        <view class="goods-detail-footer">
+        <view class="goods-detail-footer" v-if="info.status == '1'">
             <uni-goods-nav :options="[{
                     icon: 'compose',
                     text: '投诉'
@@ -122,9 +125,10 @@ const init = async (pId: string) => {
     categoryName.value = productStore.categoryNameById(info.categoryId) || ""
 }
 const naviagteToStoreHouse = () => {
-    uni.navigateTo({
-        url: `/pages/home/mine/myStoresHouse?id=${info.userId}`
-    })
+    let data = encodeURIComponent(JSON.stringify(partUserInfo))
+	uni.navigateTo({
+		url: `/pages/home/mine/myStoresHouse?userInfo=${data}&self=0`
+	})
 }
 onLoad((options) => {
     pageParams.pId = options?.pId
@@ -140,7 +144,16 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 $footer-height: 50px;
-
+.selled-container {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 100px;
+	top: 100px;
+	display: flex;
+	justify-content: center;
+	align-items: flex-end;
+}
 .goods-detail-container {
     display: flex;
     flex-direction: column;

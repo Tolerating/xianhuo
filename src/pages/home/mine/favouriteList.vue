@@ -12,7 +12,6 @@ import { cancelFavourite } from '@/api/home/goods'
 import type { Product } from '@/types/Product';
 const productStore = useProductStore()
 const userStore = useUserStore()
-const {counts} = storeToRefs(userStore)
 const { sellModeList } = storeToRefs(productStore)
 const favouriteList = reactive<Product[]>([])
 const sellModeMap = reactive<string[]>([])
@@ -35,7 +34,6 @@ const cancelStar = (product: Product, index: number) => {
                     uni.showToast({
                         title: res.message
                     })
-                    counts.value.star--
                     favouriteList.splice(index, 1)
                 })
             }
@@ -55,7 +53,7 @@ onMounted(async () => {
         <view class="favourite-list">
             <view class="list-item" v-for="(item, index) in favouriteList" :key="item.detail">
                 <view class="item-info" style="position: relative;" >
-                    <uv-button style="position: absolute;right: 0;top: 0;" type="success" :plain="true" size="small" shape="circle" :iconSize="18" icon="star"
+                    <uv-button style="position: absolute;right: -3px;top: 0;" type="success" size="mini"
                                 @tap="cancelStar(item, index)" text="取消收藏"></uv-button>
                     <view class="item-info-left">
                         <view style="padding-bottom: 100%;position: relative;">
@@ -65,24 +63,24 @@ onMounted(async () => {
                     <view class="item-info-right" @tap="navigateToDetail(item)">
                         <view style="display: flex;justify-content: space-between;">
                             <view style="display: flex;">
-                                <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                                <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
                                 <text style="font-weight: bold;">{{ item.detail.slice(0, 6) }}...</text>
                             </view>
                             
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="tags" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <uv-icon name="tags" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
                             <text>{{ sellModeMap[item.sellModeId] }}</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="map" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <uv-icon name="map" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
                             <text>{{ item.address }}</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text style="padding-right: 20px;">{{ item.createTime }}</text>
+                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
+                            <text >{{ item.createTime }}</text>
                         </view>
-                        <ProductPrice style="display: flex;justify-content: flex-end;margin-top: 15px;"
+                        <ProductPrice style="display: flex;justify-content: flex-end;"
                             :mode="item.sellModeId" originPrice="0" :currentPrice="item.currentPrice"
                             :timeUnit="item.timeUnit"></ProductPrice>
                     </view>
@@ -104,14 +102,14 @@ onMounted(async () => {
         padding: 0 5px;
 
         .list-item {
-            $item-height: 160px;
+            $item-height: 150px;
             display: flex;
             flex-direction: column;
             background-color: white;
             border-radius: $xh-border-radius-base;
             height: $item-height;
             margin-top: 15px;
-            padding: 5px;
+            overflow: hidden;
 
             .item-info {
                 display: flex;
@@ -134,7 +132,7 @@ onMounted(async () => {
                         display: flex;
                         align-items: center;
                         text{
-                            font-size: $xh-font-size-base;
+                            font-size: 11px;
                         }
                     }
                 }

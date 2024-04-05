@@ -78,7 +78,7 @@ onLoad((option: any) => {
                         <text>{{ product.address }}</text>
                     </view>
                     <ProductPrice style="display: flex;justify-content: flex-end;margin-top: 15px;"
-                        :mode="product.sellModeId" originPrice="0" :currentPrice="product.currentPrice"
+                        :mode="product.sellModeId" originPrice="0" :currentPrice="String(product.currentPrice)"
                         :timeUnit="product.timeUnit"></ProductPrice>
                 </view>
             </view>

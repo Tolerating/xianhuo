@@ -24,5 +24,6 @@ export interface ChatList {
   //是否删
   status: number,
   content?: string,
+  type?:number,
   sendTime?: string
 }

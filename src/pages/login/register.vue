@@ -33,8 +33,7 @@ import type { User } from "@/types/Users";
 	// 获取验证码
 	const getCode = async ()=>{
 		if(!countDownFlag.value){
-			// emailCode.value = await requestEmailCode(email.value)
-			emailCode.value = "123123"
+			emailCode.value = await requestEmailCode(email.value)
 			countDown.value = 60
 			countDownFlag.value = true
 			setInterval(()=>{
@@ -54,8 +53,8 @@ import type { User } from "@/types/Users";
 		uni.showToast({
 			title:result.message,
 			success(){
-				uni.switchTab({
-					url:"/pages/home/index"
+				uni.navigateTo({
+					url:"/pages/login/index"
 				})
 			}
 		})

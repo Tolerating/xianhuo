@@ -7,11 +7,9 @@ import { onMounted } from 'vue';
 import { reactive } from 'vue';
 import { dispatchProductList,dispatchedProduct } from '@/api/home/goods'
 import useUserStore from '@/stores/users';
-import { receivedProduct } from '@/api/home/goods'
 import type { OrderInfo } from '@/types/OrderInfo';
 const productStore = useProductStore()
 const userStore = useUserStore()
-const { counts } = storeToRefs(userStore)
 const { sellModeList } = storeToRefs(productStore)
 const favouriteList = reactive<OrderInfo[]>([])
 const sellModeMap = reactive<string[]>([])
@@ -51,8 +49,7 @@ onMounted(async () => {
         <view class="favourite-list">
             <view class="list-item" v-for="(item, index) in favouriteList" :key="item.buyId">
                 <view class="item-info" style="position: relative;">
-                    <uv-button style="position: absolute;right: 0;top: 0;" type="success" :plain="true" size="small"
-                        shape="circle" :iconSize="18" icon="star" @tap="cancelStar(item, index)"
+                    <uv-button style="position: absolute;right: -3px;top: 0;" type="success" size="mini" @tap="cancelStar(item, index)"
                         text="确认发货"></uv-button>
                     <view class="item-info-left">
                         <view style="padding-bottom: 100%;position: relative;">
@@ -62,24 +59,24 @@ onMounted(async () => {
                     <view class="item-info-right" @tap="navigateToDetail(item)">
                         <view style="display: flex;justify-content: space-between;">
                             <view style="display: flex;">
-                                <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                                <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
                                 <text style="font-weight: bold;">{{ item.productDetail.slice(0, 6) }}...</text>
                             </view>
 
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="map" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <uv-icon name="map" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
                             <text>{{ item.productAddress }}</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text style="padding-right: 20px;">创建时间：{{ item.createTime }}</text>
+                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
+                            <text>创建时间：{{ item.createTime }}</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text style="padding-right: 20px;">支付时间：{{ item.payTime }}</text>
+                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
+                            <text>支付时间：{{ item.payTime }}</text>
                         </view>
-                        <ProductPrice style="display: flex;justify-content: flex-end;margin-top: 25px;" :mode="1"
+                        <ProductPrice style="display: flex;justify-content: flex-end;" :mode="1"
                             originPrice="0" :currentPrice="item.total as string" timeUnit="周" />
                     </view>
                 </view>
@@ -108,7 +105,7 @@ onMounted(async () => {
             border-radius: $xh-border-radius-base;
             height: $item-height;
             margin-top: 15px;
-            padding: 5px;
+            overflow: hidden;
 
             .item-info {
                 display: flex;
@@ -132,7 +129,7 @@ onMounted(async () => {
                         align-items: center;
 
                         text {
-                            font-size: $xh-font-size-base;
+                            font-size: 11px;
                         }
                     }
                 }

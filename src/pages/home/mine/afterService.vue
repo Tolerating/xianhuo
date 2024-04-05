@@ -1,12 +1,9 @@
 <script lang="ts" setup>
 import { APP_BASE_URL } from '@/config/index'
-import ProductPrice from '@/components/goods/ProductPrice.vue'
-import { computed, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { reactive, ref } from 'vue';
-import { deleteProduct, buyHistory, updateOrderStatus, askAfterService, getAfterService, allAfterService, askPlatform, afterHistory } from '@/api/home/goods'
-import dayjs from 'dayjs'
+import { afterHistory } from '@/api/home/goods'
 import useUserStore from '@/stores/users';
-import type { OrderInfo } from '@/types/OrderInfo';
 import type { AfterService } from '@/types/AfterService';
 const userStore = useUserStore()
 const buyAfterList = reactive<AfterService[]>([])
@@ -20,7 +17,6 @@ const navigateToDetail = (product: AfterService) => {
 
 onMounted(() => {
     afterHistory().then(res => {
-        console.log(res);
         buyAfterList.length = 0
         buyAfterList.push(...(res.data?.filter(item => {
             return item.buyerId == String(userStore.userInfo.id)
@@ -52,21 +48,21 @@ onMounted(() => {
                     </view>
                     <view class="item-info-right">
                         <view class="item-right-wrapper">
-                            <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
                             <text style="font-weight: bold;">{{ item.productDetail.slice(0, 10) }}...</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text class="item-right-text" style="padding-right: 20px;">{{ item.createTime }} 申请</text>
+                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
+                            <text class="item-right-text" >{{ item.createTime }} 申请</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text class="item-right-text" style="padding-right: 20px;">{{ (item.sellerDealTime &&
+                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
+                            <text class="item-right-text" >{{ (item.sellerDealTime &&
                 item.platformDealTime) || item.sellerDealTime }} 处理</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="tags" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text class="item-right-text" style="padding-right: 20px;">商品价格：￥{{ item.productPrice
+                            <uv-icon name="tags" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
+                            <text class="item-right-text">商品价格：￥{{ item.productPrice
                                 }}</text>
                         </view>
                     </view>
@@ -90,21 +86,26 @@ onMounted(() => {
                     </view>
                     <view class="item-info-right">
                         <view class="item-right-wrapper">
-                            <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
                             <text style="font-weight: bold;">{{ item.productDetail.slice(0, 10) }}...</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text class="item-right-text" style="padding-right: 20px;">{{ item.createTime }} 申请</text>
+                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
+                            <text class="item-right-text">{{ item.createTime }} 申请</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text class="item-right-text" style="padding-right: 20px;">{{ (item.sellerDealTime &&
+                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
+                            <text class="item-right-text">{{ (item.sellerDealTime &&
                 item.platformDealTime) || item.sellerDealTime }} 处理</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="tags" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text class="item-right-text" style="padding-right: 20px;">商品价格：￥{{ item.productPrice
+                            <uv-icon name="tags" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
+                            <text class="item-right-text">申请原因：{{ item.cause
+                                }}</text>
+                        </view>
+                        <view class="item-right-wrapper">
+                            <uv-icon name="tags" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
+                            <text class="item-right-text">商品价格：￥{{ item.productPrice
                                 }}</text>
                         </view>
                     </view>
@@ -127,7 +128,6 @@ onMounted(() => {
 
     .btn-group {
         position: fixed;
-        top: 44px;
         left: 0;
         right: 0;
         display: flex;
@@ -145,14 +145,14 @@ onMounted(() => {
         padding-top: 50px;
 
         .list-item {
-            $item-height: 160px;
+            $item-height: 150px;
             display: flex;
             flex-direction: column;
             background-color: white;
             border-radius: $xh-border-radius-base;
             height: 200px;
             margin-bottom: 15px;
-            padding: 5px;
+            overflow: hidden;
 
             .item-info {
                 display: flex;
@@ -178,7 +178,7 @@ onMounted(() => {
                     }
 
                     .item-right-text {
-                        font-size: $xh-font-size-base;
+                        font-size: $xh-font-size-sm;
                     }
                 }
             }

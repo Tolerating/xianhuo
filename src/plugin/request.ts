@@ -55,8 +55,27 @@ const request = <T = any>(url = '', data = {}, type: method = 'GET', header: hea
 			header: header,
 			dataType: 'json',
 		}).then((response) => {
-			dealRespoonse(response)
-			resolve(response.data as ResponseResult<T>)
+			// dealRespoonse(response)
+			let data = response.data as ResponseResult
+			if (data.code != 200) {
+				uni.showToast({
+					title: data.message
+				});
+				reject(data.message)
+			}
+			if(data.code == 200){
+				resolve(response.data as ResponseResult<T>)
+			}
+			// 服务端返回401，跳转到登录页面
+			if (response.statusCode == 402) {
+				uni.navigateTo({
+					url: "/pages/login/index"
+				})
+				//@ts-ignore
+				reject()
+				return
+			}
+			
 		}).catch(error => {
 			console.log(error);
 			// uni.showToast({

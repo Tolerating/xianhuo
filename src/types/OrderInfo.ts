@@ -11,6 +11,44 @@ export type OrderInfo = {
      * @type {string}
      */
     orderId: string,
+
+    /**
+     * 售后id
+     *
+     * @type {string}
+     */
+    afterServiceId?:string,
+    /**
+     * 能否平台介入标志【商家拒绝过一次即置为1】，0表示不能，1表示行
+     *
+     * @type {(0|1)}
+     */
+    platformFlag?:0|1;
+    /**
+     *  商家售后处理状态，0为等待商家处理，1为商家同意，2表示商家不同意
+     *
+     * @type {(-1|0|1)}
+     */
+    sellerAfterStatus?:-1|0|2,
+   /**
+    * 平台售后处理状态，-1表示平台未介入，0表示平台介入，1表示处理完成
+    *
+    * @type {(0|-1|1)}
+    */
+   platformAfterStatus?:0|-1|1,
+     /**
+      *  售后表状态，0表示售后处理中，-1表示售后失败，1表示售后成功，11表示待发货，12表示待收货
+      *
+      * @type {(0|-1|1)}
+      */
+     afterStatus?:0|-1|1|11|12,
+
+     /**
+      * 售后创建时间
+      *
+      * @type {string}
+      */
+     afterCreateTime?:string,
     /**
      * 商品描述
      *
@@ -102,6 +140,18 @@ export type OrderInfo = {
      * @type {(1|0)}
      */
     sellerStatus?:1|0,
+    /**
+     * 买家收货时间
+     *
+     * @type {string}
+     */
+    buyerReceiveTime?:string,
+    /**
+     * 卖家发货时间
+     *
+     * @type {string}
+     */
+    sellerSendTime?:string,
     /**
      * 订单创建时间
      *

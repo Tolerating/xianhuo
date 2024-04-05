@@ -114,7 +114,7 @@
 	}
 
 	onMounted(() => {
-		console.log(props.disCoveryType, currentTab.value.id);
+		// console.log(props.disCoveryType, currentTab.value.id);
 		if (currentTab.value.id == props.disCoveryType.id) {
 			nextTick(() => {
 				productList.length = 0

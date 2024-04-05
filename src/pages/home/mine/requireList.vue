@@ -1,15 +1,9 @@
 <script lang="ts" setup>
-import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
 import { reactive } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import useUserStore from '@/stores/users';
-import { cancelFavourite } from '@/api/home/goods'
-import type { Product } from '@/types/Product';
 import {getInfoByUserId,cancelRequireInfo} from '@/api/home/require'
 import type { RequireInfo } from '@/types/RequireInfo';
-const userStore = useUserStore()
-const {counts} = storeToRefs(userStore)
 const infoList = reactive<RequireInfo[]>([])
 const navigateToDetail = (product: RequireInfo) => {
     uni.navigateTo({
@@ -27,7 +21,6 @@ const cancelStar = (info: RequireInfo, index: number) => {
                     uni.showToast({
                         title: res.message
                     })
-                    counts.value.article--
                     infoList.splice(index, 1)
                 })
             }
@@ -53,7 +46,7 @@ onLoad(() => {
         <view class="favourite-list">
             <view class="list-item" v-for="(item, index) in infoList" :key="item.detail">
                 <view class="item-info" style="position: relative;" >
-                    <uv-button style="position: absolute;right: 0;top: 0;" type="success" :plain="true" size="small" shape="circle" :iconSize="18" icon="star"
+                    <uv-button style="position: absolute;right: -3px;top: 0;" type="success"  size="mini"
                                 @tap="cancelStar(item, index)" text="已解决"></uv-button>
                     <view class="item-info-left">
                         <view style="padding-bottom: 100%;position: relative;">
@@ -63,18 +56,18 @@ onLoad(() => {
                     <view class="item-info-right" @tap="navigateToDetail(item)">
                         <view style="display: flex;justify-content: space-between;">
                             <view style="display: flex;">
-                                <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                                <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
                                 <text>{{ item.detail.slice(0, 6) }}...</text>
                             </view>
                             
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="map" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <uv-icon name="map" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
                             <text>{{ item.school }}</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text style="padding-right: 20px;">{{ item.createTime }}</text>
+                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
+                            <text>{{ item.createTime }}</text>
                         </view>
                     </view>
                 </view>
@@ -95,14 +88,14 @@ onLoad(() => {
         padding: 0 5px;
 
         .list-item {
-            $item-height: 160px;
+            $item-height: 150px;
             display: flex;
             flex-direction: column;
             background-color: white;
             border-radius: $xh-border-radius-base;
             height: $item-height;
             margin-top: 15px;
-            padding: 5px;
+			overflow: hidden;
 
             .item-info {
                 display: flex;
@@ -122,12 +115,12 @@ onLoad(() => {
                     flex-direction: column;
                     justify-content: space-between;
 					box-sizing: border-box;
-					padding-top: 40px;
+					padding: 25px;
                     .item-right-wrapper {
                         display: flex;
                         align-items: center;
                         text{
-                            font-size: $xh-font-size-base;
+                            font-size: $xh-font-size-sm;
                         }
                     }
                 }

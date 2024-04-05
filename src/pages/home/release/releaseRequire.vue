@@ -34,7 +34,6 @@ const categoryPopup = ref()
 // 发布商品
 const releaseProduct = async () => {
     let result = await addRequireInfo(releaseForm)
-    userStore.counts.article++
     uni.showToast({
         title: result.message,
         duration: 2000

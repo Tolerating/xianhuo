@@ -4,7 +4,7 @@
 			<image :src="APP_BASE_URL + product.images.split(',')[0]" class="good-image" mode=""></image>
 			<view style="padding: 5px;">
 				<text class="goods-title">
-					{{ product.detail.slice(0, 6) }}...
+					{{ product.detail.replace(/\n/g,"").slice(0, 6) }}...
 				</text>
 				<view style="display: flex;justify-content: space-between;">
 					<uv-tags :text="sellModeMap[product.sellModeId]" type="success" style="max-width: 85px;"></uv-tags>

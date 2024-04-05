@@ -52,7 +52,7 @@ const useUserStore = defineStore("user",()=>{
 },{
 	persist:{
 		key:"xh_user",
-		paths:['authorization',"userInfo","counts"],
+		paths:['authorization',"userInfo"],
 		storage:{
 			setItem(key,value) {
 				uni.setStorageSync(key,value)

@@ -11,7 +11,6 @@ import { onLoad } from '@dcloudio/uni-app';
 import useUserStore from '@/stores/users';
 const productStore = useProductStore()
 const userStore = useUserStore()
-const {counts} = storeToRefs(userStore)
 const { productList, sellModeList } = storeToRefs(productStore)
 const sellModeMap = reactive<string[]>([])
 sellModeList.value.forEach(item => {
@@ -42,7 +41,6 @@ const deleteP = (id: number, index: number) => {
                     uni.showToast({
                         title: res.message
                     })
-                    counts.value.released--
                     productList.value.splice(index, 1)
                 })
             }
@@ -66,23 +64,23 @@ onMounted(() => {
                     </view>
                     <view class="item-info-right">
                         <view class="item-right-wrapper">
-                            <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <uv-icon name="bag" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
                             <text style="font-weight: bold;">{{ item.detail.slice(0, 6) }}...</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="tags" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <uv-icon name="tags" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
                             <text class="item-right-text">{{ sellModeMap[item.sellModeId] }}</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="map" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
+                            <uv-icon name="map" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
                             <text class="item-right-text">{{ item.address }}</text>
                         </view>
                         <view class="item-right-wrapper">
-                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="22"></uv-icon>
-                            <text class="item-right-text" style="padding-right: 20px;">{{ item.createTime }}</text>
+                            <uv-icon name="clock" style="margin-right: 2px;" color="#2979ff" size="20"></uv-icon>
+                            <text class="item-right-text">{{ item.createTime }}</text>
                         </view>
-                        <ProductPrice style="display: flex;justify-content: flex-end;margin-top: 15px;"
-                            :mode="item.sellModeId" originPrice="0" :currentPrice="item.currentPrice"
+                        <ProductPrice style="display: flex;justify-content: flex-end;"
+                            :mode="item.sellModeId" originPrice="0" :currentPrice="String(item.currentPrice)"
                             :timeUnit="item.timeUnit"></ProductPrice>
                     </view>
                 </view>
@@ -108,14 +106,14 @@ onMounted(() => {
         padding: 0 5px;
 
         .list-item {
-            $item-height: 160px;
+            $item-height: 150px;
             display: flex;
             flex-direction: column;
             background-color: white;
             border-radius: $xh-border-radius-base;
             height: 200px;
             margin-bottom: 15px;
-            padding: 5px;
+            overflow: hidden;
 
             .item-info {
                 display: flex;
@@ -139,7 +137,7 @@ onMounted(() => {
                         align-items: center;
                     }
                     .item-right-text{
-                        font-size: $xh-font-size-base;
+                        font-size: 11px;
                     }
                 }
             }

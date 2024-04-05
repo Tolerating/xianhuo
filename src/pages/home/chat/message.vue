@@ -19,6 +19,18 @@
 			</view>
 		</view>
 		<view class="message-list-container">
+			<view class="message-item"  @tap="toOfficalNotice">
+				<view class="message-item-avatar">
+					<image src="../../../static/logo.png"
+						mode="scaleToFill" />
+				</view>
+				<view class="message-item-contnet">
+					<text  class="content-user-name">官方通知</text>
+					<!-- <text class="content-latest-message">{{ item.content }}</text>
+					<text class="content-latest-date">{{ item.sendTime }}</text> -->
+					<uni-badge :text="unreadNotices" type="error" size="normal" class="content-badge" />
+				</view>
+			</view>
 			<uv-empty v-if="chatlists.length == 0" style="position: fixed;top: 0;bottom: 0;left: 0;right: 0;" mode="message"></uv-empty>
 			<view v-if="chatlists.length > 0" v-for="item in chatlists" :key="item.linkId" @tap="toChat(item)"
 				@longpress="setCurrentSelectedList(item)" class="message-item">
@@ -30,7 +42,7 @@
 				<view class="message-item-contnet">
 					<text v-if="item.fromUser == String(userInfo.id)" class="content-user-name">{{ item.toUserName }}</text>
 					<text v-else class="content-user-name">{{ item.fromUserName }}</text>
-					<text class="content-latest-message">{{ item.content }}</text>
+					<text class="content-latest-message">{{ item.type==0?item.content:'【图片】' }}</text>
 					<text class="content-latest-date">{{ item.sendTime }}</text>
 					<uni-badge :text="item.unread" type="error" size="normal" class="content-badge" />
 				</view>
@@ -49,8 +61,11 @@ import { reactive } from 'vue';
 import type { ChatList } from '@/types/ChatList';
 import useUserStore from '@/stores/users/index'
 import { storeToRefs } from 'pinia';
+import useCommonStore from '@/stores/common';
+const commonStore = useCommonStore()
 const userStore = useUserStore()
 const { userInfo } = storeToRefs(userStore)
+const {unreadNotices} = storeToRefs(commonStore)
 const currentSelectedChat = ref<ChatList>()
 const isShowMenu = ref<boolean>(false);
 const chatlists = reactive<ChatList[]>([])
@@ -77,6 +92,7 @@ const setCurrentSelectedList = (item: ChatList) => {
 	isShowMenu.value = true
 }
 const deleteChatList = async () => {
+	uni.removeStorageSync(`chat${currentSelectedChat.value?.toUser}`)
 	let result = await deleteList(currentSelectedChat.value?.listId as string)
 	uni.showToast({
 		title: result.message
@@ -85,6 +101,11 @@ const deleteChatList = async () => {
 	chatlists.length = 0
 	//@ts-ignore
 	chatlists.push(...data.data)
+}
+const toOfficalNotice = ()=>{
+	uni.navigateTo({
+		url: `/pages/home/chat/officalNotice`
+	})
 }
 onShow(() => {
 	chatLists().then(res => {

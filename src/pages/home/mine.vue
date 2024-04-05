@@ -8,7 +8,7 @@
                 <image :src="userInfo.avatar" mode="aspectFill"></image>
                 <view class="profile_top_right">
                     <text style="font-size: 20px;">{{ userInfo.name }}</text>
-                    <!-- <text>关注 0 | 粉丝 0</text> -->
+                    <text style="font-size: 12px;">{{userInfo.email}}</text>
                 </view>
             </view>
             <view class="profile_bottom">
@@ -71,10 +71,10 @@
         </view>
         <uni-list>
             <uni-list-item title="我的收益" :rightText="'￥ '+ orderCount.profit" />
-            <uni-list-item title="卖家待处理售后" rightText="0" />
-            <uni-list-item showArrow title="修改个人信息" />
+            <uni-list-item title="卖家待处理售后" clickable @click="toDealAfterService" :rightText="orderCount.waitDeal" />
+            <uni-list-item showArrow title="修改个人信息" clickable @click="navigateToUpdate"/>
             <uni-list-item showArrow title="退出登录" clickable @click="logoutXH" />
-            <uni-list-item showArrow title="用户服务协议" />
+            <!-- <uni-list-item showArrow title="用户服务协议" /> -->
         </uni-list>
     </view>
 </template>
@@ -87,24 +87,24 @@ import {onShow} from '@dcloudio/uni-app'
 import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
 import {orderTypeCount} from '@/api/home/goods'
-import useProductStore from '@/stores/product/index'
 const statusBarHeight = ref<number>(Number(uni.getSystemInfoSync().statusBarHeight));
 const userStore = useUserStore()
-const productStore = useProductStore()
 const orderCount = reactive<{
     dispatch: string,
     receive: string,
     buy: string,
     sell: string,
     profit:string,
-    after:string
+    after:string,
+	waitDeal:string
 }>({
     dispatch: "",
     receive: "",
     buy: "",
     sell: "",
     after:"",
-    profit:"0.0"
+    profit:"0.0",
+	waitDeal:""
 })
 const { userInfo, counts } = storeToRefs(userStore)
 // 我的收藏，我的帖子，我的发布页面跳转函数
@@ -177,6 +177,18 @@ const orderNavigate = (flag: number) => {
     }
 }
 
+const toDealAfterService = ()=>{
+    uni.navigateTo({
+        url: "/pages/home/mine/waitDealAfterService"
+    })
+}
+
+const navigateToUpdate = ()=>{
+	uni.navigateTo({
+		url:"/pages/login/setPersonalInfo?flag=1"
+	})
+}
+
 const logoutXH = () => {
     uni.showModal({
         title: '提示',
@@ -199,11 +211,7 @@ onShow(()=>{
     orderTypeCount().then(res=>{
         Object.assign(orderCount,res.data)
     })
-})
-onMounted(() => {
-    console.log("登录页挂载");
-    productStore.requestProductList()
-    
+	userStore.initCounts()
 })
 </script>
 

@@ -116,7 +116,6 @@ const releaseProduct = async () => {
     } else {
         // 处理上传图片服务器路径为字符串，以逗号拼接
         result = await releaseGoods(releaseForm)
-        userStore.counts.released++
 
     }
     let { message,data } = result

@@ -3,14 +3,23 @@ import { uploadImg } from '@/api/home/goods';
 import StatusBar from '@/components/StatusBar.vue'
 import type { User } from '@/types/Users';
 import type { AMAPLocation, FileSelect } from '@/types/common';
-import { onHide, onReady, onShow } from '@dcloudio/uni-app';
+import { onHide, onLoad, onReady, onShow } from '@dcloudio/uni-app';
 import { reactive } from 'vue';
 import { ref } from 'vue';
 import { DEFAULT_AVATAR, APP_BASE_URL } from '@/config/index'
 import { improveInfo } from '@/api/user/user'
 import { getSignature, registerUniId } from '@/api/user/login'
 import useUserStore from '@/stores/users/index'
+import { storeToRefs } from 'pinia';
 const userStore = useUserStore()
+const {userInfo} = storeToRefs(userStore)
+const avatarPreview = reactive([
+    {
+        "name": "avatar.png",
+        "extname": "png",
+        "url": APP_BASE_URL + DEFAULT_AVATAR,
+    }
+])
 const formData = reactive<{
     name: string,
     avatar: string,
@@ -18,12 +27,29 @@ const formData = reactive<{
     location: string
 }>({
     name: "",
-    avatar: APP_BASE_URL + DEFAULT_AVATAR,
+    avatar:"",
     school: "",
     location: ""
 })
 // 存储地址选择界面传回的地址信息
 const selectedLocation = reactive<AMAPLocation>({} as AMAPLocation)
+onLoad((options:any)=>{
+	const {flag} = options
+	if(flag==1){
+		uni.showToast({
+			title:"flag-----1"
+		})
+		// 用户设置
+		let avatar = userInfo.value.avatar.replace(APP_BASE_URL,"")
+		formData.name = userInfo.value.name
+		formData.avatar = avatar
+		formData.school = userInfo.value.school
+		formData.location = userInfo.value.location
+		avatarPreview[0].url = userInfo.value.avatar
+	}else{
+		formData.avatar =  APP_BASE_URL + DEFAULT_AVATAR
+	}
+})
 onShow(() => {
     console.log("设置用户信息---显示");
 
@@ -42,13 +68,7 @@ const imageStyles = reactive({
         radius: '50%'
     }
 })
-const avatarPreview = reactive([
-    {
-        "name": "avatar.png",
-        "extname": "png",
-        "url": APP_BASE_URL + DEFAULT_AVATAR,
-    }
-])
+
 const setAvatar = async (e: any) => {
     const result = await uploadImg({ name: "file", file: e.tempFiles[0].file, uri: e.tempFilePaths[0] })
     console.log(result);

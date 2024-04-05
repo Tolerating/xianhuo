@@ -13,7 +13,6 @@ onShow(()=>{
 	// const pages = getCurrentPages()
 	// const page = pages[pages.length - 1]
 	// console.log(page.route);
-	console.log(commonStore.socket);
 	
 	if(!socket.value){
 		commonStore.initSocket(String(userStore.userInfo.id))
@@ -25,7 +24,7 @@ onHide(()=>{
 })
 
 onLaunch(() => {
-	console.log("launch", uni.getStorageSync("xh_user"));
+	// console.log("launch", uni.getStorageSync("xh_user"));
 	if (uni.getStorageSync("xh_user") != '') {
 		productStore.requestSellMode()
 		productStore.requestCategory()
@@ -36,7 +35,7 @@ onLaunch(() => {
 		// 用户第一次登录后没有完善用户信息就退出应用，再次打开应用后的判断
 		if (userStore.userInfo.name == "") {
 			uni.redirectTo({
-				url: "/pages/login/setPersonalInfo",
+				url: "/pages/login/setPersonalInfo?flag=0",
 				success() {
 					// #ifdef APP-PLUS
 					plus.navigator.closeSplashscreen()
