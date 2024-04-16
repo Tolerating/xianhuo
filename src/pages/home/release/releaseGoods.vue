@@ -1,6 +1,6 @@
 <!-- 商品发布页 -->
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, toRaw } from 'vue';
 import { reactive } from 'vue';
 import { ref } from 'vue';
 import { uploadImg, releaseGoods, updateProduct } from '@/api/home/goods'
@@ -18,6 +18,7 @@ import { APP_BASE_URL } from '@/config/index'
 import { storeToRefs } from 'pinia';
 import type { SellModeProductRequire } from '@/types/SellModeProductRequire'
 import { watch } from 'vue';
+import type { ProductRequire } from '@/types/ProductRequire';
 
 
 const StatusBarHeight = uni.getSystemInfoSync().statusBarHeight
@@ -78,6 +79,9 @@ const timeUnitList = reactive<{ value: string, text: string }[]>([])
 timeUnit.forEach((ele) => {
     timeUnitList.push({ value: ele, text: ele })
 })
+
+// 全部商品要求数据
+const requireArray = reactive<ProductRequire[]>([])
 // 发货方式为快递的邮费选项
 const freightSelect = ref<number>(0)
 type PriceType = 0 | 1 | 2
@@ -126,7 +130,7 @@ const releaseProduct = async () => {
 	if(isEdit.value){
 		data = releaseForm.id
 	}
-    uni.navigateTo({
+    uni.redirectTo({
     	url: `/pages/goods/goodDetail?uId=${releaseForm.userId}&pId=${data}`
     })
 
@@ -170,6 +174,17 @@ const dispatchComputed = computed(() => {
     return result
 
 })
+
+const requireListCom = computed(()=>{
+	let dis = sellMode.value
+	let arr:ProductRequire[] = []
+	productRequireList.value.forEach(item=>{
+		arr.push(item)
+	})
+	return arr
+})
+
+// 根据数据库中的售卖、发货、商品要求关系规则表计算出要显示的商品要求，返回一个数组给商品要求
 const requireComputed = computed(() => {
     let arr: number[] = []
     requireRuleList.filter(item => {
@@ -244,8 +259,6 @@ const showTypeRight = () => {
     categoryPopup.value.show()
 }
 const initData = async () => {
-    console.log("dispatch", dispatchMode.value);
-
     // 编辑状态的数据回显
     if (isEdit.value) {
         const data = await requestProductById(productId.value)
@@ -286,7 +299,10 @@ const dispatchAddress = computed(() => {
 
 
 onLoad((option: any) => {
-    productStore.requestAllProductRequire()
+    requireArray.length = 0
+	productStore.requestAllProductRequire().then(res=>{
+		requireArray.push(...res)	
+	})
     allMode().then(res => {
         Object.assign(requireRuleList, res.data)
     });
@@ -356,7 +372,7 @@ onMounted(() => {
                 </uni-section>
             </uni-section>
             <uni-section type="line" class="sell-item" title="商品要求">
-                <uni-data-checkbox style="padding-left: 10px;" :localdata="requireComputed" v-model="selectedProductRequire"
+                <uni-data-checkbox style="padding-left: 10px;" :localdata="requireListCom" v-model="selectedProductRequire"
                     :map="{ text: 'name', value: 'id' }" multiple @change="productRequireChange"/>
             </uni-section>
             <hr>

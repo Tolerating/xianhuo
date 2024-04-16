@@ -83,12 +83,15 @@
 import { reactive } from 'vue';
 import { ref } from 'vue';
 import useUserStore from '@/stores/users/index'
+import useCommonStore from "@/stores/common"
 import {onShow} from '@dcloudio/uni-app'
 import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
 import {orderTypeCount} from '@/api/home/goods'
 const statusBarHeight = ref<number>(Number(uni.getSystemInfoSync().statusBarHeight));
 const userStore = useUserStore()
+const commonStore = useCommonStore()
+const {closeSocket} = commonStore
 const orderCount = reactive<{
     dispatch: string,
     receive: string,
@@ -107,6 +110,7 @@ const orderCount = reactive<{
 	waitDeal:""
 })
 const { userInfo, counts } = storeToRefs(userStore)
+const {resetUserInfo} = userStore
 // 我的收藏，我的帖子，我的发布页面跳转函数
 const countsNavigate = (flag: number) => {
     switch (flag) {
@@ -195,8 +199,10 @@ const logoutXH = () => {
         content: '确定退出',
         success: function (res) {
             if (res.confirm) {
-                uni.removeStorageSync("xh_user")
-                console.log("退出前",uni.getStorageSync("xh_user"));
+				resetUserInfo()
+				closeSocket()
+                // uni.removeStorageSync("xh_user")
+                console.log("退出前",uni.getStorageSync("xh_user"),userInfo.value);
                 
                 uni.redirectTo({
                     url: "/pages/login/index"

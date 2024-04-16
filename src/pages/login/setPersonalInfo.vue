@@ -10,8 +10,11 @@ import { DEFAULT_AVATAR, APP_BASE_URL } from '@/config/index'
 import { improveInfo } from '@/api/user/user'
 import { getSignature, registerUniId } from '@/api/user/login'
 import useUserStore from '@/stores/users/index'
+import useCommonStore from '@/stores/common'
 import { storeToRefs } from 'pinia';
 const userStore = useUserStore()
+const commonStore = useCommonStore()
+const {initSocket} = commonStore
 const {userInfo} = storeToRefs(userStore)
 const avatarPreview = reactive([
     {
@@ -36,9 +39,6 @@ const selectedLocation = reactive<AMAPLocation>({} as AMAPLocation)
 onLoad((options:any)=>{
 	const {flag} = options
 	if(flag==1){
-		uni.showToast({
-			title:"flag-----1"
-		})
 		// 用户设置
 		let avatar = userInfo.value.avatar.replace(APP_BASE_URL,"")
 		formData.name = userInfo.value.name
@@ -51,8 +51,6 @@ onLoad((options:any)=>{
 	}
 })
 onShow(() => {
-    console.log("设置用户信息---显示");
-
     uni.$once("school-location", (data) => {
         Object.assign(selectedLocation, data)
         // 处理发布商品定位，格式为 "经度,维度"
@@ -71,7 +69,6 @@ const imageStyles = reactive({
 
 const setAvatar = async (e: any) => {
     const result = await uploadImg({ name: "file", file: e.tempFiles[0].file, uri: e.tempFilePaths[0] })
-    console.log(result);
     formData.avatar = result.data
 
 }
@@ -84,7 +81,6 @@ const formRules = {
         }, {
             validateFunction(rule: Object, value: string, data: Object, callback: Function) {
                 const reg = /^[\u4e00-\u9fa5\w]{1,16}$/g
-                console.log(value);
                 if (!reg.test(value)) {
                     callback("昵称仅支持汉字，字母、数字、下划线，长度不超过16个字符")
                 }
@@ -140,6 +136,7 @@ const submit = () => {
     // })
     const result = await improveInfo(formData)
     userStore.getUserInfo()
+	initSocket(String(userInfo.value.id))
     uni.showToast({
         title:result.message,
         success(){

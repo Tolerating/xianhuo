@@ -45,6 +45,9 @@ import validator from 'validator'
 import { computed } from 'vue';
 import { onBackPress } from '@dcloudio/uni-app';
 import useProductStore from '@/stores/product/index';
+import useCommonStore from '@/stores/common'
+const commonStore = useCommonStore()
+const {initSocket} = commonStore
 const email = ref<string>("")
 const password = ref<string>("")
 const store = useUserStore()
@@ -71,6 +74,7 @@ const loginXH = async () => {
 				productStore.requestAllDispatchMode()
 				productStore.requestAllProductRequire()
 				store.getUserInfo()
+				initSocket(String(store.userInfo.id))
 				store.initCounts()
 			}
 		})

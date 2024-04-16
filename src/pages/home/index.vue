@@ -48,7 +48,8 @@ const store = useCommonStore()
 const userStore = useUserStore()
 const {reachBottom,homeRefesh} = storeToRefs(store)
 const {userInfo} = storeToRefs(userStore)
-const {tabList, currentTab} = store
+const {tabList, currentTab,initSocket} = store
+const {socket} = storeToRefs(store)
 const categoryPopup = ref()
 
 onReachBottom(() => {
@@ -109,6 +110,9 @@ const navigateToFilter = (e:Category)=>{
 
 onShow(()=>{
 	homeRefesh.value = !homeRefesh.value
+	// if(!socket.value){
+	// 	initSocket(String(userInfo.value.id))
+	// }
     // setSession()
 })
 </script>
