@@ -2,7 +2,7 @@
 import ProductPrice from '@/components/goods/ProductPrice.vue'
 import { APP_BASE_URL } from '@/config';
 import type { Product } from '@/types/Product';
-import { addOrderInfo,payProduct } from '@/api/home/goods'
+import { addOrderInfo,payProduct,deleteOrderInfo } from '@/api/home/goods'
 import { onLoad } from '@dcloudio/uni-app';
 import { reactive, ref } from 'vue';
 import useUserStore from '@/stores/users'
@@ -38,7 +38,12 @@ const buyProduct = () => {
                     console.log("支付成功",rawdata);
                 },
                 fail: function (err) {
+					uni.showToast({
+						title:'支付失败:' + JSON.stringify(err),
+						icon:"none"
+					})
                     console.log('支付失败:' + JSON.stringify(err));
+					deleteOrderInfo(data.orderId)
                 }
             });
         })
