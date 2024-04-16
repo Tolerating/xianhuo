@@ -195,6 +195,13 @@ const pageFilterProduct = (current: number, size: number, productName: string, l
 const addOrderInfo = (data: OrderInfo) => request("/order", data, "POST")
 
 /**
+ * 删除订单
+ *
+ * @param {string} orderId
+ */
+const deleteOrderInfo = (orderId:string)=>request(`/order?orderId=${orderId}`,{},"DELETE")
+
+/**
  * 商品支付
  *
  * @param {string} orderId
@@ -400,5 +407,6 @@ export {
 	delNotice,
 	afterDispatch,
 	afterReceive,
-	productRefund
+	productRefund,
+	deleteOrderInfo
 }
