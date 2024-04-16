@@ -36,6 +36,8 @@ const checkReceive = (item:OrderInfo)=>{
 						icon:"success"
 					})
 					init()
+				}).catch(err=>{
+					uni.hideLoading()
 				})
 			}
 		}
@@ -48,7 +50,6 @@ onMounted(() => {
 </script>
 <template>
     <view class="released-list-container">
-        <uni-notice-bar text="温馨提示：如果填写信息有误可以点击商品展示框或编辑按钮进行修改信息重新发布，如果您不想卖了可以点击下架按钮进行下架。" />
         <view class="released-list">
             <view class="list-item" style="position: relative;" v-for="(item, index) in sellHistoryList" :key="item.createTime">
                 <view class="item-info" @tap="navigateToDetail(item)">
