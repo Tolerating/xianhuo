@@ -116,10 +116,10 @@
 	onMounted(() => {
 		// console.log(props.disCoveryType, currentTab.value.id);
 		if (currentTab.value.id == props.disCoveryType.id) {
-			nextTick(() => {
+			// nextTick(() => {
 				productList.length = 0
 				typeRequest(false)
-			})
+			// })
 		}
 	})
 </script>
