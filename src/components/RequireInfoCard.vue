@@ -4,7 +4,7 @@
 			<image src="../static/require.png" class="good-image" mode=""></image>
 			<view style="padding: 5px;">
 				<text class="goods-title">
-					{{ info.detail.slice(0, 15) }}...
+					{{ info.detail.slice(0, 8) }}...
 				</text>
                 <uv-tags :text="categoryName" style="max-width: 85px;"></uv-tags>
 				<text style="font-size: 14px;">{{ info.createTime }}</text>

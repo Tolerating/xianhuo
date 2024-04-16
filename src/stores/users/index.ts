@@ -8,7 +8,7 @@ import {favouriteCount} from '@/api/home/goods'
 
 const useUserStore = defineStore("user",()=>{
 	// 用户个人信息
-	const userInfo = reactive<User>({} as User)
+	const userInfo = ref<User>({} as User)
 	// token
 	const authorization = ref<string | null>(null)
 	// 我的页面，收藏、发布商品、帖子数量
@@ -26,10 +26,16 @@ const useUserStore = defineStore("user",()=>{
 	}
 	async function getUserInfo(){
 		const result = await requestUserInfo()
-		Object.assign(userInfo,result.data)
-		userInfo.avatar = APP_BASE_URL + userInfo.avatar
+		Object.assign(userInfo.value,result.data)
+		userInfo.value.avatar = APP_BASE_URL + userInfo.value.avatar
 		return result.data
 
+	}
+	function resetUserInfo(){
+		userInfo.value = {} as User
+		uni.removeStorageSync("xh_user")
+		deleteAuthorization()
+		
 	}
 	async function initCounts() {
 		const released = await releasedCount()
@@ -47,7 +53,8 @@ const useUserStore = defineStore("user",()=>{
 		deleteAuthorization,
 		updateAuthorization,
 		getUserInfo,
-		initCounts
+		initCounts,
+		resetUserInfo
 	}
 },{
 	persist:{

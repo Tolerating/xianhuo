@@ -59,7 +59,8 @@ const request = <T = any>(url = '', data = {}, type: method = 'GET', header: hea
 			let data = response.data as ResponseResult
 			if (data.code != 200) {
 				uni.showToast({
-					title: data.message
+					title: data.message,
+					icon:"none"
 				});
 				reject(data.message)
 			}
@@ -78,11 +79,10 @@ const request = <T = any>(url = '', data = {}, type: method = 'GET', header: hea
 			
 		}).catch(error => {
 			console.log(error);
-			// uni.showToast({
-			// 	title: "网络错误",
-			// 	icon:"error",
-			// 	duration: 2000
-			// });
+			uni.showToast({
+				title: error,
+				icon:"none",
+			});
 			reject(error);
 		});
 	});

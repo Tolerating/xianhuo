@@ -10,11 +10,9 @@ const commonStore = useCommonStore()
 const {socket,socketOpen}  = storeToRefs(commonStore)
 
 onShow(()=>{
-	// const pages = getCurrentPages()
-	// const page = pages[pages.length - 1]
-	// console.log(page.route);
+	console.log(userStore.userInfo);
 	
-	if(!socket.value){
+	if(!socket.value && JSON.stringify(userStore.userInfo) != "{}"){
 		commonStore.initSocket(String(userStore.userInfo.id))
 	}	
 })
